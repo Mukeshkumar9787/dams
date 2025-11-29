@@ -15,9 +15,7 @@ const register = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: "User registered successfully",
-      data: {
-        userId: result.id
-      },
+      data: result
     });
   } catch (err) {
       return errorHandler(err, res);
@@ -32,9 +30,7 @@ const login = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Login successful",
-      data: {
-        userId: result.id
-      }
+      data: result
     });
   } catch (err) {
       return errorHandler(err, res);

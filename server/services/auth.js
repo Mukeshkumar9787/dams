@@ -1,5 +1,14 @@
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import prisma from "../prisma/client.js";
+
+const generateToken = (user) => {
+  return jwt.sign(
+    { id: user.id, email: user.email }, 
+    process.env.JWT_SECRET,
+    { expiresIn: process.env.JWT_EXPIRES_IN || "7d" }
+  );
+};
 
 const register = async ({ name, email, password, mobile }) => {
   const existing = await prisma.user.findUnique({ where: { email } });
@@ -12,7 +21,7 @@ const register = async ({ name, email, password, mobile }) => {
 
   const hashed = await bcrypt.hash(password, 10);
 
-  return prisma.user.create({
+  const user = await prisma.user.create({
     data: {
       name,
       email,
@@ -20,6 +29,16 @@ const register = async ({ name, email, password, mobile }) => {
       mobile: mobile || null,
     },
   });
+
+  // generate jwt
+  const token = generateToken(user);
+
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    token,
+  };
 };
 
 const login = async ({ email, password }) => {
@@ -39,7 +58,14 @@ const login = async ({ email, password }) => {
     throw err;
   }
 
-  return user;
+  const token = generateToken(user);
+
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    token,
+  };
 };
 
 export default {
