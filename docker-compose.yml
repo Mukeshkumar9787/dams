@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: dams-postgres
+    environment:
+      POSTGRES_DB: dams_prototype
+      POSTGRES_USER: dams_user
+      POSTGRES_PASSWORD: dams_password_123
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - dams-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dams_user -d dams_prototype"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  postgres_data:
+    driver: local
+    
+networks:
+  dams-network:
+    driver: bridge
