@@ -1,4 +1,5 @@
 import { authService } from "../services/index.js";
+import { errorHandler } from "../utils/errorHandler.js";
 
 const register = async (req, res) => {
   try {
@@ -12,15 +13,14 @@ const register = async (req, res) => {
     });
 
     return res.status(201).json({
+      success: true,
       message: "User registered successfully",
-      userId: result.id,
+      data: {
+        userId: result.id
+      },
     });
   } catch (err) {
-    console.error("REGISTER ERROR:", err);
-
-    return res.status(err.statusCode || 500).json({
-      error: err.message || "Something went wrong",
-    });
+      return errorHandler(err, res);
   }
 };
 
@@ -29,17 +29,15 @@ const login = async (req, res) => {
     const { email, password } = req.body;
 
     const result = await authService.login({ email, password });
-
     return res.status(200).json({
+      success: true,
       message: "Login successful",
-      userId: result.id,
+      data: {
+        userId: result.id
+      }
     });
   } catch (err) {
-    console.error("LOGIN ERROR:", err);
-
-    return res.status(err.statusCode || 500).json({
-      error: err.message || "Something went wrong",
-    });
+      return errorHandler(err, res);
   }
 };
 
