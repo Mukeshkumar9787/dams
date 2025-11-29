@@ -1,9 +1,11 @@
-require('dotenv').config();
+import dotenv from "dotenv";
+dotenv.config();
 
-const express = require('express');
-const helmet = require('helmet');
-const morgan = require('morgan');
-const cors = require('cors');
+import express from "express";
+import helmet from "helmet";
+import morgan from "morgan";
+import cors from "cors";
+import router from "./routes/index.js";
 
 const app = express();
 
@@ -23,9 +25,14 @@ app.use(cors());
 // Parse incoming JSON payloads
 app.use(express.json());
 
-// Example route
-app.get('/', (req, res) => {
-  res.json({ message: 'API running successfully 🚀' });
+app.use('/api', router);
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    status: 404,
+    message: "Route not found",
+  });
 });
 
 // -------------------------
