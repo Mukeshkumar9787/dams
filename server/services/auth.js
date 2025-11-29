@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt";
+import prisma from "../prisma/client.js";
 
 const register = async ({ name, email, password, mobile }) => {
-  // Check existing user
-  const existing = null;
+  const existing = await prisma.user.findUnique({ where: { email } });
 
   if (existing) {
     const err = new Error("Email already exists");
@@ -10,13 +10,20 @@ const register = async ({ name, email, password, mobile }) => {
     throw err;
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashed = await bcrypt.hash(password, 10);
 
-  return {};
+  return prisma.user.create({
+    data: {
+      name,
+      email,
+      password: hashed,
+      mobile: mobile || null,
+    },
+  });
 };
 
 const login = async ({ email, password }) => {
-  const user = null;
+  const user = await prisma.user.findUnique({ where: { email } });
 
   if (!user) {
     const err = new Error("User not found");
@@ -35,7 +42,6 @@ const login = async ({ email, password }) => {
   return user;
 };
 
-// Export as default object for easy import
 export default {
   register,
   login,
