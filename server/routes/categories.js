@@ -4,7 +4,7 @@ import categoryController from "../controllers/categories.js"; // use .js extens
 const router = express.Router();
 
 // Create category
-router.post("/create", categoryController.createCategory);
+router.post("/", categoryController.createCategory);
 
 // Get all categories
 router.get("/", categoryController.getCategories);

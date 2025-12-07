@@ -4,8 +4,8 @@ import prisma from "../prisma/client.js";
  * Create category
  */
 const createCategory = async ({ title, img }) => {
-  const exists = await prisma.category.findUnique({
-    where: { title },
+  const exists = await prisma.category.findFirst({
+    where: { title, deletedAt: null },
   });
 
   if (exists) {
@@ -98,7 +98,6 @@ const deleteCategory = async (id) => {
 
   return {
     id: deleted.id,
-    message: "Category deleted successfully",
   };
 };
 

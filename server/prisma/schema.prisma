@@ -42,4 +42,5 @@ model Category {
   deletedAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  @@unique([title, deletedAt])
 }
