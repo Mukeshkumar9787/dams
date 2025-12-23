@@ -3,9 +3,9 @@ import { errorHandler } from "../utils/errorHandler.js";
 
 const createCategory = async (req, res) => {
   try {
-    const { title, img } = req.body;
+    const { title, status, fileIds } = req.body;
 
-    const result = await categoryService.createCategory({ title, img });
+    const result = await categoryService.createCategory({ title, status, fileIds });
 
     return res.status(201).json({
       success: true,
@@ -48,9 +48,9 @@ const getCategoryById = async (req, res) => {
 const updateCategory = async (req, res) => {
   try {
     const id = Number(req.params.id);
-    const { title, img } = req.body;
+    const { title, fileIds, deletedFileIds } = req.body;
 
-    const result = await categoryService.updateCategory(id, { title, img });
+    const result = await categoryService.updateCategory(id, { title, fileIds, deletedFileIds });
 
     return res.status(200).json({
       success: true,

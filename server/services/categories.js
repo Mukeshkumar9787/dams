@@ -1,9 +1,12 @@
 import prisma from "../prisma/client.js";
+import { FEATURE_TYPES } from "../utils/constants.js";
+import { convertToFullFilePath, deleteFiles } from "../utils/helpers.js";
+import { fileService } from "./index.js";
 
 /**
  * Create category
  */
-const createCategory = async ({ title, img }) => {
+const createCategory = async ({ title, img, fileIds }) => {
   const exists = await prisma.category.findFirst({
     where: { title, deletedAt: null },
   });
@@ -14,17 +17,16 @@ const createCategory = async ({ title, img }) => {
     throw err;
   }
 
-  const category = await prisma.category.create({
-    data: {
-      title,
-      img,
-    },
-  });
+  let category = null;
+
+  await prisma.$transaction( async (tx) => {
+    category = await tx.category.create({ data: { title }});
+    await fileService.updateFilesByIds({ tx, feature: FEATURE_TYPES.CATEGORY, featureId: category.id, fileIds })
+  })
 
   return {
     id: category.id,
     title: category.title,
-    img: category.img,
     createdAt: category.createdAt,
   };
 };
@@ -33,12 +35,19 @@ const createCategory = async ({ title, img }) => {
  * Get all categories (ignoring deleted ones)
  */
 const getCategories = async () => {
-  const categories = await prisma.category.findMany({
-    where: { deletedAt: null },
-    orderBy: { createdAt: "desc" },
+  const categories = await prisma.$queryRaw`
+    select c.id, c.title, c.status, f.path as img
+    from "Category" c
+    left join "File" f on f."featureId" = c.id and f."deletedAt" is null
+    where c."deletedAt" is null
+    order by c."createdAt" desc;
+  `;
+  return categories.map(i => {
+    if(i.img){
+      i.img = convertToFullFilePath(i.img);
+    }
+    return i;
   });
-
-  return categories;
 };
 
 /**
@@ -59,7 +68,7 @@ const getCategoryById = async (id) => {
 /**
  * Update category
  */
-const updateCategory = async (id, { title, img }) => {
+const updateCategory = async (id, { title, fileIds, deletedFileIds }) => {
   const category = await prisma.category.findUnique({ where: { id } });
 
   if (!category || category.deletedAt) {
@@ -68,14 +77,24 @@ const updateCategory = async (id, { title, img }) => {
     throw err;
   }
 
-  const updated = await prisma.category.update({
-    where: { id },
-    data: {
-      title: title ?? category.title,
-      img: img ?? category.img,
-    },
-  });
+  let updated = null;
+  let deletedFiles = [];
 
+  await prisma.$transaction(async (tx) => {
+    let deletedRecords;
+    [updated, { deletedRecords }] = await Promise.all([
+      tx.category.update({
+        where: { id },
+        data: {
+          title: title ?? category.title,
+        },
+      }),
+      fileService.updateFilesByIds({ tx, feature: FEATURE_TYPES.CATEGORY, featureId: category.id, fileIds, deletedFileIds })
+    ]);
+    deletedFiles = deletedRecords;
+  })
+
+  deleteFiles(deletedFiles.map(i => i.path));
   return updated;
 };
 

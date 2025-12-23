@@ -21,6 +21,11 @@ enum Status {
   INACTIVE
 }
 
+enum Feature {
+  CATEGORY 
+  PRODUCT
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   name      String
@@ -37,10 +42,21 @@ model User {
 model Category {
   id         Int       @id @default(autoincrement())
   title      String
-  img        String
   status     Status   @default(ACTIVE)
   deletedAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@unique([title, deletedAt])
 }
+
+
+model File {
+  id         Int       @id @default(autoincrement())
+  feature    Feature?
+  featureId  Int?
+  path       String
+  deletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
