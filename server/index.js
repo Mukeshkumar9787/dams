@@ -9,10 +9,6 @@ import router from "./routes/index.js";
 
 const app = express();
 
-// -------------------------
-// MIDDLEWARES
-// -------------------------
-
 // Adds secure HTTP headers
 app.use(helmet());
 

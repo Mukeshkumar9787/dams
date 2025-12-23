@@ -1,4 +1,5 @@
 import prisma from "../prisma/client.js";
+import { convertToFullFilePath } from "../utils/helpers.js";
 
 /**
  * Create File
@@ -13,7 +14,7 @@ const createFile = async ({ path }) => {
 
   return {
     id: file.id,
-    path: file.path,
+    path: convertToFullFilePath(file.path),
   };
 };
 

@@ -15,6 +15,6 @@ export const ROLE_TYPES = {
 }
 
 export const STATUS_COLOR = {
-    ACTIVE: "bg-green-500",
-    INACTIVE: "bg-red-300"
+    ACTIVE: "green",
+    INACTIVE: "red"
 }

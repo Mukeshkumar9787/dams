@@ -2,7 +2,7 @@
 import React from "react";
 import Breadcrumb from "../Common/Breadcrumb";
 import Link from "next/link";
-import { getCategories } from "../../http/category";
+import { getCategories } from "../../http/apiCalls.js";
 import PlusIcon from "../Common/PlusIcon";
 import { Table } from "antd"
 import { STATUS_COLOR, STATUS_TYPES } from "../../utils/constants.js"

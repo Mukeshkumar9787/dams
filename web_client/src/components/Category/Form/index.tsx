@@ -1,32 +1,23 @@
 "use client";
 
 import Breadcrumb from "@/components/Common/Breadcrumb";
+import FileUploader from "@/components/Common/FileUploader";
+import { createCategory } from "@/http/apiCalls";
+import { STATUS_TYPES } from "@/utils/constants";
 import React, { useState } from "react";
 
 const CategoryForm = () => {
-  const [name, setName] = useState("");
-  const [status, setStatus] = useState("active");
+  const [title, setTitle] = useState("");
+  const [status, setStatus] = useState(STATUS_TYPES.ACTIVE);
   const [image, setImage] = useState(null);
-  const [preview, setPreview] = useState(null);
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
 
-    setImage(file);
-    setPreview(URL.createObjectURL(file));
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("status", status);
-    formData.append("image", image);
-
-    // 🔥 call API here
-    console.log({ name, status, image });
+    const response = await createCategory({title, status, fileIds: image.id ? [image.id] : []})
+    if(!response.success){
+      
+    }
   };
 
   return (
@@ -50,8 +41,8 @@ const CategoryForm = () => {
                 <input
                   type="text"
                   placeholder="Enter category name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
                   required
                   className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
                 />
@@ -60,22 +51,7 @@ const CategoryForm = () => {
               {/* Category Image */}
               <div className="mb-5">
                 <label className="block mb-2.5">Category Image</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="block w-full text-sm text-dark-5"
-                />
-
-                {preview && (
-                  <div className="mt-4">
-                    <img
-                      src={preview}
-                      alt="Preview"
-                      className="w-32 h-32 object-cover rounded-lg border"
-                    />
-                  </div>
-                )}
+                <FileUploader files={image} setFiles={setImage} />
               </div>
 
               {/* Status */}
@@ -86,8 +62,9 @@ const CategoryForm = () => {
                   onChange={(e) => setStatus(e.target.value)}
                   className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
                 >
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
+                  {Object.values(STATUS_TYPES).map(value => 
+                    <option key={value} value={value}>{value}</option>
+                  )}
                 </select>
               </div>
 
