@@ -2,26 +2,71 @@
 
 import Breadcrumb from "@/components/Common/Breadcrumb";
 import FileUploader from "@/components/Common/FileUploader";
-import { createCategory } from "@/http/apiCalls";
+import { createCategory, deleteCategory, getCategoryBySlug, updateCategory } from "@/http/apiCalls";
 import { STATUS_TYPES } from "@/utils/constants";
 import { CATEGORY_URL } from "@/utils/appUrls";
-import React, { useState } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
 
-const CategoryForm = () => {
+const CategoryForm = ({ params }) => {
   const router = useRouter();
-  const [title, setTitle] = useState("");
-  const [status, setStatus] = useState(STATUS_TYPES.ACTIVE);
-  const [image, setImage] = useState(null);
+  const [title, setTitle] = React.useState("");
+  const [status, setStatus] = React.useState(STATUS_TYPES.ACTIVE);
+  const [image, setImage] = React.useState(null);
+  const editDataRef = React.useRef({ title: '', status: STATUS_TYPES.ACTIVE, id: '', img: null, fileId: '' });
+
+  let isNew = params.slug === 'new';
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await createCategory({title, status, fileIds: image.id ? [image.id] : []})
+    let response:any;
+    if(isNew){
+      response = await createCategory({title, status, fileIds: image.id ? [image.id] : []})
+    }else {
+      let fileIds = [];
+      let deleteFileIds = [];
+      if(editDataRef.current.fileId !== image.id){
+        fileIds.push(image.id);
+        deleteFileIds.push(editDataRef.current.fileId);
+      }
+      response = await updateCategory({title, status, fileIds, deleteFileIds, id: editDataRef.current.id })
+    }
     if(response.success){
        router.replace(CATEGORY_URL);
     }
   };
+  
+  const handleDelete = async (e) => {
+    e.preventDefault();
+    if(!window.confirm(`Do you want to delete: ${title} category ?`)) return
+    if(!isNew){
+      let response = await deleteCategory({id: editDataRef.current.id})
+      if(response.success){
+         router.replace(CATEGORY_URL);
+      }
+    }
+  };
+
+
+
+  React.useEffect(() => {
+    if(isNew) return;
+    const fetchCategory = async () => {
+      try {
+        const data = await getCategoryBySlug(params);
+        editDataRef.current = data?.data || {};
+        setTitle(editDataRef.current.title);
+        setStatus(editDataRef.current.status);
+        setImage({id: editDataRef.current.fileId, path: editDataRef.current.img});
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchCategory();
+    }, []);
+  
 
   return (
     <>
@@ -72,12 +117,23 @@ const CategoryForm = () => {
               </div>
 
               {/* Submit */}
+              <div className="w-full flex">
               <button
                 type="submit"
-                className="w-full flex justify-center font-medium text-white bg-dark py-3 px-6 rounded-lg hover:bg-blue transition"
+                className="w-3/4 flex justify-center font-medium text-white bg-dark py-3 px-6 rounded-lg transition"
               >
                 Save Category
               </button>
+              {!isNew &&
+                  <button
+                  type="button"
+                  onClick={handleDelete}
+                  className="ml-3 w-1/4 font-medium text-white bg-red py-3 px-6 rounded-lg transition"
+                  >
+                  Delete
+                  </button>
+              }
+              </div>
             </form>
 
           </div>

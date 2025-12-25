@@ -34,7 +34,6 @@ model User {
   mobile    String?
   role      Role     @default(USER)
   status    Status   @default(ACTIVE)
-  deletedAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -54,7 +53,6 @@ model File {
   feature    Feature?
   featureId  Int?
   path       String
-  deletedAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

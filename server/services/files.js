@@ -24,14 +24,14 @@ const updateFilesByIds = async ({ tx=prisma, feature, featureId, fileIds=[], del
     fileUploadPromise = tx.file.updateManyAndReturn({ 
         select: {id: true, path: true},
         where: { id: { in: fileIds } },
-        data: { feature, featureId, deletedAt: null }
+        data: { feature, featureId }
       });
   }
 
   let deleteFilesPromise = [];
   
   if(deletedFileIds.length > 0){
-    deleteFilesPromise = tx.file.updateManyAndReturn({ 
+    deleteFilesPromise = tx.file.deleteMany({ 
         select: {id: true, path: true},
         where: { id: { in: deletedFileIds } },
         data: { deletedAt: new Date() }

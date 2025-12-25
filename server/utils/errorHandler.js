@@ -8,6 +8,10 @@ function errorHandler(err, res) {
       err.statusCode = 400;
       err.message = `${err.message} already exists`;
     }
+    if (err.code === "P2025") {
+      err.statusCode = 404;
+      err.message = `${err.message} not found`;
+    }
   }
 
   return res.status(err.statusCode || 500).json({

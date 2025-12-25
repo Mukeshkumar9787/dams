@@ -28,7 +28,7 @@ const getCategories = async () => {
   const categories = await prisma.$queryRaw`
     select c.id, c.title, c.status, c.slug, f.path as img
     from "Category" c
-    left join "File" f on f."featureId" = c.id and f."deletedAt" is null
+    left join "File" f on f."featureId" = c.id
     order by c."createdAt" desc;
   `;
   return categories.map(i => {
@@ -43,46 +43,51 @@ const getCategories = async () => {
  * Get single category
  */
 const getCategoryBySlug = async (slug) => {
-  const category = await prisma.category.findUnique({ where: { slug } });
-
-  if (!category || category.deletedAt) {
+  const categories = await prisma.$queryRaw`
+    select c.id, c.title, c.status, c.slug, f.path as img, f.id as "fileId"
+    from "Category" c
+    left join "File" f on f."featureId" = c.id
+    where c.slug = ${slug}
+    order by c."createdAt" desc;
+  `;
+  if (categories.length === 0) {
     const err = new Error("Category not found");
     err.statusCode = 404;
     throw err;
   }
-
+  let category = categories[0]; 
+  category.img = convertToFullFilePath(category.img);
   return category;
 };
 
 /**
  * Update category
  */
-const updateCategory = async (id, { title, fileIds, deletedFileIds }) => {
-  const category = await prisma.category.findUnique({ where: { id } });
-
-  if (!category || category.deletedAt) {
-    const err = new Error("Category not found");
-    err.statusCode = 404;
-    throw err;
-  }
-
+const updateCategory = async (id, { title, fileIds, deletedFileIds, status }) => {
   let updated = null;
   let deletedFiles = [];
-
+  
   await prisma.$transaction(async (tx) => {
     let deletedRecords;
     [updated, { deletedRecords }] = await Promise.all([
       tx.category.update({
         where: { id },
         data: {
-          title: title ?? category.title,
-          slug: title ?? slugText(title)
+          title,
+          slug: slugText(title),
+          status
         },
       }),
-      fileService.updateFilesByIds({ tx, feature: FEATURE_TYPES.CATEGORY, featureId: category.id, fileIds, deletedFileIds })
+      fileService.updateFilesByIds({ tx, feature: FEATURE_TYPES.CATEGORY, featureId: id, fileIds, deletedFileIds })
     ]);
     deletedFiles = deletedRecords;
   })
+
+  if (!updated) {
+    const err = new Error("Category not found");
+    err.statusCode = 404;
+    throw err;
+  }
 
   deleteFiles(deletedFiles.map(i => i.path));
   return updated;
@@ -95,6 +100,12 @@ const deleteCategory = async (id) => {
   const deleted = await prisma.category.delete({
     where: { id },
   });
+
+  if (!deleted) {
+    const err = new Error("Category not found");
+    err.statusCode = 404;
+    throw err;
+  }
 
   return {
     id: deleted.id,

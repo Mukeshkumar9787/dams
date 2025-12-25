@@ -4,9 +4,11 @@ import Breadcrumb from "../Common/Breadcrumb";
 import Link from "next/link";
 import { getCategories } from "../../http/apiCalls.js";
 import PlusIcon from "../Common/PlusIcon";
-import { Table } from "antd"
+import { Button, Table } from "antd"
 import { STATUS_COLOR, STATUS_TYPES } from "../../utils/constants.js"
 import EditIcon from "../Common/EditIcon";
+import { CATEGORY_NEW_URL, CATEGORY_URL } from "@/utils/appUrls";
+import DeleteIcon from "../Common/DeleteIcon";
 
 const Category = () => {
   const [categoryItems, setCategoryItems] = React.useState([]);
@@ -47,15 +49,27 @@ const Category = () => {
         if(text === STATUS_TYPES.INACTIVE){
           className = STATUS_COLOR.INACTIVE
         }
-        return <div className={`bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded`}>{text}</div>
+        return (
+          <div className="w-full flex flex-row">
+            <div className={`w-1/2 bg-${className} text-white px-4 py-2 rounded`}>{text}</div>
+          </div> )
       },
     },
     {
       title: 'Action',
-      dataIndex: 'id',
+      dataIndex: 'slug',
       key: 'action',
-      render: (text) => {
-        return <EditIcon/ >
+      render: (slug) => {
+        return(
+          <>
+            <Link
+                  href={CATEGORY_URL + `/${slug}`}
+                  className="inline-flex items-center gap-2 text-dark hover:text-green transition"
+                  >
+                  <EditIcon/ >
+            </Link>
+          </>
+        )
       },
     }
   ]
@@ -73,7 +87,7 @@ const Category = () => {
             <div className="flex flex-wrap items-center justify-between gap-5 mb-7.5">
               <div></div>
               <Link
-                href="/category/new"
+                href={CATEGORY_NEW_URL}
                 className="inline-flex items-center gap-2 text-dark hover:text-green transition"
               >
                 <PlusIcon />

@@ -28,7 +28,7 @@ const FileUploader = ({ files, setFiles, multiSelect = false }) => {
             type="file"
             accept="image/*"
             onChange={handleImageChange}
-            required
+            required={localFiles.length === 0}
             className="block w-full text-sm text-dark-5"
         />
         {localFiles.map((file: { id: number, path: string }) => 

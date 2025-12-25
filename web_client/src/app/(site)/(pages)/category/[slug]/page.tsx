@@ -5,10 +5,10 @@ export const metadata: Metadata = {
   title: "New Category",
 };
 
-const NewCategoryPage = () => {
+const NewCategoryPage = async ({params}) => {
   return (
     <>
-      <CategoryForm />
+      <CategoryForm params={ await params} />
     </>
   );
 };

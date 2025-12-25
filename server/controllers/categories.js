@@ -46,9 +46,8 @@ const getCategoryBySlug = async (req, res) => {
 const updateCategory = async (req, res) => {
   try {
     const id = Number(req.params.id);
-    const { title, fileIds, deletedFileIds } = req.body;
 
-    const result = await categoryService.updateCategory(id, { title, fileIds, deletedFileIds });
+    const result = await categoryService.updateCategory(id, req.body);
 
     return res.status(200).json({
       success: true,

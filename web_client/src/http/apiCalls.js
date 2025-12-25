@@ -20,3 +20,18 @@ export async function uploadFile(data) {
   });
   return res.data;
 }
+
+export async function getCategoryBySlug(values) {
+  const res = await axiosInstance.get(`${API_CATEGORIES}/${values.slug}`, values);
+  return res?.data || [];
+}
+
+export async function updateCategory(data) {
+  const res = await axiosInstance.put(`${API_CATEGORIES}/${data.id}`, data );
+  return res.data;
+}
+
+export async function deleteCategory(data) {
+  const res = await axiosInstance.delete(`${API_CATEGORIES}/${data.id}`);
+  return res.data;
+}
