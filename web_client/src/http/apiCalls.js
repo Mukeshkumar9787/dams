@@ -4,7 +4,7 @@ import axiosInstance from './axiosInstance';
 
 export async function getCategories(values) {
   const res = await axiosInstance.get(API_CATEGORIES, values);
-  return res.data;
+  return res?.data || [];
 }
 
 export async function createCategory(data) {

@@ -12,7 +12,7 @@ router.post("/", validateInput(categoryBodySchema),categoryController.createCate
 router.get("/", categoryController.getCategories);
 
 // Get single category by ID
-router.get("/:id", categoryController.getCategoryById);
+router.get("/:slug", categoryController.getCategoryBySlug);
 
 // Update category
 router.put("/:id", validateInput(categoryBodySchema), categoryController.updateCategory);

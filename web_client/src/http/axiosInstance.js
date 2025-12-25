@@ -21,4 +21,11 @@ axiosInstance.interceptors.request.use((config) => {
   Promise.reject(error);
 });
 
+axiosInstance.interceptors.response.use((response) => {
+  return response
+}, (error) => {
+  window.alert(error?.response?.data?.message || 'Something went wrong');
+  return  error?.response || { data: { success: false, message: "Something went wrong"}}
+});
+
 export default axiosInstance;

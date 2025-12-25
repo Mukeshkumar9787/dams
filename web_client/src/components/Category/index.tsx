@@ -80,7 +80,7 @@ const Category = () => {
                 <span>Add&nbsp;Category</span>
               </Link>
             </div>
-            <Table dataSource={categoryItems} columns={columns} pagination={false} />
+            <Table dataSource={categoryItems} columns={columns} rowKey="id" pagination={false} />
           </div>
         </section>
       

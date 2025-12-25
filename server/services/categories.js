@@ -1,26 +1,16 @@
 import prisma from "../prisma/client.js";
 import { FEATURE_TYPES } from "../utils/constants.js";
-import { convertToFullFilePath, deleteFiles } from "../utils/helpers.js";
+import { convertToFullFilePath, deleteFiles, slugText } from "../utils/helpers.js";
 import { fileService } from "./index.js";
 
 /**
  * Create category
  */
-const createCategory = async ({ title, img, fileIds }) => {
-  const exists = await prisma.category.findFirst({
-    where: { title, deletedAt: null },
-  });
-
-  if (exists) {
-    const err = new Error("Category already exists");
-    err.statusCode = 400;
-    throw err;
-  }
-
+const createCategory = async ({ title, fileIds }) => {
   let category = null;
 
   await prisma.$transaction( async (tx) => {
-    category = await tx.category.create({ data: { title }});
+    category = await tx.category.create({ data: { title, slug: slugText(title) }});
     await fileService.updateFilesByIds({ tx, feature: FEATURE_TYPES.CATEGORY, featureId: category.id, fileIds })
   })
 
@@ -36,10 +26,9 @@ const createCategory = async ({ title, img, fileIds }) => {
  */
 const getCategories = async () => {
   const categories = await prisma.$queryRaw`
-    select c.id, c.title, c.status, f.path as img
+    select c.id, c.title, c.status, c.slug, f.path as img
     from "Category" c
     left join "File" f on f."featureId" = c.id and f."deletedAt" is null
-    where c."deletedAt" is null
     order by c."createdAt" desc;
   `;
   return categories.map(i => {
@@ -53,8 +42,8 @@ const getCategories = async () => {
 /**
  * Get single category
  */
-const getCategoryById = async (id) => {
-  const category = await prisma.category.findUnique({ where: { id } });
+const getCategoryBySlug = async (slug) => {
+  const category = await prisma.category.findUnique({ where: { slug } });
 
   if (!category || category.deletedAt) {
     const err = new Error("Category not found");
@@ -87,6 +76,7 @@ const updateCategory = async (id, { title, fileIds, deletedFileIds }) => {
         where: { id },
         data: {
           title: title ?? category.title,
+          slug: title ?? slugText(title)
         },
       }),
       fileService.updateFilesByIds({ tx, feature: FEATURE_TYPES.CATEGORY, featureId: category.id, fileIds, deletedFileIds })
@@ -102,17 +92,8 @@ const updateCategory = async (id, { title, fileIds, deletedFileIds }) => {
  * Soft delete category
  */
 const deleteCategory = async (id) => {
-  const category = await prisma.category.findUnique({ where: { id } });
-
-  if (!category || category.deletedAt) {
-    const err = new Error("Category not found");
-    err.statusCode = 404;
-    throw err;
-  }
-
-  const deleted = await prisma.category.update({
+  const deleted = await prisma.category.delete({
     where: { id },
-    data: { deletedAt: new Date() },
   });
 
   return {
@@ -123,7 +104,7 @@ const deleteCategory = async (id) => {
 export default {
   createCategory,
   getCategories,
-  getCategoryById,
+  getCategoryBySlug,
   updateCategory,
   deleteCategory,
 };

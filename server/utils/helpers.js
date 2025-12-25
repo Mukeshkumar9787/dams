@@ -24,3 +24,7 @@ export const deleteFiles = (files) => {
     files.map(file => deleteFile(file))
   ])
 };
+
+export const slugText = (text) => {
+  return text.replace(/\s+/g, '-');
+}
