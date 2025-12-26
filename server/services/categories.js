@@ -1,4 +1,5 @@
-import prisma from "../prisma/client.js";
+import prisma, { PrismaConfig } from "../prisma/client.js";
+
 import { FEATURE_TYPES } from "../utils/constants.js";
 import { convertToFullFilePath, deleteFiles, slugText } from "../utils/helpers.js";
 import { fileService } from "./index.js";
@@ -22,15 +23,33 @@ const createCategory = async ({ title, fileIds }) => {
 };
 
 /**
- * Get all categories (ignoring deleted ones)
+ * Get all categories
  */
-const getCategories = async () => {
+const getCategories = async ({ status }) => {
+  const conditions = [];
+
+  if (status) {
+    conditions.push(PrismaConfig.sql`c.status = ${status}`);
+  }
+
+  const whereClause =
+    conditions.length
+      ? PrismaConfig.sql`WHERE ${PrismaConfig.join(conditions, PrismaConfig.sql` AND `)}`
+      : PrismaConfig.empty;
+
   const categories = await prisma.$queryRaw`
-    select c.id, c.title, c.status, c.slug, f.path as img
-    from "Category" c
-    left join "File" f on f."featureId" = c.id
-    order by c."createdAt" desc;
+    SELECT
+      c.id,
+      c.title,
+      c.status,
+      c.slug,
+      f.path AS img
+    FROM "Category" c
+    LEFT JOIN "File" f ON f."featureId" = c.id
+    ${whereClause}
+    ORDER BY c."createdAt" DESC;
   `;
+  
   return categories.map(i => {
     if(i.img){
       i.img = convertToFullFilePath(i.img);

@@ -2,7 +2,7 @@ import React from "react";
 import { Metadata } from "next";
 import CategoryForm from "@/components/Category/Form";
 export const metadata: Metadata = {
-  title: "New Category",
+  title: "Category",
 };
 
 const NewCategoryPage = async ({params}) => {

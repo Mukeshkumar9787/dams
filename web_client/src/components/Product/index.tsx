@@ -7,16 +7,16 @@ import PlusIcon from "../Common/PlusIcon";
 import { Table } from "antd"
 import { STATUS_COLOR, STATUS_TYPES } from "../../utils/constants.js"
 import EditIcon from "../Common/EditIcon";
-import { CATEGORY_NEW_URL, CATEGORY_URL } from "@/utils/appUrls";
+import { CATEGORY_URL, PRODUCT_NEW_URL } from "@/utils/appUrls";
 
-const Category = () => {
-  const [categoryItems, setCategoryItems] = React.useState([]);
+const Product = () => {
+  const [productItems, setProductItems] = React.useState([]);
 
   React.useEffect(() => {
     const fetchCategories = async () => {
       try {
         const data = await getCategories();
-        setCategoryItems(data?.data || []);
+        setProductItems(data?.data || []);
       } catch (err) {
         console.error(err);
       }
@@ -78,7 +78,7 @@ const Category = () => {
     <>
       {/* <!-- ===== Breadcrumb Section Start ===== --> */}
       <section>
-        <Breadcrumb title={"Category"} pages={["Category"]} />
+        <Breadcrumb title={"Product"} pages={["Product"]} />
       </section>
       {/* <!-- ===== Breadcrumb Section End ===== --> */}
         <section className="overflow-hidden py-20 bg-gray-2">
@@ -86,14 +86,14 @@ const Category = () => {
             <div className="flex flex-wrap items-center justify-between gap-5 mb-7.5">
               <div></div>
               <Link
-                href={CATEGORY_NEW_URL}
+                href={PRODUCT_NEW_URL}
                 className="inline-flex items-center gap-2 text-dark hover:text-green transition"
               >
                 <PlusIcon />
-                <span>Add&nbsp;Category</span>
+                <span>Add&nbsp;Product</span>
               </Link>
             </div>
-            <Table dataSource={categoryItems} columns={columns} rowKey="id" pagination={false} />
+            <Table dataSource={productItems} columns={columns} rowKey="id" pagination={false} />
           </div>
         </section>
       
@@ -101,4 +101,4 @@ const Category = () => {
   );
 };
 
-export default Category;
+export default Product;

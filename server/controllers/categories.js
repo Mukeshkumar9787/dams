@@ -19,7 +19,7 @@ const createCategory = async (req, res) => {
 
 const getCategories = async (req, res) => {
   try {
-    const result = await categoryService.getCategories();
+    const result = await categoryService.getCategories(req.query);
 
     return res.status(200).json({
       success: true,
