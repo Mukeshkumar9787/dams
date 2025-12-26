@@ -70,7 +70,7 @@ const CategoryForm = ({ params }) => {
 
   return (
     <>
-      <Breadcrumb title={"Category"} pages={["Category"]} />
+      <Breadcrumb title={"Category"} pages={["Category /", params.slug]} />
 
       <section className="overflow-hidden py-20 bg-gray-2">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
@@ -78,7 +78,7 @@ const CategoryForm = ({ params }) => {
 
             <div className="text-center mb-8">
               <h2 className="font-semibold text-xl sm:text-2xl text-dark">
-                Create Category
+                {isNew ? "Create Category" : "Category Details"} 
               </h2>
             </div>
 
