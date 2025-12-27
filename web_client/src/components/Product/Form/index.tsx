@@ -2,7 +2,7 @@
 
 import Breadcrumb from "@/components/Common/Breadcrumb";
 import FileUploader from "@/components/Common/FileUploader";
-import { createProduct, deleteProduct, getCategories, getProductBySlug, updateProduct } from "@/http/apiCalls";
+import { createProduct, deleteProduct, getCategories, getHsnCodes, getProductBySlug, updateProduct } from "@/http/apiCalls";
 import { STATUS_TYPES } from "@/utils/constants";
 import { CATEGORY_URL } from "@/utils/appUrls";
 import React from "react";
@@ -12,10 +12,17 @@ const ProductForm = ({ params }) => {
   const router = useRouter();
   const [title, setTitle] = React.useState("");
   const [status, setStatus] = React.useState(STATUS_TYPES.ACTIVE);
-  const [image, setImage] = React.useState([]);
-  const editDataRef = React.useRef({ title: '', status: STATUS_TYPES.ACTIVE, id: '', img: null, fileId: '' });
+  const [images, setImages] = React.useState([]);
+  const editDataRef = React.useRef({ title: '', status: STATUS_TYPES.ACTIVE, id: '', images: [] });
   const [categoryItems, setCategoryItems] = React.useState([]);
   const [categoryId, setCategoryId] = React.useState(null);
+  const [hsnItems, setHsnItems] = React.useState([]);
+  const [hsnId, setHsnId] = React.useState(null);
+  const [mrp, setMrp] = React.useState(0);
+  const [price, setPrice] = React.useState(0);
+  const [stock, setStock] = React.useState(0);
+  const tax = React.useRef(0);
+  
   
   React.useEffect(() => {
     const fetchCategories = async () => {
@@ -30,6 +37,19 @@ const ProductForm = ({ params }) => {
     fetchCategories();
   }, []);
 
+  React.useEffect(() => {
+    const fetchHsn = async () => {
+      try {
+        const data = await getHsnCodes({status: STATUS_TYPES.ACTIVE});
+        setHsnItems(data?.data || []);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchHsn();
+  }, []);
+
   let isNew = params.slug === 'new';
 
 
@@ -37,14 +57,14 @@ const ProductForm = ({ params }) => {
     e.preventDefault();
     let response:any;
     if(isNew){
-      response = await createProduct({title, status, fileIds: image.id ? [image.id] : []})
+      response = await createProduct({title, status, fileIds: images.map(i => i.id)})
     }else {
       let fileIds = [];
       let deleteFileIds = [];
-      if(editDataRef.current.fileId !== image.id){
-        fileIds.push(image.id);
-        deleteFileIds.push(editDataRef.current.fileId);
-      }
+      // if(editDataRef.current.fileId !== images.id){
+      //   fileIds.push(images.id);
+      //   deleteFileIds.push(editDataRef.current.fileId);
+      // }
       response = await updateProduct({title, status, fileIds, deleteFileIds, id: editDataRef.current.id })
     }
     if(response.success){
@@ -73,7 +93,7 @@ const ProductForm = ({ params }) => {
         editDataRef.current = data?.data || {};
         setTitle(editDataRef.current.title);
         setStatus(editDataRef.current.status);
-        setImage({id: editDataRef.current.fileId, path: editDataRef.current.img});
+        setImages(editDataRef.current.images);
       } catch (err) {
         console.error(err);
       }
@@ -117,18 +137,92 @@ const ProductForm = ({ params }) => {
                 <select
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
+                  required
                   className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
                 >
+                  <option value={null}>Select</option>
                   {categoryItems.map(value => 
                     <option key={value.id} value={value.id}>{value.title}</option>
                   )}
                 </select>
               </div>
 
+              {/* Hsn */}
+              <div className="mb-7 flex w-full gap-5">
+                <div className="w-1/2">
+                  <label className="block mb-2.5">Hsn</label>
+                  <select
+                    value={hsnId}
+                    onChange={(e) => {
+                      setHsnId(e.target.value); 
+                      tax.current = hsnItems.find(i => i.id === parseInt(e.target.value))?.tax || 0
+                    }}
+                    className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                    >
+                    <option value={null}>Select</option>
+                    {hsnItems.map(value => 
+                      <option key={value.id} value={value.id}>{value.code}</option>
+                    )}
+                  </select>
+                </div>
+                <div className="w-1/2">
+                <label className="block mb-2.5">Tax</label>
+                <input
+                  type="text"
+                  placeholder="Enter Tax"
+                  value={tax.current}
+                  disabled
+                  className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                />
+              </div>
+              </div>
+
+              <div className="mb-7 flex w-full gap-5">
+                <div className="w-1/2">
+                  <label className="block mb-2.5">Mrp</label>
+                  <input
+                  type="number"
+                  placeholder="Enter MRP"
+                  value={mrp}
+                  onChange={(e) => setMrp(e.target.value)}
+                  required
+                  min={0}
+                  className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                  />
+                </div>
+                <div className="w-1/2">
+                  <label className="block mb-2.5">Price</label>
+                  <input
+                  type="number"
+                  placeholder="Enter Price"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  required
+                  min={0}
+                  className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                  />
+                </div>
+              </div>
+
+              <div className="mb-7">
+                  <label className="block mb-2.5">Stock</label>
+                  <input
+                  type="number"
+                  placeholder="Enter stock"
+                  value={stock}
+                  onChange={(e) => setStock(e.target.value)}
+                  required
+                  min={0}
+                  className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                  />
+              </div>
+
+
+
               {/* Product Image */}
               <div className="mb-5">
                 <label className="block mb-2.5">Product Image</label>
-                <FileUploader files={image} setFiles={setImage} multiSelect />
+                <FileUploader files={images} setFiles={setImages} multiSelect />
               </div>
 
               {/* Status */}

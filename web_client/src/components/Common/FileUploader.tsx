@@ -2,7 +2,7 @@
 import { uploadFile } from "@/http/apiCalls";
 import React from "react";
 
-const FileUploader = ({ files, setFiles, multiSelect = false }) => {
+const FileUploader = ({ files, setFiles, multiSelect = false, setDeletedFiles = null }) => {
   let localFiles = multiSelect ? files : (files ? [files] : []);
   const handleImageChange = async(e: { target: { files: any; }; }) => {
     const uploadedFiles = [...(e.target.files)];
@@ -22,6 +22,13 @@ const FileUploader = ({ files, setFiles, multiSelect = false }) => {
     })
   };
 
+  const handleFileDelete = (id:number) => {
+    setFiles(prev => prev.filter(i => i.id !== id));
+    if(setDeletedFiles){
+      setDeletedFiles(prev => [...prev, id]);
+    }
+  }
+
   return (
     <div className="mb-5">
         <input
@@ -31,15 +38,18 @@ const FileUploader = ({ files, setFiles, multiSelect = false }) => {
             required={localFiles.length === 0}
             className="block w-full text-sm text-dark-5"
         />
-        {localFiles.map((file: { id: number, path: string }) => 
-            <div key={file.id} className="mt-4">
-              <img
-                  src={file.path}
-                  alt="Preview"
-                  className="w-32 h-32 object-cover rounded-lg border"
-              />
-            </div>
-        )}
+        <div className="flex flex-col gap-2">
+          {localFiles.map((file: { id: number, path: string }) => 
+              <div key={file.id} className="mt-4 w-32 w-32">
+                <button type="button" onClick={()=> handleFileDelete(file.id)} className="flex w-full text-end">X</button>
+                <img
+                    src={file.path}
+                    alt="Preview"
+                    className="w-32 h-32 object-cover rounded-lg border"
+                />
+              </div>
+          )}
+        </div>
     </div>
   );
 };
