@@ -1,5 +1,5 @@
 import { Menu } from "@/types/Menu";
-import { CATEGORY_URL, PRODUCT_URL } from "@/utils/appUrls";
+import { CATEGORY_URL, HSN_URL, PRODUCT_URL } from "@/utils/appUrls";
 
 export const menuData: Menu[] = [
   {
@@ -28,12 +28,18 @@ export const menuData: Menu[] = [
   },
   {
     id: 5,
+    title: "HSN",
+    newTab: false,
+    path: HSN_URL,
+  },
+  {
+    id: 6,
     title: "Product",
     newTab: false,
     path: PRODUCT_URL,
   },
   {
-    id: 6,
+    id: 7,
     title: "pages",
     newTab: false,
     path: "/",
