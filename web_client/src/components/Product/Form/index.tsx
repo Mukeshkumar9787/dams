@@ -22,6 +22,8 @@ const ProductForm = ({ params }) => {
   const [price, setPrice] = React.useState(0);
   const [stock, setStock] = React.useState(0);
   const tax = React.useRef(0);
+  const fileIdsRef = React.useRef(new Set());
+  const deletedFileIdsRef = React.useRef(new Set());
   
   
   React.useEffect(() => {
@@ -55,17 +57,15 @@ const ProductForm = ({ params }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if(images.length === 0){
+      window.alert("Select a file ...!");
+      return;
+    }
     let response:any;
     if(isNew){
-      response = await createProduct({title, status, fileIds: images.map(i => i.id)})
+      response = await createProduct({title, status, fileIds: [...fileIdsRef.current], deletedFileIds: [...deletedFileIdsRef.current]})
     }else {
-      let fileIds = [];
-      let deleteFileIds = [];
-      // if(editDataRef.current.fileId !== images.id){
-      //   fileIds.push(images.id);
-      //   deleteFileIds.push(editDataRef.current.fileId);
-      // }
-      response = await updateProduct({title, status, fileIds, deleteFileIds, id: editDataRef.current.id })
+      response = await updateProduct({title, status, fileIds: [...fileIdsRef.current], deletedFileIds: [...deletedFileIdsRef.current], id: editDataRef.current.id })
     }
     if(response.success){
        router.replace(CATEGORY_URL);
@@ -222,7 +222,7 @@ const ProductForm = ({ params }) => {
               {/* Product Image */}
               <div className="mb-5">
                 <label className="block mb-2.5">Product Image</label>
-                <FileUploader files={images} setFiles={setImages} multiSelect />
+                <FileUploader files={images} setFiles={setImages} multiSelect fileIdsRef={fileIdsRef} deletedFileIdsRef={deletedFileIdsRef} />
               </div>
 
               {/* Status */}

@@ -2,7 +2,7 @@
 import { uploadFile } from "@/http/apiCalls";
 import React from "react";
 
-const FileUploader = ({ files, setFiles, multiSelect = false, setDeletedFiles = null }) => {
+const FileUploader = ({ files, setFiles, multiSelect = false, fileIdsRef, deletedFileIdsRef }) => {
   let localFiles = multiSelect ? files : (files ? [files] : []);
   const handleImageChange = async(e: { target: { files: any; }; }) => {
     const uploadedFiles = [...(e.target.files)];
@@ -14,29 +14,40 @@ const FileUploader = ({ files, setFiles, multiSelect = false, setDeletedFiles = 
     const formData = new FormData();
     formData.append("file", file);
     const response = await uploadFile(formData);
+    if(!response) return
     setFiles((prev) => {
       if(multiSelect){
-        return [...prev, {...response.data}]
+        return [...prev, {...response.data}];
       }
       return response.data;
     })
+    if(!multiSelect && fileIdsRef.current.size > 0){
+      let onlyFileId = [...fileIdsRef.current][0];
+      deletedFileIdsRef.current.add(onlyFileId);
+      fileIdsRef.current.delete(onlyFileId);
+    }
+    fileIdsRef.current.add(response.data.id);
   };
 
   const handleFileDelete = (id:number) => {
-    setFiles(prev => prev.filter(i => i.id !== id));
-    if(setDeletedFiles){
-      setDeletedFiles(prev => [...prev, id]);
+    if(multiSelect){
+      setFiles(prev => prev.filter(i => i.id !== id));
+    }else{
+      setFiles(null);
+    }
+    deletedFileIdsRef.current.add(id);
+    if(fileIdsRef.current.has(id)){
+      fileIdsRef.current.delete(id)
     }
   }
-
   return (
     <div className="mb-5">
         <input
             type="file"
             accept="image/*"
             onChange={handleImageChange}
-            required={localFiles.length === 0}
             className="block w-full text-sm text-dark-5"
+            multiple={multiSelect}
         />
         <div className="flex flex-col gap-2">
           {localFiles.map((file: { id: number, path: string }) => 

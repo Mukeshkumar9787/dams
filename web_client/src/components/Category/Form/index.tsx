@@ -14,15 +14,21 @@ const CategoryForm = ({ params }) => {
   const [status, setStatus] = React.useState(STATUS_TYPES.ACTIVE);
   const [image, setImage] = React.useState(null);
   const editDataRef = React.useRef({ title: '', status: STATUS_TYPES.ACTIVE, id: '', img: null, fileId: '' });
+  const fileIdsRef = React.useRef(new Set());
+  const deletedFileIdsRef = React.useRef(new Set());
 
   let isNew = params.slug === 'new';
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if(!image){
+      window.alert("Select a file ...!");
+      return;
+    }
     let response:any;
     if(isNew){
-      response = await createCategory({title, status, fileIds: image.id ? [image.id] : []})
+      response = await createCategory({title, status, fileIds: [...fileIdsRef.current], deleteFileIds: [...deletedFileIdsRef.current]})
     }else {
       let fileIds = [];
       let deleteFileIds = [];
@@ -30,7 +36,7 @@ const CategoryForm = ({ params }) => {
         fileIds.push(image.id);
         deleteFileIds.push(editDataRef.current.fileId);
       }
-      response = await updateCategory({title, status, fileIds, deleteFileIds, id: editDataRef.current.id })
+      response = await updateCategory({title, status, fileIds: [...fileIdsRef.current], deleteFileIds: [...deletedFileIdsRef.current], id: editDataRef.current.id })
     }
     if(response.success){
        router.replace(CATEGORY_URL);
@@ -99,7 +105,7 @@ const CategoryForm = ({ params }) => {
               {/* Category Image */}
               <div className="mb-5">
                 <label className="block mb-2.5">Category Image</label>
-                <FileUploader files={image} setFiles={setImage} />
+                <FileUploader files={image} setFiles={setImage} fileIdsRef={fileIdsRef} deletedFileIdsRef={deletedFileIdsRef} />
               </div>
 
               {/* Status */}
