@@ -21,3 +21,21 @@ export const hsnBodySchema = Joi.object({
     .valid(...Object.values(STATUS_TYPES))
     .default(STATUS_TYPES.ACTIVE),
 });
+
+export const productBodySchema = Joi.object({
+  title: Joi.string().min(1).max(100).required(),
+  categoryId: Joi.number().required(), 
+  hsnId: Joi.number().optional(), 
+  mrp: Joi.number().required(), 
+  price: Joi.number().required(), 
+  stock: Joi.number().required(), 
+  fileIds: Joi.array()
+    .items(Joi.number().integer().positive())
+    .optional(),
+  deletedFileIds: Joi.array()
+    .items(Joi.number().integer().positive())
+    .optional(),
+  status: Joi.string()
+    .valid(...Object.values(STATUS_TYPES))
+    .default(STATUS_TYPES.ACTIVE),
+});

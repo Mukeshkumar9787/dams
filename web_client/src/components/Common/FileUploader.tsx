@@ -17,16 +17,17 @@ const FileUploader = ({ files, setFiles, multiSelect = false, fileIdsRef, delete
     if(!response) return
     setFiles((prev) => {
       if(multiSelect){
+        fileIdsRef.current.add(response.data.id);
         return [...prev, {...response.data}];
+      }else{
+        if(prev){
+          let onlyFileId = prev.id;
+          deletedFileIdsRef.current.add(onlyFileId);
+          fileIdsRef.current.delete(onlyFileId);
+        };
       }
       return response.data;
     })
-    if(!multiSelect && fileIdsRef.current.size > 0){
-      let onlyFileId = [...fileIdsRef.current][0];
-      deletedFileIdsRef.current.add(onlyFileId);
-      fileIdsRef.current.delete(onlyFileId);
-    }
-    fileIdsRef.current.add(response.data.id);
   };
 
   const handleFileDelete = (id:number) => {
@@ -49,7 +50,7 @@ const FileUploader = ({ files, setFiles, multiSelect = false, fileIdsRef, delete
             className="block w-full text-sm text-dark-5"
             multiple={multiSelect}
         />
-        <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {localFiles.map((file: { id: number, path: string }) => 
               <div key={file.id} className="mt-4 w-32 w-32">
                 <button type="button" onClick={()=> handleFileDelete(file.id)} className="flex w-full text-end">X</button>

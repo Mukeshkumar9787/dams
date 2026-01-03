@@ -28,7 +28,7 @@ const CategoryForm = ({ params }) => {
     }
     let response:any;
     if(isNew){
-      response = await createCategory({title, status, fileIds: [...fileIdsRef.current], deleteFileIds: [...deletedFileIdsRef.current]})
+      response = await createCategory({title, status, fileIds: [...fileIdsRef.current], deletedFileIds: [...deletedFileIdsRef.current]})
     }else {
       let fileIds = [];
       let deleteFileIds = [];
@@ -36,7 +36,7 @@ const CategoryForm = ({ params }) => {
         fileIds.push(image.id);
         deleteFileIds.push(editDataRef.current.fileId);
       }
-      response = await updateCategory({title, status, fileIds: [...fileIdsRef.current], deleteFileIds: [...deletedFileIdsRef.current], id: editDataRef.current.id })
+      response = await updateCategory({title, status, fileIds: [...fileIdsRef.current], deletedFileIds: [...deletedFileIdsRef.current], id: editDataRef.current.id })
     }
     if(response.success){
        router.replace(CATEGORY_URL);

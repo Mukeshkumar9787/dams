@@ -4,7 +4,7 @@ import Breadcrumb from "@/components/Common/Breadcrumb";
 import FileUploader from "@/components/Common/FileUploader";
 import { createProduct, deleteProduct, getCategories, getHsnCodes, getProductBySlug, updateProduct } from "@/http/apiCalls";
 import { STATUS_TYPES } from "@/utils/constants";
-import { CATEGORY_URL } from "@/utils/appUrls";
+import { PRODUCT_URL } from "@/utils/appUrls";
 import React from "react";
 import { useRouter } from "next/navigation";
 
@@ -13,15 +13,15 @@ const ProductForm = ({ params }) => {
   const [title, setTitle] = React.useState("");
   const [status, setStatus] = React.useState(STATUS_TYPES.ACTIVE);
   const [images, setImages] = React.useState([]);
-  const editDataRef = React.useRef({ title: '', status: STATUS_TYPES.ACTIVE, id: '', images: [] });
+  const editDataRef = React.useRef({});
   const [categoryItems, setCategoryItems] = React.useState([]);
   const [categoryId, setCategoryId] = React.useState(null);
   const [hsnItems, setHsnItems] = React.useState([]);
   const [hsnId, setHsnId] = React.useState(null);
-  const [mrp, setMrp] = React.useState(0);
-  const [price, setPrice] = React.useState(0);
-  const [stock, setStock] = React.useState(0);
-  const tax = React.useRef(0);
+  const [mrp, setMrp] = React.useState(1);
+  const [price, setPrice] = React.useState(1);
+  const [stock, setStock] = React.useState(1);
+  const tax = hsnItems.find(i => i.id == hsnId)?.tax || 0;
   const fileIdsRef = React.useRef(new Set());
   const deletedFileIdsRef = React.useRef(new Set());
   
@@ -61,14 +61,15 @@ const ProductForm = ({ params }) => {
       window.alert("Select a file ...!");
       return;
     }
+    let data = { title, status, categoryId, hsnId, mrp, price, stock, fileIds: [...fileIdsRef.current], deletedFileIds: [...deletedFileIdsRef.current] }
     let response:any;
     if(isNew){
-      response = await createProduct({title, status, fileIds: [...fileIdsRef.current], deletedFileIds: [...deletedFileIdsRef.current]})
+      response = await createProduct(data);
     }else {
-      response = await updateProduct({title, status, fileIds: [...fileIdsRef.current], deletedFileIds: [...deletedFileIdsRef.current], id: editDataRef.current.id })
+      response = await updateProduct({...data, id: editDataRef.current.id })
     }
     if(response.success){
-       router.replace(CATEGORY_URL);
+       router.replace(PRODUCT_URL);
     }
   };
   
@@ -78,7 +79,7 @@ const ProductForm = ({ params }) => {
     if(!isNew){
       let response = await deleteProduct({id: editDataRef.current.id})
       if(response.success){
-         router.replace(CATEGORY_URL);
+         router.replace(PRODUCT_URL);
       }
     }
   };
@@ -94,6 +95,11 @@ const ProductForm = ({ params }) => {
         setTitle(editDataRef.current.title);
         setStatus(editDataRef.current.status);
         setImages(editDataRef.current.images);
+        setCategoryId(editDataRef.current.categoryId);
+        setHsnId(editDataRef.current.hsnId);
+        setMrp(editDataRef.current.mrp);
+        setPrice(editDataRef.current.price);
+        setStock(editDataRef.current.stock);
       } catch (err) {
         console.error(err);
       }
@@ -152,10 +158,10 @@ const ProductForm = ({ params }) => {
                 <div className="w-1/2">
                   <label className="block mb-2.5">Hsn</label>
                   <select
+                    itemType="number"
                     value={hsnId}
                     onChange={(e) => {
                       setHsnId(e.target.value); 
-                      tax.current = hsnItems.find(i => i.id === parseInt(e.target.value))?.tax || 0
                     }}
                     className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
                     >
@@ -170,7 +176,7 @@ const ProductForm = ({ params }) => {
                 <input
                   type="text"
                   placeholder="Enter Tax"
-                  value={tax.current}
+                  value={tax}
                   disabled
                   className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
                 />
@@ -186,7 +192,7 @@ const ProductForm = ({ params }) => {
                   value={mrp}
                   onChange={(e) => setMrp(e.target.value)}
                   required
-                  min={0}
+                  min={1}
                   className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
                   />
                 </div>
@@ -198,7 +204,7 @@ const ProductForm = ({ params }) => {
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
                   required
-                  min={0}
+                  min={1}
                   className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
                   />
                 </div>
@@ -212,7 +218,7 @@ const ProductForm = ({ params }) => {
                   value={stock}
                   onChange={(e) => setStock(e.target.value)}
                   required
-                  min={0}
+                  min={1}
                   className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
                   />
               </div>

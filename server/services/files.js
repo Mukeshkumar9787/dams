@@ -31,11 +31,11 @@ const updateFilesByIds = async ({ tx=prisma, feature, featureId, fileIds=[], del
   let deleteFilesPromise = [];
   
   if(deletedFileIds.length > 0){
-    deleteFilesPromise = tx.file.deleteMany({ 
-        select: {id: true, path: true},
-        where: { id: { in: deletedFileIds } },
-        data: { deletedAt: new Date() }
-      });
+      deleteFilesPromise = await prisma.$queryRaw`
+      DELETE FROM "File"
+      WHERE id in (${deletedFileIds.join(',')})
+      RETURNING id, path;
+    `;
   }
   
   const [updatedRecords, deletedRecords] = await Promise.all([

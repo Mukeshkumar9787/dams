@@ -7,12 +7,12 @@ import { fileService } from "./index.js";
 /**
  * Create category
  */
-const createCategory = async ({ title, fileIds }) => {
+const createCategory = async ({ title, fileIds, status, deletedFileIds }) => {
   let category = null;
 
   await prisma.$transaction( async (tx) => {
-    category = await tx.category.create({ data: { title, slug: slugText(title) }});
-    await fileService.updateFilesByIds({ tx, feature: FEATURE_TYPES.CATEGORY, featureId: category.id, fileIds })
+    category = await tx.category.create({ data: { title, slug: slugText(title), status }});
+    await fileService.updateFilesByIds({ tx, feature: FEATURE_TYPES.CATEGORY, featureId: category.id, fileIds, deletedFileIds })
   })
 
   return {
@@ -85,7 +85,7 @@ const getCategoryBySlug = async (slug) => {
 const updateCategory = async (id, { title, fileIds, deletedFileIds, status }) => {
   let updated = null;
   let deletedFiles = [];
-  
+
   await prisma.$transaction(async (tx) => {
     let deletedRecords;
     [updated, { deletedRecords }] = await Promise.all([

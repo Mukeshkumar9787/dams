@@ -3,6 +3,7 @@ import authRoutes from "./auth.js";
 import categoryRoutes from "./categories.js";
 import fileRoutes from "./files.js"
 import hsnRoutes from "./hsn.js"
+import productRoutes from "./products.js"
 
 
 const router = express.Router();
@@ -24,5 +25,7 @@ router.use("/categories", categoryRoutes);
 router.use("/files", fileRoutes);
 
 router.use("/hsn", hsnRoutes);
+
+router.use("/products", productRoutes);
 
 export default router;

@@ -1,5 +1,5 @@
 
-import { API_CATEGORIES, API_FILES, API_HSN } from './apiUrls';
+import { API_CATEGORIES, API_FILES, API_HSN, API_PRODUCTS } from './apiUrls';
 import axiosInstance from './axiosInstance';
 
 export async function getCategories(params) {
@@ -36,28 +36,28 @@ export async function deleteCategory(data) {
   return res.data;
 }
 
-export async function getProducts(values) {
-  const res = await axiosInstance.get(API_CATEGORIES, values);
+export async function getProducts(params) {
+  const res = await axiosInstance.get(API_PRODUCTS,{ params });
   return res?.data || [];
 }
 
 export async function createProduct(data) {
-  const res = await axiosInstance.post(API_CATEGORIES, data );
+  const res = await axiosInstance.post(API_PRODUCTS, data );
   return res.data;
 }
 
 export async function getProductBySlug(values) {
-  const res = await axiosInstance.get(`${API_CATEGORIES}/${values.slug}`, values);
+  const res = await axiosInstance.get(`${API_PRODUCTS}/${values.slug}`, values);
   return res?.data || [];
 }
 
 export async function updateProduct(data) {
-  const res = await axiosInstance.put(`${API_CATEGORIES}/${data.id}`, data );
+  const res = await axiosInstance.put(`${API_PRODUCTS}/${data.id}`, data );
   return res.data;
 }
 
 export async function deleteProduct(data) {
-  const res = await axiosInstance.delete(`${API_CATEGORIES}/${data.id}`);
+  const res = await axiosInstance.delete(`${API_PRODUCTS}/${data.id}`);
   return res.data;
 }
 
