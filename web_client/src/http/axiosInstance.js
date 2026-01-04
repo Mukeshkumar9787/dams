@@ -11,10 +11,12 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use((config) => {
-  // Do something before request is sent
-  if (window._token) {
-    config.headers.authorization = `Bearer ${window._token}`; // eslint-disable-line
-  }
+  try {
+    // Do something before request is sent
+    if (window._token) {
+      config.headers.authorization = `Bearer ${window._token}`; // eslint-disable-line
+    }
+  } catch (error) {}
   return config;
 }, (error) => {
   // Do something with request error
@@ -24,7 +26,9 @@ axiosInstance.interceptors.request.use((config) => {
 axiosInstance.interceptors.response.use((response) => {
   return response
 }, (error) => {
-  window.alert(error?.response?.data?.message || 'Something went wrong');
+  try {
+    window.alert(error?.response?.data?.message || 'Something went wrong');
+  } catch (err) {}
   return  error?.response || { data: { success: false, message: "Something went wrong"}}
 });
 

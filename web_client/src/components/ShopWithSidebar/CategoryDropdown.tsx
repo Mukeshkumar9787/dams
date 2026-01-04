@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { getCategories } from "@/http/apiCalls";
+import { STATUS_TYPES } from "@/utils/constants";
+import { useEffect, useState } from "react";
 
 const CategoryItem = ({ category }) => {
   const [selected, setSelected] = useState(false);
@@ -35,7 +37,7 @@ const CategoryItem = ({ category }) => {
           </svg>
         </div>
 
-        <span>{category.name}</span>
+        <span>{category.title}</span>
       </div>
 
       <span
@@ -43,14 +45,28 @@ const CategoryItem = ({ category }) => {
           selected ? "text-white bg-blue" : "bg-gray-2"
         } inline-flex rounded-[30px] text-custom-xs px-2 ease-out duration-200 group-hover:text-white group-hover:bg-blue`}
       >
-        {category.products}
+        {category.productCount}
       </span>
     </button>
   );
 };
 
-const CategoryDropdown = ({ categories }) => {
+const CategoryDropdown = () => {
+  const [categories, setCategories] = useState([]);
   const [toggleDropdown, setToggleDropdown] = useState(true);
+
+  useEffect(() => {
+      const fetchCategories = async () => {
+        try {
+          const data = await getCategories({status: STATUS_TYPES.ACTIVE, includeProductCount: true});
+          setCategories(data?.data || []);
+        } catch (err) {
+          console.error(err);
+        }
+      };
+  
+      fetchCategories();
+    }, []);
 
   return (
     <div className="bg-white shadow-1 rounded-lg">

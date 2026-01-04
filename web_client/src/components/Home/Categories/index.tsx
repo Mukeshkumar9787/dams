@@ -1,15 +1,16 @@
 "use client";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { useCallback, useRef, useEffect } from "react";
-import data from "./categoryData";
-import Image from "next/image";
+import { useCallback, useRef, useEffect, useState } from "react";
 
 // Import Swiper styles
 import "swiper/css/navigation";
 import "swiper/css";
 import SingleItem from "./SingleItem";
+import { getCategories } from "@/http/apiCalls";
+import { STATUS_TYPES } from "@/utils/constants";
 
 const Categories = () => {
+  const [data, setData] = useState([]);
   const sliderRef = useRef(null);
 
   const handlePrev = useCallback(() => {
@@ -26,6 +27,19 @@ const Categories = () => {
     if (sliderRef.current) {
       sliderRef.current.swiper.init();
     }
+  }, []);
+
+  useEffect(() => {
+      const fetchCategories = async () => {
+        try {
+          const data = await getCategories({status: STATUS_TYPES.ACTIVE});
+          setData(data?.data || []);
+        } catch (err) {
+          console.error(err);
+        }
+      };
+  
+      fetchCategories();
   }, []);
 
   return (

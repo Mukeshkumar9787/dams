@@ -7,7 +7,7 @@ import RecentlyViewdItems from "./RecentlyViewd";
 import { usePreviewSlider } from "@/app/context/PreviewSliderContext";
 import { useAppSelector } from "@/redux/store";
 
-const ShopDetails = () => {
+const ShopDetails = ({params}) => {
   const [activeColor, setActiveColor] = useState("blue");
   const { openPreviewModal } = usePreviewSlider();
   const [previewImg, setPreviewImg] = useState(0);
@@ -127,9 +127,9 @@ const ShopDetails = () => {
                         </svg>
                       </button>
 
-                      {product.imgs?.previews?.[previewImg] && (
-                        <Image
-                          src={product.imgs.previews[previewImg]}
+                      {product.images[previewImg] && (
+                        <img
+                          src={product.images[previewImg]}
                           alt="products-details"
                           width={400}
                           height={400}
@@ -140,7 +140,7 @@ const ShopDetails = () => {
 
                   {/* ?  &apos;border-blue &apos; :  &apos;border-transparent&apos; */}
                   <div className="flex flex-wrap sm:flex-nowrap gap-4.5 mt-6">
-                    {product.imgs?.thumbnails.map((item, key) => (
+                    {product.images.map((item, key) => (
                       <button
                         onClick={() => setPreviewImg(key)}
                         key={key}

@@ -47,6 +47,8 @@ const getProducts = async ({ status, pageNumber=1, pageSize=10, search='' }) => 
         p.title,
         p.status,
         p.slug,
+        p.mrp,
+        p.price,
         c.title as "categoryName",
         (select f."path"  from "File" f where f.feature = ${FEATURE_TYPES.PRODUCT} and f."featureId" = p."id" order by f."createdAt" asc limit 1) as img
       FROM "Product" p

@@ -8,10 +8,10 @@ export const metadata: Metadata = {
   // other metadata
 };
 
-const ShopDetailsPage = () => {
+const ShopDetailsPage = async({params}) => {
   return (
     <main>
-      <ShopDetails />
+      <ShopDetails params={ await params} />
     </main>
   );
 };

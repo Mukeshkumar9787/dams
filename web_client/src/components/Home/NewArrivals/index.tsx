@@ -1,10 +1,11 @@
-import React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import ProductItem from "@/components/Common/ProductItem";
-import shopData from "@/components/Shop/shopData";
+import { getProducts } from "@/http/apiCalls";
+import { STATUS_TYPES } from "@/utils/constants";
 
-const NewArrival = () => {
+const NewArrival = async () => {
+  const data = await getProducts({pageSize: 8, status: STATUS_TYPES.ACTIVE});
+  const shopData = data.data || [];
   return (
     <section className="overflow-hidden pt-15">
       <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">

@@ -16,7 +16,7 @@ const Product = () => {
   const [search, setSearch] = React.useState('');
 
   React.useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchProducts = async () => {
       try {
         const data = await getProducts({...pagination, search});
         setProductItems(data?.data || []);
@@ -26,7 +26,7 @@ const Product = () => {
       }
     };
 
-    fetchCategories();
+    fetchProducts();
   }, [pagination, search]);
 
   const columns = [

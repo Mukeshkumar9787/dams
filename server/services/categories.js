@@ -25,7 +25,7 @@ const createCategory = async ({ title, fileIds, status, deletedFileIds }) => {
 /**
  * Get all categories
  */
-const getCategories = async ({ status }) => {
+const getCategories = async ({ status, includeProductCount = false }) => {
   const conditions = [];
 
   if (status) {
@@ -37,6 +37,11 @@ const getCategories = async ({ status }) => {
       ? PrismaConfig.sql`WHERE ${PrismaConfig.join(conditions, PrismaConfig.sql` AND `)}`
       : PrismaConfig.empty;
 
+  let includeProductCountClause = PrismaConfig.empty;
+  if(includeProductCount){
+    includeProductCountClause = PrismaConfig.sql`,(SELECT COUNT(1)::TEXT FROM "Product" p where p."categoryId" = c.id) as "productCount"`
+  };
+
   const categories = await prisma.$queryRaw`
     SELECT
       c.id,
@@ -44,6 +49,7 @@ const getCategories = async ({ status }) => {
       c.status,
       c.slug,
       f.path AS img
+      ${includeProductCountClause}
     FROM "Category" c
     LEFT JOIN "File" f ON f."featureId" = c.id
     ${whereClause}
