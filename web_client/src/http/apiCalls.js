@@ -1,5 +1,5 @@
 
-import { API_CATEGORIES, API_FILES, API_HSN, API_PRODUCTS } from './apiUrls';
+import { API_CATEGORIES, API_COLOR, API_FILES, API_HSN, API_PRODUCTS, API_SIZE } from './apiUrls';
 import axiosInstance from './axiosInstance';
 
 export async function getCategories(params) {
@@ -83,5 +83,55 @@ export async function updateHsn(data) {
 
 export async function deleteHsn(data) {
   const res = await axiosInstance.delete(`${API_HSN}/${data.id}`);
+  return res.data;
+}
+
+export async function getSizes(params) {
+  const res = await axiosInstance.get(API_SIZE, { params });
+  return res?.data || [];
+}
+
+export async function createSize(data) {
+  const res = await axiosInstance.post(API_SIZE, data );
+  return res.data;
+}
+
+export async function getSizeBySlug(values) {
+  const res = await axiosInstance.get(`${API_SIZE}/${values.slug}`, values);
+  return res?.data || [];
+}
+
+export async function updateSize(data) {
+  const res = await axiosInstance.put(`${API_SIZE}/${data.id}`, data );
+  return res.data;
+}
+
+export async function deleteSize(data) {
+  const res = await axiosInstance.delete(`${API_SIZE}/${data.id}`);
+  return res.data;
+}
+
+export async function getColors(params) {
+  const res = await axiosInstance.get(API_COLOR, { params });
+  return res?.data || [];
+}
+
+export async function createColor(data) {
+  const res = await axiosInstance.post(API_COLOR, data );
+  return res.data;
+}
+
+export async function getColorBySlug(values) {
+  const res = await axiosInstance.get(`${API_COLOR}/${values.slug}`, values);
+  return res?.data || [];
+}
+
+export async function updateColor(data) {
+  const res = await axiosInstance.put(`${API_COLOR}/${data.id}`, data );
+  return res.data;
+}
+
+export async function deleteColor(data) {
+  const res = await axiosInstance.delete(`${API_COLOR}/${data.id}`);
   return res.data;
 }

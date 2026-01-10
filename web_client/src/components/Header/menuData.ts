@@ -1,5 +1,5 @@
 import { Menu } from "@/types/Menu";
-import { CATEGORY_URL, HSN_URL, PRODUCT_URL } from "@/utils/appUrls";
+import { CATEGORY_URL, COLOR_URL, HSN_URL, PRODUCT_URL, SIZE_URL } from "@/utils/appUrls";
 
 export const menuData: Menu[] = [
   {
@@ -37,6 +37,18 @@ export const menuData: Menu[] = [
     title: "Product",
     newTab: false,
     path: PRODUCT_URL,
+  },
+  {
+    id: 7,
+    title: "Size",
+    newTab: false,
+    path: SIZE_URL,
+  },
+  {
+    id: 8,
+    title: "Color",
+    newTab: false,
+    path: COLOR_URL,
   },
   {
     id: 7,

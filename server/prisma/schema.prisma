@@ -22,7 +22,7 @@ enum Status {
 }
 
 enum Feature {
-  CATEGORY 
+  CATEGORY
   PRODUCT
 }
 
@@ -39,47 +39,69 @@ model User {
 }
 
 model Category {
-  id         Int       @id @default(autoincrement())
-  title      String    @unique
-  slug       String    @unique
-  status     Status   @default(ACTIVE)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  products Product[]
+  id        Int       @id @default(autoincrement())
+  title     String    @unique
+  slug      String    @unique
+  status    Status    @default(ACTIVE)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  products  Product[]
 }
 
-
 model File {
-  id         Int       @id @default(autoincrement())
-  feature    Feature?
-  featureId  Int?
-  path       String
+  id        Int      @id @default(autoincrement())
+  feature   Feature?
+  featureId Int?
+  path      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Hsn {
-  id         Int       @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   code      String    @unique
   tax       Int
-  status     Status   @default(ACTIVE)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  products Product[]
+  status    Status    @default(ACTIVE)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  products  Product[]
 }
 
 model Product {
-  id         Int       @id @default(autoincrement())
-  title      String    @unique
-  slug       String    @unique
+  id         Int      @id @default(autoincrement())
+  title      String   @unique
+  slug       String   @unique
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  categoryId Int 
+  categoryId Int
   mrp        Float
   price      Float
-  Hsn        Hsn?      @relation(fields: [hsnId], references: [id], onDelete: Restrict)
+  Hsn        Hsn?     @relation(fields: [hsnId], references: [id], onDelete: Restrict)
   hsnId      Int?
+  Size       Size?    @relation(fields: [sizeId], references: [id], onDelete: Restrict)
+  sizeId     Int?
+  Color      Color?   @relation(fields: [colorId], references: [id], onDelete: Restrict)
+  colorId    Int?
   stock      Int
   status     Status   @default(ACTIVE)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Size {
+  id        Int       @id @default(autoincrement())
+  title     String    @unique
+  status    Status    @default(ACTIVE)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  products  Product[]
+}
+
+model Color {
+  id        Int       @id @default(autoincrement())
+  title     String    @unique
+  code      String    @unique
+  status    Status    @default(ACTIVE)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  products  Product[]
 }

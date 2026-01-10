@@ -2,56 +2,45 @@
 import React from "react";
 import Breadcrumb from "../Common/Breadcrumb";
 import Link from "next/link";
-import { getProducts } from "../../http/apiCalls.js";
+import { getColors } from "../../http/apiCalls.js";
 import PlusIcon from "../Common/PlusIcon";
-import { Input, Table } from "antd"
+import { Table } from "antd"
 import { STATUS_COLOR, STATUS_TYPES } from "../../utils/constants.js"
 import EditIcon from "../Common/EditIcon";
-import { PRODUCT_NEW_URL, PRODUCT_URL } from "@/utils/appUrls";
+import { COLOR_NEW_URL, COLOR_URL } from "@/utils/appUrls";
 
-const Product = () => {
-  const [productItems, setProductItems] = React.useState([]);
-  const [totalCount, setTotalCount] = React.useState(0);
-  const [pagination, setPagination] = React.useState({ pageNumber: 1, pageSize: 10});
-  const [search, setSearch] = React.useState('');
+const Color = () => {
+  const [items, setItems] = React.useState([]);
 
   React.useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchItems = async () => {
       try {
-        const data = await getProducts({...pagination, search});
-        setProductItems(data?.data || []);
-        setTotalCount(data?.totalCount || 0);
+        const data = await getColors();
+        setItems(data?.data || []);
       } catch (err) {
         console.error(err);
       }
     };
 
-    fetchProducts();
-  }, [pagination, search]);
+    fetchItems();
+  }, []);
 
   const columns = [
     {
-      title: 'Image',
-      dataIndex: 'img',
-      key: 'img',
-      render: (text) => {
-        return <img className="w-20 h-20" src={text}/>
+      title: 'Title',
+      dataIndex: 'title',
+      key: 'title',
+      render: (title) => {
+        return (
+          <div className="w-full flex flex-row">
+            <div>{title}</div>
+          </div> )
       },
     },
     {
-      title: 'Name',
-      dataIndex: 'title',
-      key: 'title',
-    },
-    {
-      title: 'Category',
-      dataIndex: 'categoryName',
-      key: 'categoryName',
-    },
-    {
       title: 'Color',  
-      dataIndex: 'colorCode',
-      key: 'color',
+      dataIndex: 'code',
+      key: 'code',
       render: (code) => {
         return (
           <div className="w-full flex flex-row">
@@ -60,12 +49,7 @@ const Product = () => {
       },
     },
     {
-      title: 'Size',  
-      dataIndex: 'sizeName',
-      key: 'size',
-    },
-    {
-      title: 'Status',
+      title: 'Status',  
       dataIndex: 'status',
       key: 'status',
       render: (text) => {
@@ -81,13 +65,13 @@ const Product = () => {
     },
     {
       title: 'Action',
-      dataIndex: 'slug',
+      dataIndex: 'title',
       key: 'action',
-      render: (slug) => {
+      render: (title) => {
         return(
           <>
             <Link
-                  href={PRODUCT_URL + `/${slug}`}
+                  href={COLOR_URL + `/${title}`}
                   className="inline-flex items-center gap-2 text-dark hover:text-green transition"
                   >
                   <EditIcon/ >
@@ -103,35 +87,22 @@ const Product = () => {
     <>
       {/* <!-- ===== Breadcrumb Section Start ===== --> */}
       <section>
-        <Breadcrumb title={"Product"} pages={["Product"]} />
+        <Breadcrumb title={"Color"} pages={["Color"]} />
       </section>
       {/* <!-- ===== Breadcrumb Section End ===== --> */}
         <section className="overflow-hidden py-20 bg-gray-2">
           <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
             <div className="flex flex-wrap items-center justify-between gap-5 mb-7.5">
-              <div>
-                <Input placeholder="Search" type="text" value={search} onChange={(e) => setSearch(e.target.value)} />
-              </div>
+              <div></div>
               <Link
-                href={PRODUCT_NEW_URL}
+                href={COLOR_NEW_URL}
                 className="inline-flex items-center gap-2 text-dark hover:text-green transition"
               >
                 <PlusIcon />
-                <span>Add&nbsp;Product</span>
+                <span>Add&nbsp;Color</span>
               </Link>
             </div>
-            <Table dataSource={productItems} columns={columns} rowKey="id"
-             pagination={{
-                current: pagination.pageNumber,
-                pageSize: pagination.pageSize,
-                total: totalCount,
-                showSizeChanger: true,
-                pageSizeOptions: ['10', '20'],
-                onChange(page, pageSize) {
-                  setPagination({pageNumber: page, pageSize});
-                },
-              }}
-            />
+            <Table dataSource={items} columns={columns} rowKey="id" pagination={false} />
           </div>
         </section>
       
@@ -139,4 +110,4 @@ const Product = () => {
   );
 };
 
-export default Product;
+export default Color;

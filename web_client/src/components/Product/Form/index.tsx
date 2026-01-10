@@ -2,11 +2,12 @@
 
 import Breadcrumb from "@/components/Common/Breadcrumb";
 import FileUploader from "@/components/Common/FileUploader";
-import { createProduct, deleteProduct, getCategories, getHsnCodes, getProductBySlug, updateProduct } from "@/http/apiCalls";
+import { createProduct, deleteProduct, getCategories, getColors, getHsnCodes, getProductBySlug, getSizes, updateProduct } from "@/http/apiCalls";
 import { STATUS_TYPES } from "@/utils/constants";
 import { PRODUCT_URL } from "@/utils/appUrls";
 import React from "react";
 import { useRouter } from "next/navigation";
+import { Select } from "antd";
 
 const ProductForm = ({ params }) => {
   const router = useRouter();
@@ -18,6 +19,10 @@ const ProductForm = ({ params }) => {
   const [categoryId, setCategoryId] = React.useState(null);
   const [hsnItems, setHsnItems] = React.useState([]);
   const [hsnId, setHsnId] = React.useState(null);
+  const [colorId, setColorId] = React.useState(null);
+  const [colorItems, setColorItems] = React.useState([]);
+  const [sizeId, setSizeId] = React.useState(null);
+  const [sizeItems, setSizeItems] = React.useState([]);
   const [mrp, setMrp] = React.useState(1);
   const [price, setPrice] = React.useState(1);
   const [stock, setStock] = React.useState(1);
@@ -37,6 +42,32 @@ const ProductForm = ({ params }) => {
     };
 
     fetchCategories();
+  }, []);
+
+  React.useEffect(() => {
+    const fetchColors = async () => {
+      try {
+        const data = await getColors({status: STATUS_TYPES.ACTIVE});
+        setColorItems(data?.data || []);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchColors();
+  }, []);
+
+  React.useEffect(() => {
+    const fetchSizes = async () => {
+      try {
+        const data = await getSizes({status: STATUS_TYPES.ACTIVE});
+        setSizeItems(data?.data || []);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchSizes();
   }, []);
 
   React.useEffect(() => {
@@ -61,7 +92,7 @@ const ProductForm = ({ params }) => {
       window.alert("Select a file ...!");
       return;
     }
-    let data = { title, status, categoryId, hsnId, mrp, price, stock, fileIds: [...fileIdsRef.current], deletedFileIds: [...deletedFileIdsRef.current] }
+    let data = { title, status, categoryId, hsnId, sizeId, colorId, mrp, price, stock, fileIds: [...fileIdsRef.current], deletedFileIds: [...deletedFileIdsRef.current] }
     let response:any;
     if(isNew){
       response = await createProduct(data);
@@ -97,6 +128,8 @@ const ProductForm = ({ params }) => {
         setImages(editDataRef.current.images);
         setCategoryId(editDataRef.current.categoryId);
         setHsnId(editDataRef.current.hsnId);
+        setColorId(editDataRef.current.colorId);
+        setSizeId(editDataRef.current.sizeId);
         setMrp(editDataRef.current.mrp);
         setPrice(editDataRef.current.price);
         setStock(editDataRef.current.stock);
@@ -151,6 +184,48 @@ const ProductForm = ({ params }) => {
                     <option key={value.id} value={value.id}>{value.title}</option>
                   )}
                 </select>
+              </div>
+
+              {/* Color / Size */}
+              <div className="mb-7 flex w-full gap-5">
+                <div className="w-1/2">
+                  <label className="block mb-2.5">Color</label>
+                  <Select value={colorId} onChange={(value) => setColorId(value)} style={{ width: 200 }} className="h-13 bg-gray">
+                    {colorItems.map(item => (
+                      <Select.Option key={item.id} value={item.id}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span
+                            style={{
+                              width: 16,
+                              height: 16,
+                              backgroundColor: item.code,
+                              display: 'inline-block',
+                              borderRadius: 4,
+                              border: '1px solid #ccc'
+                            }}
+                          />
+                          {item.title}
+                        </div>
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </div>
+                <div className="w-1/2">
+                  <label className="block mb-2.5">Size</label>
+                  <select
+                    itemType="number"
+                    value={sizeId}
+                    onChange={(e) => {
+                      setSizeId(e.target.value); 
+                    }}
+                    className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                    >
+                    <option value={null}>Select</option>
+                    {sizeItems.map(value => 
+                      <option key={value.id} value={value.id}>{value.title}</option>
+                    )}
+                  </select>
+                </div>
               </div>
 
               {/* Hsn */}

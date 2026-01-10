@@ -26,6 +26,8 @@ export const productBodySchema = Joi.object({
   title: Joi.string().min(1).max(100).required(),
   categoryId: Joi.number().required(), 
   hsnId: Joi.number().optional(), 
+  colorId: Joi.number().optional(), 
+  sizeId: Joi.number().optional(), 
   mrp: Joi.number().required(), 
   price: Joi.number().required(), 
   stock: Joi.number().required(), 
@@ -35,6 +37,21 @@ export const productBodySchema = Joi.object({
   deletedFileIds: Joi.array()
     .items(Joi.number().integer().positive())
     .optional(),
+  status: Joi.string()
+    .valid(...Object.values(STATUS_TYPES))
+    .default(STATUS_TYPES.ACTIVE),
+});
+
+export const sizeBodySchema = Joi.object({
+  title: Joi.string().min(1).max(100).required(),
+  status: Joi.string()
+    .valid(...Object.values(STATUS_TYPES))
+    .default(STATUS_TYPES.ACTIVE),
+});
+
+export const colorBodySchema = Joi.object({
+  title: Joi.string().min(1).max(100).required(),
+  code: Joi.string().min(1).max(100).required(),
   status: Joi.string()
     .valid(...Object.values(STATUS_TYPES))
     .default(STATUS_TYPES.ACTIVE),

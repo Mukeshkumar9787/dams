@@ -7,11 +7,11 @@ import { fileService } from "./index.js";
 /**
  * Create Product
  */
-const createProduct = async ({ title, fileIds, deletedFileIds, categoryId, hsnId, mrp, price, stock, status }) => {
+const createProduct = async ({ title, fileIds, deletedFileIds, categoryId, hsnId, mrp, price, stock, status, sizeId, colorId }) => {
   let product = null;
 
   await prisma.$transaction( async (tx) => {
-    product = await tx.Product.create({ data: { title, slug: slugText(title), categoryId, hsnId, mrp, price, stock, status }});
+    product = await tx.Product.create({ data: { title, slug: slugText(title), categoryId, hsnId, mrp, price, stock, status, sizeId, colorId }});
     await fileService.updateFilesByIds({ tx, feature: FEATURE_TYPES.PRODUCT, featureId: product.id, fileIds, deletedFileIds })
   })
 
@@ -50,9 +50,13 @@ const getProducts = async ({ status, pageNumber=1, pageSize=10, search='' }) => 
         p.mrp,
         p.price,
         c.title as "categoryName",
+        s.title as "sizeName",
+        color.code as "colorCode",
         (select f."path"  from "File" f where f.feature = ${FEATURE_TYPES.PRODUCT} and f."featureId" = p."id" order by f."createdAt" asc limit 1) as img
       FROM "Product" p
       LEFT JOIN "Category" c ON c."id" = p."categoryId"
+      LEFT JOIN "Size" s ON s."id" = p."sizeId"
+      LEFT JOIN "Color" color ON color."id" = p."colorId"
       ${whereClause}
       ORDER BY p."createdAt" DESC
       OFFSET ${offset} LIMIT ${pageSize};
@@ -103,7 +107,7 @@ const getProductBySlug = async (slug) => {
 /**
  * Update Product
  */
-const updateProduct = async (id, { title, fileIds, deletedFileIds, categoryId, hsnId, mrp, price, stock, status }) => {
+const updateProduct = async (id, { title, fileIds, deletedFileIds, categoryId, hsnId, mrp, price, stock, status, sizeId, colorId }) => {
   let updated = null;
   let deletedFiles = [];
   
@@ -116,7 +120,7 @@ const updateProduct = async (id, { title, fileIds, deletedFileIds, categoryId, h
           title,
           slug: slugText(title),
           categoryId, hsnId, mrp: parseFloat(mrp), price: parseFloat(price), stock,
-          status
+          status, sizeId, colorId
         },
       }),
       fileService.updateFilesByIds({ tx, feature: FEATURE_TYPES.PRODUCT, featureId: id, fileIds, deletedFileIds })
