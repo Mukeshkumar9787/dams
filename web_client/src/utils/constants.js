@@ -18,3 +18,8 @@ export const STATUS_COLOR = {
     ACTIVE: "green",
     INACTIVE: "red"
 }
+
+export const PROJECT_DETAILS = {
+    name: "DAMS",
+    description: "ecommerce platform"
+}

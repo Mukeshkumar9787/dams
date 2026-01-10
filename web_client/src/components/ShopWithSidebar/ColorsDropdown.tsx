@@ -1,11 +1,26 @@
 "use client";
+import { getColors } from "@/http/apiCalls";
+import { STATUS_TYPES } from "@/utils/constants";
+import { getContrastTextColor } from "@/utils/helper";
 import React, { useState } from "react";
+
 
 const ColorsDropdwon = () => {
   const [toggleDropdown, setToggleDropdown] = useState(true);
-  const [activeColor, setActiveColor] = useState("blue");
-
-  const colors = ["red", "blue", "orange", "pink", "purple"];
+  const [activeColor, setActiveColor] = useState(null);
+  const [colorItems, setColorItems] = useState([]);
+  React.useEffect(() => {
+      const fetchColors = async () => {
+        try {
+          const data = await getColors({status: STATUS_TYPES.ACTIVE});
+          setColorItems(data?.data || []);
+        } catch (err) {
+          console.error(err);
+        }
+      };
+  
+      fetchColors();
+    }, []);
 
   return (
     <div className="bg-white shadow-1 rounded-lg">
@@ -46,31 +61,20 @@ const ColorsDropdwon = () => {
           toggleDropdown ? "flex" : "hidden"
         }`}
       >
-        {colors.map((color, key) => (
+        {colorItems.map((color) => (
           <label
-            key={key}
-            htmlFor={color}
+            key={color.id}
+            htmlFor={color.title}
             className="cursor-pointer select-none flex items-center"
+            onClick={() => {setActiveColor(color.id)}}
           >
-            <div className="relative">
-              <input
-                type="radio"
-                name="color"
-                id={color}
-                className="sr-only"
-                onChange={() => setActiveColor(color)}
-              />
-              <div
-                className={`flex items-center justify-center w-5.5 h-5.5 rounded-full ${
-                  activeColor === color && "border"
-                }`}
-                style={{ borderColor: `${color}` }}
-              >
-                <span
-                  className="block w-3 h-3 rounded-full"
-                  style={{ backgroundColor: `${color}` }}
-                ></span>
-              </div>
+            <div
+              className="block w-8 h-8 rounded-full text-center flex items-center justify-center"
+              style={{ backgroundColor: color.code, color: getContrastTextColor(color.code) }}
+            >
+              <span>
+                {(activeColor === color.id) ? `✔` : ""}
+              </span>
             </div>
           </label>
         ))}
