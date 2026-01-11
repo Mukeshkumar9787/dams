@@ -5,22 +5,21 @@ import { getContrastTextColor } from "@/utils/helper";
 import React, { useState } from "react";
 
 
-const ColorsDropdwon = () => {
+const ColorsDropdwon = ({ setColorFilter }) => {
   const [toggleDropdown, setToggleDropdown] = useState(true);
-  const [activeColor, setActiveColor] = useState(null);
   const [colorItems, setColorItems] = useState([]);
   React.useEffect(() => {
-      const fetchColors = async () => {
-        try {
-          const data = await getColors({status: STATUS_TYPES.ACTIVE});
-          setColorItems(data?.data || []);
-        } catch (err) {
-          console.error(err);
-        }
-      };
-  
-      fetchColors();
-    }, []);
+    const fetchColors = async () => {
+      try {
+        const data = await getColors({status: STATUS_TYPES.ACTIVE});
+        setColorItems(data?.data || []);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchColors();
+  }, []);
 
   return (
     <div className="bg-white shadow-1 rounded-lg">
@@ -66,15 +65,12 @@ const ColorsDropdwon = () => {
             key={color.id}
             htmlFor={color.title}
             className="cursor-pointer select-none flex items-center"
-            onClick={() => {setActiveColor(color.id)}}
+            onClick={() => {setColorFilter(color.code)}}
           >
             <div
               className="block w-8 h-8 rounded-full text-center flex items-center justify-center"
-              style={{ backgroundColor: color.code, color: getContrastTextColor(color.code) }}
+              style={{ backgroundColor: color.code }}
             >
-              <span>
-                {(activeColor === color.id) ? `✔` : ""}
-              </span>
             </div>
           </label>
         ))}

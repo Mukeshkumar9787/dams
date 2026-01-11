@@ -3,7 +3,7 @@ import { getSizes } from "@/http/apiCalls";
 import { STATUS_TYPES } from "@/utils/constants";
 import React, { useState } from "react";
 
-const SizeDropdown = () => {
+const SizeDropdown = ({ setSizeFilter }) => {
   const [toggleDropdown, setToggleDropdown] = useState(true);
   const [sizeItems, setSizeItems] = useState([]);
   React.useEffect(() => {
@@ -62,6 +62,7 @@ const SizeDropdown = () => {
           <label key={size.id}
             htmlFor={size.title}
             className="cursor-pointer select-none flex items-center rounded-md hover:bg-blue hover:text-white"
+            onClick={()=>{setSizeFilter(size.title)}}
           >
             <div className="relative">
               <input type="radio" name="size" id="sizeM" className="sr-only" />

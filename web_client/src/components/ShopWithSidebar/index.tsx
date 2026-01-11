@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Breadcrumb from "../Common/Breadcrumb";
 import CategoryDropdown from "./CategoryDropdown";
 import SizeDropdown from "./SizeDropdown";
@@ -7,6 +7,8 @@ import ColorsDropdwon from "./ColorsDropdown";
 import SingleGridItem from "../Shop/SingleGridItem";
 import { Pagination } from "antd";
 import { getProducts } from "@/http/apiCalls";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
+import Filter from "./Filter";
 
 const ShopWithSidebar = () => {
   const [productSidebar, setProductSidebar] = useState(false);
@@ -14,21 +16,35 @@ const ShopWithSidebar = () => {
   const [productItems, setProductItems] = React.useState([]);
   const [totalCount, setTotalCount] = React.useState(0);
   const [pagination, setPagination] = React.useState({ pageNumber: 1, pageSize: 6});
-  const [search, setSearch] = React.useState('');
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const params = new URLSearchParams(searchParams.toString());
+  
+  const fetchProducts = useCallback(async () => {
+    try {
+      const params = new URLSearchParams(searchParams.toString());
+      const category = params.get('category');
+      const size = params.get('size');
+      const color = params.get('color');
+
+      const data = await getProducts({
+        ...pagination,
+        category,
+        size,
+        color,
+      });
+
+      setProductItems(data?.data || []);
+      setTotalCount(data?.totalCount || 0);
+    } catch (err) {
+      console.error(err);
+    }
+  }, [pagination, searchParams]);
 
   React.useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const data = await getProducts({...pagination, search});
-        setProductItems(data?.data || []);
-        setTotalCount(data?.totalCount || 0);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
     fetchProducts();
-  }, [pagination, search]);
+  }, [fetchProducts]);
 
   const handleStickyMenu = () => {
     if (window.scrollY >= 80) {
@@ -56,6 +72,25 @@ const ShopWithSidebar = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   });
+
+  const clearFilter = () => {
+    router.push(pathname);
+  };
+
+  const setCategoryFilter = (category: string) => {
+    params.set('category', category.toString());
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  const setSizeFilter = (size: string) => {
+    params.set('size', size.toString());
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  const setColorFilter = (color: string) => {
+    params.set('color', color.toString());
+    router.push(`${pathname}?${params.toString()}`);
+  };
 
   return (
     <>
@@ -112,18 +147,19 @@ const ShopWithSidebar = () => {
                   <div className="bg-white shadow-1 rounded-lg py-4 px-5">
                     <div className="flex items-center justify-between">
                       <p>Filters:</p>
-                      <button className="text-blue">Clean All</button>
+                      <button className="text-blue" onClick={clearFilter}>Clean All</button>
                     </div>
+                    <Filter />
                   </div>
 
                   {/* <!-- category box --> */}
-                  <CategoryDropdown />
+                  <CategoryDropdown setCategoryFilter={setCategoryFilter} />
 
                   {/* // <!-- size box --> */}
-                  <SizeDropdown />
+                  <SizeDropdown setSizeFilter={setSizeFilter} />
 
                   {/* // <!-- color box --> */}
-                  <ColorsDropdwon />
+                  <ColorsDropdwon setColorFilter={setColorFilter} />
 
                 </div>
               </form>
