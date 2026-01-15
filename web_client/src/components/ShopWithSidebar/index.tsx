@@ -5,10 +5,12 @@ import CategoryDropdown from "./CategoryDropdown";
 import SizeDropdown from "./SizeDropdown";
 import ColorsDropdwon from "./ColorsDropdown";
 import SingleGridItem from "../Shop/SingleGridItem";
-import { Pagination } from "antd";
+import { Button, Pagination } from "antd";
 import { getProducts } from "@/http/apiCalls";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import Filter from "./Filter";
+import { STATUS_TYPES } from "@/utils/constants";
+import { Empty } from 'antd';
 
 const ShopWithSidebar = () => {
   const [productSidebar, setProductSidebar] = useState(false);
@@ -33,6 +35,7 @@ const ShopWithSidebar = () => {
         category,
         size,
         color,
+        status: STATUS_TYPES.ACTIVE
       });
 
       setProductItems(data?.data || []);
@@ -168,7 +171,8 @@ const ShopWithSidebar = () => {
 
             {/* // <!-- Content Start --> */}
             <div className="xl:max-w-[870px] w-full">
-
+            {(productItems.length > 0) ?
+              <>
               {/* <!-- Products Grid Tab Content Start --> */}
               <div
                 className={`${"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-7.5 gap-y-9"}`}
@@ -184,6 +188,15 @@ const ShopWithSidebar = () => {
                 </div>
               </div>
               {/* <!-- Products Pagination End --> */}
+              </>
+              :
+              <Empty description={
+                <div> 
+                  <div>No products found</div>
+                  <Button onClick={clearFilter} type="dashed"> Clear Filters</Button>
+                </div>
+              }/>
+              }
             </div>
             {/* // <!-- Content End --> */}
           </div>

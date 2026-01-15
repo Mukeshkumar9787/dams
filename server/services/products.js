@@ -21,11 +21,24 @@ const createProduct = async ({ title, fileIds, deletedFileIds, categoryId, hsnId
 /**
  * Get all Products
  */
-const getProducts = async ({ status, pageNumber=1, pageSize=10, search='' }) => {
+const getProducts = async ({ status, pageNumber=1, pageSize=10, search='', color, category, size }) => {
   const conditions = [];
 
   if (status) {
     conditions.push(PrismaConfig.sql`p.status = ${status}`);
+  }
+
+  if (color) {
+    conditions.push(PrismaConfig.sql`color.code = ${color}`);
+  }
+
+  if (category) {
+    conditions.push(PrismaConfig.sql`c.slug = ${category}`);
+  }
+
+  
+  if (size) {
+    conditions.push(PrismaConfig.sql`s.title = ${size}`);
   }
   
   if(search) {
@@ -35,7 +48,7 @@ const getProducts = async ({ status, pageNumber=1, pageSize=10, search='' }) => 
 
   const whereClause =
     conditions.length
-      ? PrismaConfig.sql`WHERE ${PrismaConfig.join(conditions, PrismaConfig.sql` AND `)}`
+      ? PrismaConfig.sql`WHERE ${PrismaConfig.join(conditions,` AND `)}`
       : PrismaConfig.empty;
   
   const offset = (pageNumber - 1) * pageSize;
@@ -61,7 +74,13 @@ const getProducts = async ({ status, pageNumber=1, pageSize=10, search='' }) => 
       ORDER BY p."createdAt" DESC
       OFFSET ${offset} LIMIT ${pageSize};
     `,
-    prisma.$queryRaw`SELECT COUNT(1) FROM "Product" p ${whereClause}`
+    prisma.$queryRaw`
+      SELECT COUNT(1) FROM "Product" p 
+      LEFT JOIN "Category" c ON c."id" = p."categoryId"
+      LEFT JOIN "Size" s ON s."id" = p."sizeId"
+      LEFT JOIN "Color" color ON color."id" = p."colorId"
+      ${whereClause}
+    `
   ]);
 
   return { 
