@@ -1,7 +1,7 @@
 import { Tag } from "antd";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-const Filter = ({ }) => { 
+const Filter = ({ clearFilter }) => { 
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
@@ -18,26 +18,22 @@ const Filter = ({ }) => {
         fontSize: 14,
         padding: '6px 12px',
         borderRadius: 6,
-        cursor: 'pointer'
+        cursor: 'pointer',
+        backgroundColor: 'white',
     };
+    if(!category && !color && !size) return <span></span>
     return (
-        <div>
-            <div>
-
+        <div className="flex max-w-full rounded-lg py-4 px-5 items-center flex-wrap gap-3">
             {category && 
                 <Tag
                 key={category}
                 closable
                 style={style}
-                className="cursor-pointer"
                 onClick={() => handleClose('category')}
                 >
-                Category: {category}
+                <span className="font-">Category: </span> <span className="font-bold">{category}</span> 
                 </Tag>
             }
-            </div>
-            <div>
-
             {size && 
                 <Tag
                 key={size}
@@ -45,30 +41,24 @@ const Filter = ({ }) => {
                 closable
                 onClick={() => handleClose('size')}
                 >
-                Size: {size}
+                <span className="font-">Size: </span> <span className="font-bold">{size}</span> 
                 </Tag>
             }
-            </div>
-
-            <div>
-
             {color && 
                 <Tag
                 key={color}
                 style={style}
+                closable
                 onClick={() => handleClose('color')}
+                className="flex"
                 >
-                <span className="flex items-center justify-center">
-                    <span>
-                        Color:
-                    </span>
-                    <span key={color} className={`ml-3 w-8 h-8`} style={{backgroundColor: color}}>
-                    </span>
+                <span className="flex items-center justify-center rounded-lg">
+                    <span> Color: </span>
+                    <span key={color} className={`ml-1 w-5 h-5`} style={{backgroundColor: color}}></span>
                 </span>
                 </Tag>
             }
-            </div>
-
+            <button className="text-blue" onClick={clearFilter}>Clear All Filters</button>
         </div>
     )
 }

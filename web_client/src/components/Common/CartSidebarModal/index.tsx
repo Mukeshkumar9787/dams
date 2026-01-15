@@ -1,22 +1,43 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import { useCartModalContext } from "@/app/context/CartSidebarModalContext";
 import {
   removeItemFromCart,
-  selectTotalPrice,
 } from "@/redux/features/cart-slice";
 import { useAppSelector } from "@/redux/store";
-import { useSelector } from "react-redux";
 import SingleItem from "./SingleItem";
 import Link from "next/link";
 import EmptyCart from "./EmptyCart";
+import { STATUS_TYPES } from "@/utils/constants";
+import { getProducts } from "@/http/apiCalls";
+import { getCurrencyDetails, getProductCountFromCart } from "@/utils/helper";
 
 const CartSidebarModal = () => {
   const { isCartModalOpen, closeCartModal } = useCartModalContext();
   const cartItems = useAppSelector((state) => state.cartReducer.items);
+  const [productItems, setProductItems] = useState([]);
 
-  const totalPrice = useSelector(selectTotalPrice);
+  const fetchProducts = useCallback(async () => {
+    try {
+      if(cartItems.length === 0){
+        setProductItems([]);
+        return;
+      }
+      const data = await getProducts({
+        productIds: cartItems.map(i => i.id),
+        pagination: false,
+        status: STATUS_TYPES.ACTIVE
+      });
+      setProductItems(data?.data || []);
+    } catch (err) {
+      console.error(err);
+    }
+  }, [cartItems]);
+
+  useEffect(() => {
+    fetchProducts();
+  },[fetchProducts])
 
   useEffect(() => {
     // closing modal while clicking outside
@@ -34,6 +55,8 @@ const CartSidebarModal = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isCartModalOpen, closeCartModal]);
+
+  const totalPrice = productItems.reduce((acc, c) => acc + (c.price * getProductCountFromCart(c.id, cartItems)), 0)
 
   return (
     <div
@@ -78,9 +101,9 @@ const CartSidebarModal = () => {
             <div className="flex flex-col gap-6">
               {/* <!-- cart item --> */}
               {cartItems.length > 0 ? (
-                cartItems.map((item, key) => (
+                productItems.map((item) => (
                   <SingleItem
-                    key={key}
+                    key={item.id}
                     item={item}
                     removeItemFromCart={removeItemFromCart}
                   />
@@ -95,20 +118,13 @@ const CartSidebarModal = () => {
             <div className="flex items-center justify-between gap-5 mb-6">
               <p className="font-medium text-xl text-dark">Subtotal:</p>
 
-              <p className="font-medium text-xl text-dark">${totalPrice}</p>
+              <p className="font-medium text-xl text-dark">{getCurrencyDetails().currencySymbol}{totalPrice}</p>
             </div>
 
             <div className="flex items-center gap-4">
               <Link
-                onClick={() => closeCartModal()}
-                href="/cart"
-                className="w-full flex justify-center font-medium text-white bg-blue py-[13px] px-6 rounded-md ease-out duration-200 hover:bg-blue-dark"
-              >
-                View Cart
-              </Link>
-
-              <Link
                 href="/checkout"
+                onClick={() => closeCartModal()}
                 className="w-full flex justify-center font-medium text-white bg-dark py-[13px] px-6 rounded-md ease-out duration-200 hover:bg-opacity-95"
               >
                 Checkout

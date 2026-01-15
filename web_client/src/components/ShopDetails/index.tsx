@@ -127,20 +127,20 @@ const ShopDetails = ({params}) => {
                         </svg>
                       </button>
 
-                      {product.images[previewImg] && (
+                      {/* {product.images[previewImg] && (
                         <img
                           src={product.images[previewImg]}
                           alt="products-details"
                           width={400}
                           height={400}
                         />
-                      )}
+                      )} */}
                     </div>
                   </div>
 
                   {/* ?  &apos;border-blue &apos; :  &apos;border-transparent&apos; */}
                   <div className="flex flex-wrap sm:flex-nowrap gap-4.5 mt-6">
-                    {product.images.map((item, key) => (
+                    {/* {product.images.map((item, key) => (
                       <button
                         onClick={() => setPreviewImg(key)}
                         key={key}
@@ -156,7 +156,7 @@ const ShopDetails = ({params}) => {
                           alt="thumbnail"
                         />
                       </button>
-                    ))}
+                    ))} */}
                   </div>
                 </div>
 

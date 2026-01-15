@@ -20,3 +20,14 @@ export function getContrastTextColor(hexColor) {
   // WCAG recommended threshold
   return luminance > 0.5 ? '#000000' : '#FFFFFF';
 }
+
+export const getCurrencyDetails = () => {
+  return {
+    currencyName: "Indian Rupee",
+    isoCode: "INR",
+    currencyCode: "Rs",
+    currencySymbol: "₹"
+  }
+}
+
+export const getProductCountFromCart = (id, cartItems) => cartItems.find(i => i.id === id)?.quantity || 0;

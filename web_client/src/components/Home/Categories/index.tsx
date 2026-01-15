@@ -8,10 +8,19 @@ import "swiper/css";
 import SingleItem from "./SingleItem";
 import { getCategories } from "@/http/apiCalls";
 import { STATUS_TYPES } from "@/utils/constants";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 
 const Categories = () => {
   const [data, setData] = useState([]);
   const sliderRef = useRef(null);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const params = new URLSearchParams(searchParams.toString());
+
+  const setCategoryFilter = (category: string) => {
+    params.set('category', category.toString());
+    router.push(`/shop?${params.toString()}`);
+  };
 
   const handlePrev = useCallback(() => {
     if (!sliderRef.current) return;
@@ -150,7 +159,7 @@ const Categories = () => {
           >
             {data.map((item, key) => (
               <SwiperSlide key={key}>
-                <SingleItem item={item} />
+                <SingleItem item={item} onClick={()=>{setCategoryFilter(item.slug)}} />
               </SwiperSlide>
             ))}
           </Swiper>

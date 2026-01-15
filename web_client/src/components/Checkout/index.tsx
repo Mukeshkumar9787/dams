@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import Breadcrumb from "../Common/Breadcrumb";
-import Login from "./Login";
 import Shipping from "./Shipping";
 import ShippingMethod from "./ShippingMethod";
 import PaymentMethod from "./PaymentMethod";
@@ -12,14 +11,12 @@ const Checkout = () => {
   return (
     <>
       <Breadcrumb title={"Checkout"} pages={["checkout"]} />
-      <section className="overflow-hidden py-20 bg-gray-2">
+      <section className="overflow-hidden py-20 pt-5 bg-gray-2">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
           <form>
             <div className="flex flex-col lg:flex-row gap-7.5 xl:gap-11">
               {/* <!-- checkout left --> */}
               <div className="lg:max-w-[670px] w-full">
-                {/* <!-- login box --> */}
-                <Login />
 
                 {/* <!-- billing details --> */}
                 <Billing />
@@ -124,9 +121,6 @@ const Checkout = () => {
 
                 {/* <!-- coupon box --> */}
                 <Coupon />
-
-                {/* <!-- shipping box --> */}
-                <ShippingMethod />
 
                 {/* <!-- payment box --> */}
                 <PaymentMethod />
