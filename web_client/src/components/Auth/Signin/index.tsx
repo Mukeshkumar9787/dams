@@ -1,10 +1,35 @@
+"use client"
 import Breadcrumb from "@/components/Common/Breadcrumb";
+import { Button, Modal } from "antd";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const Signin = () => {
+  const [alertModal, setAlertModal] = useState(false);
+  let next = localStorage.getItem('next'); 
+  useEffect(() => {
+    if(next){
+      setAlertModal(true);
+    }
+  },[]);
   return (
     <>
+      <Modal
+        open={alertModal}
+        closable={false}
+        centered
+        footer={[
+        <Button
+          key="ok"
+          type="dashed"
+          onClick={() => setAlertModal(false)}
+        >
+          Ok
+        </Button>,
+      ]}
+      >
+        Login to proceed...!
+      </Modal>
       <Breadcrumb title={"Signin"} pages={["Signin"]} />
       <section className="overflow-hidden py-20 bg-gray-2">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">

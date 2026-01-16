@@ -1,13 +1,24 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import Breadcrumb from "../Common/Breadcrumb";
-import Shipping from "./Shipping";
-import ShippingMethod from "./ShippingMethod";
 import PaymentMethod from "./PaymentMethod";
 import Coupon from "./Coupon";
 import Billing from "./Billing";
+import { getLoggedInUserData } from "@/utils/helper";
+import { useRouter } from "next/navigation";
 
 const Checkout = () => {
+  const router = useRouter();
+  useEffect(()=> {
+    const navigateGuestUser = async() => {
+      let user = await getLoggedInUserData();
+      if(!user) {
+        localStorage.setItem("next", 'checkout');
+        router.push('/signin');
+      }
+    }
+    navigateGuestUser();
+  },[]);
   return (
     <>
       <Breadcrumb title={"Checkout"} pages={["checkout"]} />
@@ -17,29 +28,8 @@ const Checkout = () => {
             <div className="flex flex-col lg:flex-row gap-7.5 xl:gap-11">
               {/* <!-- checkout left --> */}
               <div className="lg:max-w-[670px] w-full">
-
                 {/* <!-- billing details --> */}
                 <Billing />
-
-                {/* <!-- address box two --> */}
-                <Shipping />
-
-                {/* <!-- others note box --> */}
-                <div className="bg-white shadow-1 rounded-[10px] p-4 sm:p-8.5 mt-7.5">
-                  <div>
-                    <label htmlFor="notes" className="block mb-2.5">
-                      Other Notes (optional)
-                    </label>
-
-                    <textarea
-                      name="notes"
-                      id="notes"
-                      rows={5}
-                      placeholder="Notes about your order, e.g. speacial notes for delivery."
-                      className="rounded-md border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full p-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
-                    ></textarea>
-                  </div>
-                </div>
               </div>
 
               {/* // <!-- checkout right --> */}
