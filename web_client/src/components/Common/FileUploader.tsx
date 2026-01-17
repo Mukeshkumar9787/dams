@@ -22,9 +22,11 @@ const FileUploader = ({ files, setFiles, multiSelect = false, fileIdsRef, delete
       }else{
         if(prev){
           let onlyFileId = prev.id;
-          deletedFileIdsRef.current.add(onlyFileId);
-          fileIdsRef.current.delete(onlyFileId);
+          if(onlyFileId){
+            deletedFileIdsRef.current.add(onlyFileId);
+          };
         };
+        fileIdsRef.current.add(response.data.id);
       }
       return response.data;
     })
@@ -36,6 +38,7 @@ const FileUploader = ({ files, setFiles, multiSelect = false, fileIdsRef, delete
     }else{
       setFiles(null);
     }
+    if(!id) return;
     deletedFileIdsRef.current.add(id);
     if(fileIdsRef.current.has(id)){
       fileIdsRef.current.delete(id)
