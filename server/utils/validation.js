@@ -76,6 +76,13 @@ export const registerSchema = Joi.object({
     .required()
 });
 
+export const resetPasswordSchema = Joi.object({
+  email: Joi.string().min(1).max(100).required(),
+  password: Joi.string()
+    .pattern(/^(?=.*[A-Z])(?=.*\d).{8,}$/)
+    .required()
+});
+
 export const verifyOTPSchema = Joi.object({
   email: Joi.string().min(1).max(100).required(),
   type: Joi.string()

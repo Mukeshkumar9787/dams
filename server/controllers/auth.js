@@ -22,6 +22,20 @@ const register = async (req, res) => {
   }
 };
 
+const resetPassword = async (req, res) => {
+  try {
+    const result = await authService.resetPassword(req.body);
+
+    return res.status(200).json({
+      success: true,
+      message: "Otp sent successfully",
+      data: result
+    });
+  } catch (err) {
+      return errorHandler(err, res);
+  }
+};
+
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -69,5 +83,6 @@ export default {
   register,
   login,
   verifyOTP,
-  loginWithOTP
+  loginWithOTP,
+  resetPassword
 };

@@ -1,12 +1,15 @@
 import express from "express";
 import authController from "../controllers/auth.js"; // use .js extension
 import validateInput from "../middlewares/requestValidationMiddleware.js";
-import { loginSchema, loginWithOTPSchema, registerSchema, verifyOTPSchema } from "../utils/validation.js";
+import { loginSchema, loginWithOTPSchema, registerSchema, resetPasswordSchema, verifyOTPSchema } from "../utils/validation.js";
 
 const router = express.Router();
 
 // Register user
 router.post("/register", validateInput(registerSchema),  authController.register);
+
+
+router.post("/reset-password", validateInput(resetPasswordSchema),  authController.resetPassword);
 
 // Login user
 router.post("/login", validateInput(loginSchema),authController.login);

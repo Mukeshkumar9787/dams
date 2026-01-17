@@ -26,7 +26,7 @@ const Signin = () => {
       e.preventDefault();
       const formData = new FormData(e.target);
       const values = Object.fromEntries(formData.entries());
-      if(!PASSWORD_REGEX.test(values.password)){
+      if(!PASSWORD_REGEX.test(values.password.toString())){
         setAlert('regex');
         return
       }

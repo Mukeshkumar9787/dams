@@ -49,6 +49,39 @@ const register = async ({ name, email, password, mobile }) => {
   }
 };
 
+const resetPassword = async ({ email, password }) => {
+  const existing = await prisma.user.findUnique({ where: { email } });
+
+  if (!existing) {
+    const err = new Error("Account doesn't exists");
+    err.statusCode = 400;
+    throw err;
+  }
+  const otp = generateSecureOTP();
+  sendMail({ to: email, 
+    subject: `${process.env.APP_NAME} OTP for Reset Password`, 
+    html: `
+    <h2>OTP Verification</h2>
+    <p>Your OTP is:</p>
+    <h1>${otp}</h1>
+    <p>Expires in 5 minutes</p>
+    ` })
+  const hashed = await hashedPassword(password);
+  await prisma.otp.create({
+    data: {
+      type: OTP_TYPES.RESET_PASSWORD,
+      email,
+      otp: hashOTP(otp),
+      meta: {
+        password: hashed,
+      }
+    }
+  });
+  return {
+    email
+  }
+};
+
 const loginWithOTP = async ({ email }) => {
   const user = await prisma.user.findUnique({ where: { email } });
 
@@ -181,5 +214,6 @@ export default {
   register,
   login,
   verifyOTP,
-  loginWithOTP
+  loginWithOTP,
+  resetPassword
 };

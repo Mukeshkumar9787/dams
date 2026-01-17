@@ -6,11 +6,13 @@ import Dropdown from "./Dropdown";
 import { useAppSelector } from "@/redux/store";
 import { useCartModalContext } from "@/app/context/CartSidebarModalContext";
 import Image from "next/image";
+import { getLoggedInUserData } from "@/utils/helper";
 
 const Header = () => {
   const [navigationOpen, setNavigationOpen] = useState(false);
   const [stickyMenu, setStickyMenu] = useState(false);
   const { openCartModal } = useCartModalContext();
+  const [user, setUser] = useState(null);
 
   const product = useAppSelector((state) => state.cartReducer.items);
 
@@ -30,6 +32,15 @@ const Header = () => {
   useEffect(() => {
     window.addEventListener("scroll", handleStickyMenu);
   });
+
+  useEffect(()=>{
+    if(!localStorage.getItem('token')) return;
+    const fetchUser = async() => {
+      const userData = await getLoggedInUserData();
+      setUser(userData);
+    }
+    fetchUser();
+  },[])
 
   return (
     <header

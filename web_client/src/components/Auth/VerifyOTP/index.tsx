@@ -4,6 +4,7 @@ import { Button, Modal } from "antd";
 import { useRouter } from "next/navigation";
 import ResendButton from "../../Common/ResendButton";
 import { afterSucessfullLogin } from "@/utils/helper";
+import { VERIFY_OTP_TYPES } from "@/utils/constants";
 
 const VerifyOTP = ({ type, sentTo=null, isOpen, onClose, resendOtp=null }) => {
   const router = useRouter();
@@ -15,7 +16,12 @@ const VerifyOTP = ({ type, sentTo=null, isOpen, onClose, resendOtp=null }) => {
         const values = Object.fromEntries(formData.entries());
         const response = await verifyOTP({...values, type});
         if(response.success){
-          afterSucessfullLogin(router, response.data.token);
+          if(type === VERIFY_OTP_TYPES.RESET_PASSWORD){
+            window.alert("Password Changed Successfully");
+            router.push('/signin');
+          }else{
+            afterSucessfullLogin(router, response.data.token);
+          }
         }
       } catch (error) {
         console.log(error);

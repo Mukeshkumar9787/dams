@@ -13,8 +13,9 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use((config) => {
   try {
     // Do something before request is sent
-    if (window._token) {
-      config.headers.authorization = `Bearer ${window._token}`; // eslint-disable-line
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.authorization = `Bearer ${token}`; // eslint-disable-line
     }
   } catch (error) {}
   return config;

@@ -1,3 +1,4 @@
+import { getUserInfo } from "@/http/apiCalls";
 
 export function getContrastTextColor(hexColor) {
   // Remove #
@@ -33,9 +34,12 @@ export const getCurrencyDetails = () => {
 export const getProductCountFromCart = (id, cartItems) => cartItems.find(i => i.id === id)?.quantity || 0;
 
 export const getLoggedInUserData = async () => {
-  let token = localStorage.getItem('token');
-  if(!token) return null;
-  return { userName: "Mukeshkumar" }
+  try {
+    const user = await getUserInfo();
+    return user.data || null;
+  } catch (error) {
+    return null;
+  } 
 }
 
 export const afterSucessfullLogin = (router, token) => {
