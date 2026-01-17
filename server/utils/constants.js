@@ -13,3 +13,10 @@ export const ROLE_TYPES = {
     USER: 'USER',
     ADMIN: 'ADMIN'
 }
+
+export const OTP_TYPES = {
+    LOGIN: 'LOGIN',
+    REGISTER: 'REGISTER',
+    RESET_PASSWORD: 'RESET_PASSWORD'
+}
+

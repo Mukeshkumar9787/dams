@@ -1,5 +1,5 @@
 
-import { API_CATEGORIES, API_COLOR, API_FILES, API_HSN, API_PRODUCTS, API_SIZE } from './apiUrls';
+import { API_CATEGORIES, API_COLOR, API_FILES, API_HSN, API_LOGIN, API_LOGIN_WITH_OTP, API_PRODUCTS, API_REGISTER, API_SIZE, API_VERIFY_OTP } from './apiUrls';
 import axiosInstance from './axiosInstance';
 
 export async function getCategories(params) {
@@ -133,5 +133,25 @@ export async function updateColor(data) {
 
 export async function deleteColor(data) {
   const res = await axiosInstance.delete(`${API_COLOR}/${data.id}`);
+  return res.data;
+}
+
+export async function register(data) {
+  const res = await axiosInstance.post(API_REGISTER, data );
+  return res.data;
+}
+
+export async function login(data) {
+  const res = await axiosInstance.post(API_LOGIN, data );
+  return res.data;
+}
+
+export async function verifyOTP(data) {
+  const res = await axiosInstance.post(API_VERIFY_OTP, data );
+  return res.data;
+}
+
+export async function loginWithOTP(data) {
+  const res = await axiosInstance.post(API_LOGIN_WITH_OTP, data );
   return res.data;
 }

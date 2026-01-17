@@ -28,3 +28,9 @@ export const deleteFiles = (files) => {
 export const slugText = (text) => {
   return text.replace(/\s+/g, '-');
 }
+
+export const OTP_EXPIRY_MINUTES = 5 * 60 * 1000;
+
+export function isOtpExpired(createdAt) {
+  return (Date.now() - createdAt.getTime()) > OTP_EXPIRY_MINUTES;
+}

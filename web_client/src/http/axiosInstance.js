@@ -27,7 +27,7 @@ axiosInstance.interceptors.response.use((response) => {
   return response
 }, (error) => {
   try {
-    window.alert(error?.response?.data?.message || 'Something went wrong');
+    window.alert(error?.response?.data?.errors || error?.response?.data?.message || 'Something went wrong');
   } catch (err) {}
   return  error?.response || { data: { success: false, message: "Something went wrong"}}
 });

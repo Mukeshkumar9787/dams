@@ -37,3 +37,10 @@ export const getLoggedInUserData = async () => {
   if(!token) return null;
   return { userName: "Mukeshkumar" }
 }
+
+export const afterSucessfullLogin = (router, token) => {
+  localStorage.setItem("token", token);
+  const next = localStorage.getItem('next'); 
+  router.push(next ? next : '/');
+  localStorage.removeItem('next');
+}

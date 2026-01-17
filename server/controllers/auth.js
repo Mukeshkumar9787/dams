@@ -37,8 +37,37 @@ const login = async (req, res) => {
   }
 };
 
+const loginWithOTP = async (req, res) => {
+  try {
+    const result = await authService.loginWithOTP(req.body);
+    return res.status(200).json({
+      success: true,
+      message: "OTP sent successfully",
+      data: result
+    });
+  } catch (err) {
+      return errorHandler(err, res);
+  }
+};
+
+const verifyOTP = async (req, res) => {
+  try {
+    const result = await authService.verifyOTP(req.body);
+    return res.status(200).json({
+      success: true,
+      message: "Registered successfully",
+      data: result
+    });
+  } catch (err) {
+      return errorHandler(err, res);
+  }
+};
+
+
 // Export as default object for easier import in routes
 export default {
   register,
   login,
+  verifyOTP,
+  loginWithOTP
 };

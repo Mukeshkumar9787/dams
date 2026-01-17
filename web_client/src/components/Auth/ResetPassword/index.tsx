@@ -5,42 +5,41 @@ import ModalInfo from "@/components/Common/ModalInfo";
 import Link from "next/link";
 import { afterSucessfullLogin } from "@/utils/helper";
 import { login } from "@/http/apiCalls";
-import { useRouter } from "next/navigation";
-import PasswordInput from "@/components/Common/PasswordInput";
-import { getAlertContent, PASSWORD_REGEX } from "@/utils/constants";
+import VerifyOTP from "../VerifyOTP";
 
 const Signin = () => {
-  const [alert, setAlert] = useState(null);
-  
-  const router = useRouter();
+  const [formType, setFormType] = useState(null);
+  const [alertModal, setAlertModal] = useState(false);
   useEffect(() => {
-    let next = localStorage.getItem('loginToProceed'); 
-    localStorage.removeItem('loginToProceed'); 
+    let next = localStorage.getItem('next'); 
     if(next){
-      setAlert('loginToProceed');
+      setAlertModal(true);
     }
   },[]);
-
+  const onClose = () => {
+    setAlertModal(false);
+  }
   const handleSubmit = async(e) => {
     try {
       e.preventDefault();
       const formData = new FormData(e.target);
       const values = Object.fromEntries(formData.entries());
-      if(!PASSWORD_REGEX.test(values.password)){
-        setAlert('regex');
-        return
-      }
       const response = await login(values);
       if(response.success){
-        afterSucessfullLogin(router, response.data.token);
+        afterSucessfullLogin(response.data.token);
       }
     } catch (error) {
       console.log(error);
     }
   }
+  const verficationClose = () => {
+    setFormType(null);
+  }
   return (
     <>
-      <ModalInfo isOpen={alert} content={getAlertContent(alert)} closable={false} onOk={()=> {setAlert(null)}}  />
+      <VerifyOTP isOpen={formType} type={formType}
+      onClose={verficationClose} />
+      <ModalInfo isOpen={alertModal} closable={false} content={<>Login to Proceed</>} onOk={onClose}  />
       <Breadcrumb title={"Signin"} pages={["Signin"]} />
       <section className="overflow-hidden py-20 bg-gray-2">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
@@ -63,7 +62,6 @@ const Signin = () => {
                     type="email"
                     name="email"
                     id="email"
-                    required
                     placeholder="Enter your email"
                     className="rounded-lg border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-3 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
                   />
@@ -74,14 +72,13 @@ const Signin = () => {
                     Password
                   </label>
 
-                  <PasswordInput
+                  <input
                     type="password"
                     name="password"
                     id="password"
                     placeholder="Enter your password"
                     autoComplete="on"
                     minLength={8}
-                    required
                     className="rounded-lg border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-3 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
                   />
                 </div>
@@ -93,20 +90,12 @@ const Signin = () => {
                   Sign in to account
                 </button>
 
-                <Link
-                  href="/signin-otp"
-                  className="block text-center text-dark-4 mt-4.5 ease-out duration-200 hover:text-dark"
-                >
-                  Signin&nbsp;with&nbsp;OTP
-                </Link>
-
-                <Link
-                  href="/reset-password"
+                <a
+                  href="#"
                   className="block text-center text-dark-4 mt-4.5 ease-out duration-200 hover:text-dark"
                 >
                   Forget your password?
-                </Link>
-
+                </a>
 
                 <p className="text-center mt-6">
                   Don&apos;t have an account?

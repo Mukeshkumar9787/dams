@@ -13,7 +13,8 @@ const Checkout = () => {
     const navigateGuestUser = async() => {
       let user = await getLoggedInUserData();
       if(!user) {
-        localStorage.setItem("next", 'checkout');
+        localStorage.setItem("next", '/checkout');
+        localStorage.setItem("loginToProceed", "true");
         router.push('/signin');
       }
     }

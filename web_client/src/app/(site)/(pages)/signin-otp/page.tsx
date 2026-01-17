@@ -1,17 +1,17 @@
-import Signin from "@/components/Auth/Signin";
 import React from "react";
 import { Metadata } from "next";
+import SigninOtp from "@/components/Auth/SignInOtp";
 export const metadata: Metadata = {
-  title: "Signin",
+  title: "SigninOtp",
   // other metadata
 };
 
-const SigninPage = () => {
+const SigninOtpPage = () => {
   return (
     <main>
-      <Signin />
+      <SigninOtp />
     </main>
   );
 };
 
-export default SigninPage;
+export default SigninOtpPage;
