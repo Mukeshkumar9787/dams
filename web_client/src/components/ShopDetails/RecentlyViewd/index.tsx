@@ -1,16 +1,18 @@
 "use client";
-import React from "react";
-import shopData from "@/components/Shop/shopData";
+import React, { useEffect, useState } from "react";
 import ProductItem from "@/components/Common/ProductItem";
 import Image from "next/image";
-import Link from "next/link";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { useCallback, useRef } from "react";
 import "swiper/css/navigation";
 import "swiper/css";
+import { getProducts } from "@/http/apiCalls";
+import { STATUS_TYPES } from "@/utils/constants";
 
-const RecentlyViewdItems = () => {
+const RecentlyViewdItems = ({ product }) => {
+  const {variant, id } = product;
+  const [shopData, setShopData] = useState([]);
   const sliderRef = useRef(null);
 
   const handlePrev = useCallback(() => {
@@ -22,6 +24,18 @@ const RecentlyViewdItems = () => {
     if (!sliderRef.current) return;
     sliderRef.current.swiper.slideNext();
   }, []);
+
+  useEffect(()=>{
+    const fetchProducts = async() => {
+      try {
+        const data = await getProducts({pageSize: 8, status: STATUS_TYPES.ACTIVE, variant});
+        setShopData((data.data || []).filter(i => i.id !== id));
+      } catch (error) {
+        
+      }
+    }
+    fetchProducts();
+  },[])
 
   return (
     <section className="overflow-hidden pt-17.5">
@@ -40,7 +54,7 @@ const RecentlyViewdItems = () => {
                 Categories
               </span>
               <h2 className="font-semibold text-xl xl:text-heading-5 text-dark">
-                Browse by Category
+                 Similar Products
               </h2>
             </div>
 

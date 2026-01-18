@@ -48,3 +48,13 @@ export const afterSucessfullLogin = (router, token) => {
   router.push(next ? next : '/');
   localStorage.removeItem('next');
 }
+
+export const getOfferPercent = (mrp, price) => {
+  if (!mrp || mrp <= 0) return 0;
+  if (price >= mrp) return 0;
+
+  const discount = mrp - price;
+  const percent = (discount / mrp) * 100;
+
+  return Math.round(percent); // or Math.floor / Math.ceil
+};

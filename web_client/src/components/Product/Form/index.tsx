@@ -12,6 +12,7 @@ import { Select } from "antd";
 const ProductForm = ({ params }) => {
   const router = useRouter();
   const [title, setTitle] = React.useState("");
+  const [variant, setVariant] = React.useState("");
   const [status, setStatus] = React.useState(STATUS_TYPES.ACTIVE);
   const [images, setImages] = React.useState([]);
   const editDataRef = React.useRef({});
@@ -92,7 +93,7 @@ const ProductForm = ({ params }) => {
       window.alert("Select a file ...!");
       return;
     }
-    let data = { title, status, categoryId, hsnId, sizeId, colorId, mrp, price, stock, fileIds: [...fileIdsRef.current], deletedFileIds: [...deletedFileIdsRef.current] }
+    let data = { title, status, categoryId, hsnId, sizeId, colorId, mrp, price, stock,variant, fileIds: [...fileIdsRef.current], deletedFileIds: [...deletedFileIdsRef.current] }
     let response:any;
     if(isNew){
       response = await createProduct(data);
@@ -123,6 +124,7 @@ const ProductForm = ({ params }) => {
       try {
         const data = await getProductBySlug(params);
         editDataRef.current = data?.data || {};
+        setVariant(editDataRef.current.variant);
         setTitle(editDataRef.current.title);
         setStatus(editDataRef.current.status);
         setImages(editDataRef.current.images);
@@ -157,6 +159,19 @@ const ProductForm = ({ params }) => {
             </div>
 
             <form onSubmit={handleSubmit}>
+              {/* Product Variant */}
+              <div className="mb-5">
+                <label className="block mb-2.5">Product Variant</label>
+                <input
+                  type="text"
+                  placeholder="Enter Variant"
+                  value={variant}
+                  onChange={(e) => setVariant(e.target.value)}
+                  required
+                  className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                />
+              </div>
+
               {/* Product Name */}
               <div className="mb-5">
                 <label className="block mb-2.5">Product Name</label>

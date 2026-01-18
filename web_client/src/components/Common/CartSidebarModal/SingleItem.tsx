@@ -23,7 +23,7 @@ const SingleItem = ({ item, removeItemFromCart }) => {
             <a href="#"> {item.title} </a>
           </h3>
           <p className="text-normal">Price: {getCurrencyDetails().currencySymbol} {item.price}</p>
-          <AddToCart id={item.id} align={"left"} />
+          <AddToCart id={item.id} align={"left"} purchase={false} />
         </div>
       </div>
 

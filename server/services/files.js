@@ -1,4 +1,4 @@
-import prisma from "../prisma/client.js";
+import prisma, { PrismaConfig } from "../prisma/client.js";
 import { convertToFullFilePath } from "../utils/helpers.js";
 
 /**
@@ -19,6 +19,7 @@ const createFile = async ({ path }) => {
 };
 
 const updateFilesByIds = async ({ tx=prisma, feature, featureId, fileIds=[], deletedFileIds=[]}) => {
+
   let fileUploadPromise = [];
   if(fileIds.length > 0){
     fileUploadPromise = tx.file.updateManyAndReturn({ 
@@ -29,11 +30,12 @@ const updateFilesByIds = async ({ tx=prisma, feature, featureId, fileIds=[], del
   }
 
   let deleteFilesPromise = [];
-  
+
   if(deletedFileIds.length > 0){
+      let condition = PrismaConfig.sql`id in (${PrismaConfig.join(deletedFileIds,`,`)})`
       deleteFilesPromise = await prisma.$queryRaw`
       DELETE FROM "File"
-      WHERE id in (${deletedFileIds.join(',')})
+      WHERE ${condition}
       RETURNING id, path;
     `;
   }

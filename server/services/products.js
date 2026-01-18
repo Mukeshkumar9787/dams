@@ -7,11 +7,11 @@ import { fileService } from "./index.js";
 /**
  * Create Product
  */
-const createProduct = async ({ title, fileIds, deletedFileIds, categoryId, hsnId, mrp, price, stock, status, sizeId, colorId }) => {
+const createProduct = async ({ title, fileIds, deletedFileIds, categoryId, hsnId, mrp, price, stock, status, sizeId, colorId, variant }) => {
   let product = null;
 
   await prisma.$transaction( async (tx) => {
-    product = await tx.Product.create({ data: { title, slug: slugText(title), categoryId, hsnId, mrp, price, stock, status, sizeId, colorId }});
+    product = await tx.Product.create({ data: { title, slug: slugText(title), categoryId, hsnId, mrp, price, stock, status, sizeId, colorId, variant }});
     await fileService.updateFilesByIds({ tx, feature: FEATURE_TYPES.PRODUCT, featureId: product.id, fileIds, deletedFileIds })
   })
 
@@ -21,7 +21,7 @@ const createProduct = async ({ title, fileIds, deletedFileIds, categoryId, hsnId
 /**
  * Get all Products
  */
-const getProducts = async ({ status, pageNumber=1, pageSize=10, search='', color, category, size, 'productIds[]': productIds = null, pagination = true }) => {
+const getProducts = async ({ status, pageNumber=1, pageSize=10, search='', color, category, size, 'productIds[]': productIds = null, pagination = true, variant }) => {
   const conditions = [];
   if (productIds) {
     if(typeof(productIds) === 'string'){
@@ -47,6 +47,10 @@ const getProducts = async ({ status, pageNumber=1, pageSize=10, search='', color
   
   if (size) {
     conditions.push(PrismaConfig.sql`s.title = ${size}`);
+  }
+  
+  if (variant) {
+    conditions.push(PrismaConfig.sql`p.variant = ${variant}`);
   }
   
   if(search) {
@@ -75,6 +79,7 @@ const getProducts = async ({ status, pageNumber=1, pageSize=10, search='', color
         p.slug,
         p.mrp,
         p.price,
+        p.variant,
         c.title as "categoryName",
         s.title as "sizeName",
         color.code as "colorCode",
@@ -112,6 +117,18 @@ const getProductBySlug = async (slug) => {
   const product = await prisma.product.findUnique({
     where: {
       slug
+    },
+    include: {
+      Color: {
+        select: {
+          code: true
+        }
+      },
+      Size: {
+        select: {
+          title: true
+        }
+      }
     }
   });
   if (!product) {
@@ -136,13 +153,17 @@ const getProductBySlug = async (slug) => {
     }
     return i;
   });
+  product.colorCode = product.Color.code;
+  product.sizeTitle = product.Size.title;
+  product.Color = undefined;
+  product.Size = undefined;
   return product;
 };
 
 /**
  * Update Product
  */
-const updateProduct = async (id, { title, fileIds, deletedFileIds, categoryId, hsnId, mrp, price, stock, status, sizeId, colorId }) => {
+const updateProduct = async (id, { title, fileIds, deletedFileIds, categoryId, hsnId, mrp, price, stock, status, sizeId, colorId, variant }) => {
   let updated = null;
   let deletedFiles = [];
   
@@ -155,7 +176,7 @@ const updateProduct = async (id, { title, fileIds, deletedFileIds, categoryId, h
           title,
           slug: slugText(title),
           categoryId, hsnId, mrp: parseFloat(mrp), price: parseFloat(price), stock,
-          status, sizeId, colorId
+          status, sizeId, colorId, variant
         },
       }),
       fileService.updateFilesByIds({ tx, feature: FEATURE_TYPES.PRODUCT, featureId: id, fileIds, deletedFileIds })
