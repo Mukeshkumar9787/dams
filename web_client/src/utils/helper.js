@@ -36,17 +36,17 @@ export const getProductCountFromCart = (id, cartItems) => cartItems.find(i => i.
 export const getLoggedInUserData = async () => {
   try {
     const user = await getUserInfo();
-    return user.data || null;
+    return user.data || {};
   } catch (error) {
-    return null;
+    return {};
   } 
 }
 
-export const afterSucessfullLogin = (router, token) => {
+export const afterSucessfullLogin = (token) => {
   localStorage.setItem("token", token);
   const next = localStorage.getItem('next'); 
-  router.push(next ? next : '/');
   localStorage.removeItem('next');
+  window.location.href = next ? next : '/'
 }
 
 export const getOfferPercent = (mrp, price) => {
@@ -58,3 +58,17 @@ export const getOfferPercent = (mrp, price) => {
 
   return Math.round(percent); // or Math.floor / Math.ceil
 };
+
+export const getMemberSince = (createdAt) => {
+  const date = new Date(createdAt);
+
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    year: 'numeric',
+  });
+};
+
+export const logout = () => {
+  localStorage.removeItem('token');
+  window.location.href = '/';
+}

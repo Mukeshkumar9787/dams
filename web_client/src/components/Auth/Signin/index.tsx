@@ -5,14 +5,12 @@ import ModalInfo from "@/components/Common/ModalInfo";
 import Link from "next/link";
 import { afterSucessfullLogin } from "@/utils/helper";
 import { login } from "@/http/apiCalls";
-import { useRouter } from "next/navigation";
 import PasswordInput from "@/components/Common/PasswordInput";
 import { getAlertContent, PASSWORD_REGEX } from "@/utils/constants";
 
 const Signin = () => {
   const [alert, setAlert] = useState(null);
   
-  const router = useRouter();
   useEffect(() => {
     let next = localStorage.getItem('loginToProceed'); 
     localStorage.removeItem('loginToProceed'); 
@@ -32,7 +30,7 @@ const Signin = () => {
       }
       const response = await login(values);
       if(response.success){
-        afterSucessfullLogin(router, response.data.token);
+        afterSucessfullLogin(response.data.token);
       }
     } catch (error) {
       console.log(error);

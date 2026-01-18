@@ -7,4 +7,6 @@ const router = express.Router();
 // Register user
 router.get("/getUserInfo", userController.getUserInfo);
 
+router.patch("/updateProfile", userController.updateProfile);
+
 export default router;

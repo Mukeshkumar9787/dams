@@ -20,7 +20,7 @@ const VerifyOTP = ({ type, sentTo=null, isOpen, onClose, resendOtp=null }) => {
             window.alert("Password Changed Successfully");
             router.push('/signin');
           }else{
-            afterSucessfullLogin(router, response.data.token);
+            afterSucessfullLogin(response.data.token);
           }
         }
       } catch (error) {
