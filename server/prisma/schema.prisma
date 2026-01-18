@@ -113,11 +113,12 @@ model Color {
 }
 
 model Otp {
-  id        Int       @id @default(autoincrement())
-  type      OTP_Types
-  email     String
-  otp       String    @unique
-  meta      Json?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id         Int       @id @default(autoincrement())
+  type       OTP_Types
+  email      String
+  otp        String
+  meta       Json?
+  verifiedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }

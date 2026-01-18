@@ -159,8 +159,12 @@ const verifyOTP = async ({ email, otp, type }) => {
     where:{
       type,
       email,
-      otp: hashOTP(otp)
-    }
+      otp: hashOTP(otp),
+      verifiedAt: null,
+    },
+    orderBy: {
+      id: 'desc',
+    },
   })
 
   if(!otpRecord){
@@ -174,6 +178,11 @@ const verifyOTP = async ({ email, otp, type }) => {
     err.statusCode = 400;
     throw err;
   }
+  await prisma.otp.update({
+    where: { id: otpRecord.id },
+    data: { verifiedAt: new Date() },
+  });
+
   if(type === OTP_TYPES.REGISTER){
     const user = await prisma.user.create({ ...otpRecord.meta, email });
     const token = generateToken(user);
