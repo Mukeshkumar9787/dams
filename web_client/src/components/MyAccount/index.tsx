@@ -6,9 +6,10 @@ import AddressModal from "./AddressModal";
 import Orders from "../Orders";
 import { getLoggedInUserData, getMemberSince, logout } from "@/utils/helper";
 import { updateProfile } from "@/http/apiCalls";
+import { Button, Popconfirm } from "antd";
 
 const MyAccount = () => {
-  const [activeTab, setActiveTab] = useState("account-details");
+  const [activeTab, setActiveTab] = useState("orders");
   const [addressModal, setAddressModal] = useState(false);
   const [user, setUser] = useState({});
 
@@ -73,8 +74,8 @@ const MyAccount = () => {
                       {user.name}
                     </p>
                     <p className="text-custom-xs">Member Since {getMemberSince(user.createdAt)}</p>
-                    <button
-                      onClick={logout}
+                    <Popconfirm title="Logout ?" okType="primary" okButtonProps={{className: "bg-blue text-white"}} onConfirm={logout}>
+                    <Button
                       className={`flex items-center rounded-md gap-1 py-1 px-2 ease-out duration-200 bg-red text-white hover:bg-dark hover:text-white ${
                         activeTab === "logout"
                           ? "text-white bg-blue"
@@ -99,7 +100,8 @@ const MyAccount = () => {
                         />
                       </svg>
                       Logout
-                    </button>
+                    </Button>
+                    </Popconfirm>
                   </div>
 
                   

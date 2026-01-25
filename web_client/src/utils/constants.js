@@ -14,6 +14,12 @@ export const ROLE_TYPES = {
     ADMIN: 'ADMIN'
 }
 
+export const ADDRESS_TYPES = {
+    SHIP: 'SHIP',
+    BILL: 'BILL'
+}
+
+
 export const STATUS_COLOR = {
     ACTIVE: "green",
     INACTIVE: "red"
@@ -23,6 +29,7 @@ export const PROJECT_DETAILS = {
     name: "DAMS",
     description: "ecommerce platform"
 }
+
 
 export const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()_+{}\[\]:;"'<>,./~`\\|-]).{8,}$/;
 export const PASSWORD_MIN_LENGTH = 8;
@@ -47,7 +54,7 @@ export const PASSWORD_ALERT_MESSAGE = () => (<div>
   </ul>
 </div>)
 export const CONFIRM_PASSWORD_ALERT_MESSAGE = () => <div className="text-center text-lg">Passwords do not match</div>;
-export const LOGIN_TO_PROCEED_ALERT_MESSAGE = () => <div className="text-center text-lg">Login to Proceed with Checkout...!</div>;
+export const LOGIN_TO_PROCEED_ALERT_MESSAGE = () => <div className="text-center text-lg">Login to Proceed...!</div>;
 
 export const getAlertContent = (alert) => {
     if(alert === 'regex') return <PASSWORD_ALERT_MESSAGE/ >;

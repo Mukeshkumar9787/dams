@@ -25,17 +25,17 @@ router.use("/auth", authRoutes);
 
 router.use("/products", productRoutes);
 
-router.use(authMiddleware);
-
 router.use("/categories", categoryRoutes);
-
-router.use("/files", fileRoutes);
-
-router.use("/hsn", hsnRoutes);
 
 router.use("/sizes", sizeRoutes);
 
 router.use("/colors", colorRoutes);
+
+router.use(authMiddleware);
+
+router.use("/files", fileRoutes);
+
+router.use("/hsn", hsnRoutes);
 
 router.use("/users", userRoutes);
 

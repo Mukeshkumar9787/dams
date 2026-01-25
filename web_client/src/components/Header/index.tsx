@@ -1,14 +1,16 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { menuData } from "./menuData";
+import { adminMenuData, menuData } from "./menuData";
 import Dropdown from "./Dropdown";
 import { useAppSelector } from "@/redux/store";
 import { useCartModalContext } from "@/app/context/CartSidebarModalContext";
 import Image from "next/image";
 import { getLoggedInUserData } from "@/utils/helper";
+import { ROLE_TYPES } from "@/utils/constants";
 
 const Header = () => {
+  const [menuItems, setMenuItems] = useState(menuData);
   const [navigationOpen, setNavigationOpen] = useState(false);
   const [stickyMenu, setStickyMenu] = useState(false);
   const { openCartModal } = useCartModalContext();
@@ -37,7 +39,12 @@ const Header = () => {
     if(!localStorage.getItem('token')) return;
     const fetchUser = async() => {
       const userData = await getLoggedInUserData();
-      setUser(userData);
+      if(userData){
+        setUser(userData);
+        if(userData.role === ROLE_TYPES.ADMIN){
+          setMenuItems([...menuData, ...adminMenuData]);
+        }
+      }
     }
     fetchUser();
   },[])
@@ -242,7 +249,7 @@ const Header = () => {
               {/* <!-- Main Nav Start --> */}
               <nav>
                 <ul className="flex xl:items-center flex-col xl:flex-row gap-5 xl:gap-6">
-                  {menuData.map((menuItem, i) =>
+                  {menuItems.map((menuItem, i) =>
                     menuItem.submenu ? (
                       <Dropdown
                         key={i}

@@ -2,14 +2,17 @@ import express from "express";
 import colorController from "../controllers/color.js"; 
 import validateInput from "../middlewares/requestValidationMiddleware.js"
 import { colorBodySchema } from "../utils/validation.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-// Create size
-router.post("/", validateInput(colorBodySchema),colorController.create);
-
 // Get all categories
 router.get("/", colorController.getAll);
+
+router.use(authMiddleware);
+
+// Create size
+router.post("/", validateInput(colorBodySchema),colorController.create);
 
 // Get single size by ID
 router.get("/:slug", colorController.getBySlug);

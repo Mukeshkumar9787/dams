@@ -14,3 +14,4 @@ export const API_VERIFY_OTP = `${API_AUTH}/verifyOTP`;
 export const API_USERS = '/users';
 export const API_USER_INFO = '/users/getUserInfo';
 export const API_USER_UPDATE_PROFILE = '/users/updateProfile';
+export const API_ADDRESS = '/address';

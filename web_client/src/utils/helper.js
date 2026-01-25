@@ -36,16 +36,18 @@ export const getProductCountFromCart = (id, cartItems) => cartItems.find(i => i.
 export const getLoggedInUserData = async () => {
   try {
     const user = await getUserInfo();
-    return user.data || {};
+    return user.data || null;
   } catch (error) {
-    return {};
+    return null;
   } 
 }
 
 export const afterSucessfullLogin = (token) => {
   localStorage.setItem("token", token);
   const next = localStorage.getItem('next'); 
-  localStorage.removeItem('next');
+  if(next){
+    localStorage.removeItem('next');
+  }
   window.location.href = next ? next : '/'
 }
 
@@ -71,4 +73,14 @@ export const getMemberSince = (createdAt) => {
 export const logout = () => {
   localStorage.removeItem('token');
   window.location.href = '/';
+}
+
+export const redirectToSignIn = (next=null) => {
+  if(next){
+    localStorage.setItem("next", next);
+  }else{
+    localStorage.removeItem('next');
+  }
+  localStorage.setItem("loginToProceed", "true");
+  window.location.href = '/signin';
 }

@@ -20,108 +20,45 @@ export const menuData: Menu[] = [
     newTab: false,
     path: "/contact",
   },
-  {
+];
+
+export const adminMenuData: Menu[] = [
+    {
     id: 4,
-    title: "Category",
-    newTab: false,
-    path: CATEGORY_URL,
-  },
-  {
-    id: 5,
-    title: "HSN",
-    newTab: false,
-    path: HSN_URL,
-  },
-  {
-    id: 6,
-    title: "Product",
-    newTab: false,
-    path: PRODUCT_URL,
-  },
-  {
-    id: 7,
-    title: "Size",
-    newTab: false,
-    path: SIZE_URL,
-  },
-  {
-    id: 8,
-    title: "Color",
-    newTab: false,
-    path: COLOR_URL,
-  },
-  {
-    id: 7,
-    title: "pages",
+    title: "Manage",
     newTab: false,
     path: "/",
     submenu: [
       {
-        id: 61,
-        title: "Shop With Sidebar",
+        id: 5,
+        title: "Category",
         newTab: false,
-        path: "/shop-with-sidebar",
+        path: CATEGORY_URL,
       },
       {
-        id: 62,
-        title: "Shop Without Sidebar",
+        id: 6,
+        title: "HSN",
         newTab: false,
-        path: "/shop-without-sidebar",
+        path: HSN_URL,
       },
       {
-        id: 64,
-        title: "Checkout",
+        id: 7,
+        title: "Product",
         newTab: false,
-        path: "/checkout",
+        path: PRODUCT_URL,
       },
       {
-        id: 65,
-        title: "Cart",
+        id: 8,
+        title: "Size",
         newTab: false,
-        path: "/cart",
+        path: SIZE_URL,
       },
       {
-        id: 66,
-        title: "Wishlist",
+        id: 9,
+        title: "Color",
         newTab: false,
-        path: "/wishlist",
-      },
-      {
-        id: 67,
-        title: "Sign in",
-        newTab: false,
-        path: "/signin",
-      },
-      {
-        id: 68,
-        title: "Sign up",
-        newTab: false,
-        path: "/signup",
-      },
-      {
-        id: 69,
-        title: "My Account",
-        newTab: false,
-        path: "/my-account",
-      },
-      {
-        id: 70,
-        title: "Contact",
-        newTab: false,
-        path: "/contact",
-      },
-      {
-        id: 62,
-        title: "Error",
-        newTab: false,
-        path: "/error",
-      },
-      {
-        id: 63,
-        title: "Mail Success",
-        newTab: false,
-        path: "/mail-success",
+        path: COLOR_URL,
       },
     ],
   }
-];
+]
