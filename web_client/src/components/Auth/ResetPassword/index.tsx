@@ -1,17 +1,18 @@
 "use client"
 import React, { useRef, useState } from "react";
 import Breadcrumb from "@/components/Common/Breadcrumb";
-import { register, resetPassword } from "@/http/apiCalls";
+import { resetPassword } from "@/http/apiCalls";
 import { getAlertContent, PASSWORD_MIN_LENGTH, PASSWORD_REGEX, VERIFY_OTP_TYPES } from "@/utils/constants";
 import Link from "next/link";
 import VerifyOTP from "../VerifyOTP";
 import ModalInfo from "@/components/Common/ModalInfo";
 import PasswordInput from "@/components/Common/PasswordInput";
 
-const ResetPassword = () => {
+const ResetPassword = ({ email = '', nestedForm=false }) => {
+  const [resetFormValue, setResetFormValue] = useState(false);
   const [alert, setAlert] = useState(null);
   const [enterOTP, setEnterOTP] = useState(false);
-  const emailRef = useRef('');
+  const emailRef = useRef(email);
 
   const handleSubmit = async(e) => {
     try {
@@ -39,9 +40,12 @@ const ResetPassword = () => {
     }
   }
 
-  const onOTPVerificationClose = () => {
+  const onOTPVerificationClose = (success=false) => {
     setEnterOTP(false);
     emailRef.current = '';
+    if(success){
+      setResetFormValue(prev => !prev);
+    }
   }
 
   const resendOtp = () => {
@@ -53,10 +57,10 @@ const ResetPassword = () => {
   return (
     <>
       <ModalInfo isOpen={alert} content={getAlertContent(alert)} onClose={()=> {setAlert(null)}} onOk={()=> {setAlert(null)}}  />
-      <VerifyOTP isOpen={enterOTP} sentTo={emailRef.current} 
-      onClose={onOTPVerificationClose} type={VERIFY_OTP_TYPES.RESET_PASSWORD} resendOtp={resendOtp} />
-      <Breadcrumb title={"Reset Password"} pages={["Reset Password"]} />
-      <section className="overflow-hidden py-20 bg-gray-2">
+      {enterOTP && <VerifyOTP isOpen={enterOTP} sentTo={emailRef.current} 
+      onClose={onOTPVerificationClose} type={VERIFY_OTP_TYPES.RESET_PASSWORD} resendOtp={resendOtp} nestedForm={nestedForm} /> }
+      {!nestedForm && <Breadcrumb title={"Reset Password"} pages={["Reset Password"]} /> }
+      <section className={`overflow-hidden ${nestedForm ? "" : "py-20"} bg-gray-2`} key={`${resetFormValue}`}>
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
           <div className="max-w-[570px] w-full mx-auto rounded-xl bg-white shadow-1 p-4 sm:p-7.5 xl:p-11">
             <div className="text-center mb-11">
@@ -76,15 +80,16 @@ const ResetPassword = () => {
                     type="email"
                     name="email"
                     id="email"
+                    defaultValue={email}
+                    readOnly={nestedForm}
                     required
                     placeholder="Enter your email address"
                     className="rounded-lg border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-3 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
                   />
                 </div>
-
                 <div className="mb-5">
                   <label htmlFor="password" className="block mb-2.5">
-                    Password <span className="text-red">*</span>
+                    New Password <span className="text-red">*</span>
                   </label>
 
                   <PasswordInput
@@ -92,7 +97,8 @@ const ResetPassword = () => {
                     name="password"
                     id="password"
                     required
-                    placeholder="Enter your password"
+                    placeholder="Enter new password"
+                    defaultValue={''}
                     autoComplete="on"
                     minLength={PASSWORD_MIN_LENGTH}
                     title="At least 6 characters, one uppercase letter, and one number"
@@ -110,7 +116,8 @@ const ResetPassword = () => {
                     name="confirmPassword"
                     id="re-type-password"
                     required
-                    placeholder="Re-type your password"
+                    defaultValue={''}
+                    placeholder="Re-type new password"
                     autoComplete="on"
                     minLength={PASSWORD_MIN_LENGTH}
                     className="rounded-lg border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-3 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
@@ -123,31 +130,33 @@ const ResetPassword = () => {
                 >
                   Reset Password
                 </button>
-
-               <Link
-                  href="/signin-otp"
-                  className="block text-center text-dark-4 mt-4.5 ease-out duration-200 hover:text-dark"
-                >
-                  Signin&nbsp;with&nbsp;OTP
-                </Link>
-
-                <Link
-                  href="/signin"
-                  className="block text-center text-dark-4 mt-4.5 ease-out duration-200 hover:text-dark"
-                >
-                  Sign In with password
-                </Link>
-
-
-                <p className="text-center mt-6">
-                  Don&apos;t have an account?
-                  <Link
-                    href="/signup"
-                    className="text-dark ease-out duration-200 hover:text-blue pl-2"
+                {!nestedForm && 
+                  <>
+                    <Link
+                      href="/signin-otp"
+                      className="block text-center text-dark-4 mt-4.5 ease-out duration-200 hover:text-dark"
                     >
-                    Sign Up Now!
-                  </Link>
-                </p>
+                      Signin&nbsp;with&nbsp;OTP
+                    </Link>
+
+                    <Link
+                      href="/signin"
+                      className="block text-center text-dark-4 mt-4.5 ease-out duration-200 hover:text-dark"
+                    >
+                      Sign In with password
+                    </Link>
+
+                    <p className="text-center mt-6">
+                      Don&apos;t have an account?
+                      <Link
+                        href="/signup"
+                        className="text-dark ease-out duration-200 hover:text-blue pl-2"
+                        >
+                        Sign Up Now!
+                      </Link>
+                    </p>
+                  </>
+                }
               </form>
             </div>
           </div>

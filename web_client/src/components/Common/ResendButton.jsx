@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "antd";
 
 const ResendButton = ({ onClick }) => {
-  const [timer, setTimer] = useState(0);
+  const [timer, setTimer] = useState(30);
 
   const handleResend = () => {
     onClick();

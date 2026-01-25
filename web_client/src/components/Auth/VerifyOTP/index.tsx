@@ -6,7 +6,7 @@ import ResendButton from "../../Common/ResendButton";
 import { afterSucessfullLogin } from "@/utils/helper";
 import { VERIFY_OTP_TYPES } from "@/utils/constants";
 
-const VerifyOTP = ({ type, sentTo=null, isOpen, onClose, resendOtp=null }) => {
+const VerifyOTP = ({ type, sentTo=null, isOpen, onClose, resendOtp=null, nestedForm=false }) => {
   const router = useRouter();
   
   const handleSubmit = async(e) => {
@@ -18,7 +18,11 @@ const VerifyOTP = ({ type, sentTo=null, isOpen, onClose, resendOtp=null }) => {
         if(response.success){
           if(type === VERIFY_OTP_TYPES.RESET_PASSWORD){
             window.alert("Password Changed Successfully");
-            router.push('/signin');
+            if(nestedForm){
+              onClose(true);
+            }else{
+              router.push('/signin');
+            }
           }else{
             afterSucessfullLogin(response.data.token);
           }
@@ -27,19 +31,20 @@ const VerifyOTP = ({ type, sentTo=null, isOpen, onClose, resendOtp=null }) => {
         console.log(error);
       }
     }
+  console.log(nestedForm, 'nestedForm')
+  let footer = nestedForm ? [] : [<Button key="extra" onClick={onClose}>Change mail</Button>];
+  footer = [
+    ...footer,
+    <ResendButton key="cancel" onClick={resendOtp}/>,
+    <Button key="ok" type="primary" className="bg-blue text-white" htmlType= 'submit' form='otpForm' >
+      Verify
+    </Button>
+    ];
   return (
     <Modal centered open={isOpen} 
       onCancel={onClose} 
       okButtonProps={{style: {backgroundColor: 'blue', color: 'white'}}}
-      footer={[
-        <Button key="extra" onClick={onClose}>
-          Change mail
-        </Button>,
-        <ResendButton key="cancel" onClick={resendOtp}/>,
-        <Button key="ok" type="primary" className="bg-blue text-white" htmlType= 'submit' form='otpForm' >
-          Verify
-        </Button>
-      ]}
+      footer={footer}
       >
       <div>
           <form id="otpForm" onSubmit={handleSubmit}>
