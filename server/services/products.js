@@ -1,6 +1,6 @@
 import prisma, { PrismaConfig } from "../prisma/client.js";
 
-import { FEATURE_TYPES } from "../utils/constants.js";
+import { FEATURE_TYPES, SQL_VALUE_CONFIG, STOCK_TYPES } from "../utils/constants.js";
 import { convertToFullFilePath, deleteFiles, slugText } from "../utils/helpers.js";
 import { fileService } from "./index.js";
 
@@ -11,7 +11,9 @@ const createProduct = async ({ title, fileIds, deletedFileIds, categoryId, hsnId
   let product = null;
 
   await prisma.$transaction( async (tx) => {
-    product = await tx.Product.create({ data: { title, slug: slugText(title), categoryId, hsnId, mrp, price, stock, status, sizeId, colorId, variant }});
+    product = await tx.Product.create({ data: { title, slug: slugText(title), categoryId, hsnId, mrp, price, status, sizeId, colorId, variant }});
+    stock = await tx.stock.create({ data: { type: STOCK_TYPES.PRODUCT, productId: product.id, quantity: stock } })
+    await tx.Product.update({ data: { stockId: stock.id }, where: { id : product.id } })
     await fileService.updateFilesByIds({ tx, feature: FEATURE_TYPES.PRODUCT, featureId: product.id, fileIds, deletedFileIds })
   })
 
@@ -23,6 +25,7 @@ const createProduct = async ({ title, fileIds, deletedFileIds, categoryId, hsnId
  */
 const getProducts = async ({ status, pageNumber=1, pageSize=10, search='', color, category, size, 'productIds[]': productIds = null, pagination = true, variant }) => {
   const conditions = [];
+
   if (productIds) {
     if(typeof(productIds) === 'string'){
       conditions.push(PrismaConfig.sql`p.id = ${productIds}`);
@@ -80,6 +83,18 @@ const getProducts = async ({ status, pageNumber=1, pageSize=10, search='', color
         p.mrp,
         p.price,
         p.variant,
+        (
+          SELECT COALESCE(SUM(COALESCE(quantity, 0)), 0)
+          FROM "Stock"
+          WHERE
+            "productId" = p.id 
+            AND 
+            type != ${STOCK_TYPES.PAYMENT_PENDING}
+            OR (
+              type = ${STOCK_TYPES.PAYMENT_PENDING}
+              AND "createdAt" > NOW() - INTERVAL '5 minutes'
+            )
+        ) as stock,
         c.title as "categoryName",
         s.title as "sizeName",
         color.code as "colorCode",
@@ -95,7 +110,8 @@ const getProducts = async ({ status, pageNumber=1, pageSize=10, search='', color
     pagination 
     ? 
     prisma.$queryRaw`
-      SELECT COUNT(1) FROM "Product" p 
+      SELECT COUNT(1)
+      FROM "Product" p 
       LEFT JOIN "Category" c ON c."id" = p."categoryId"
       LEFT JOIN "Size" s ON s."id" = p."sizeId"
       LEFT JOIN "Color" color ON color."id" = p."colorId"
@@ -105,7 +121,7 @@ const getProducts = async ({ status, pageNumber=1, pageSize=10, search='', color
   ]);
 
   return { 
-    products: products.map(i => ({ ...i, img: convertToFullFilePath(i.img) })),
+    products: products.map(i => ({ ...i, stock: parseInt(i.stock), img: convertToFullFilePath(i.img) })),
     totalCount: parseInt(totalCount[0].count)
   }
 };
@@ -136,17 +152,31 @@ const getProductBySlug = async (slug) => {
     err.statusCode = 404;
     throw err;
   }
-  const images = await prisma.file.findMany({
-    select: {
-      id: true,
-      path: true
-    },
-    where: {
-      feature: FEATURE_TYPES.PRODUCT,
-      featureId: product.id
-    },
-    orderBy: [{ createdAt: 'asc' }]
-  });
+  const [soldQty, images] = await Promise.all([
+      prisma.$queryRaw`
+        SELECT COALESCE(SUM(COALESCE(quantity, 0)), 0)
+        FROM "Stock"
+        WHERE
+          "productId" = ${product.id}
+          AND 
+          type != ${STOCK_TYPES.PAYMENT_PENDING}
+          OR (
+            type = ${STOCK_TYPES.PAYMENT_PENDING}
+            AND "createdAt" > NOW() - INTERVAL '5 minutes'
+          )
+      `,
+      prisma.file.findMany({
+      select: {
+        id: true,
+        path: true
+      },
+      where: {
+        feature: FEATURE_TYPES.PRODUCT,
+        featureId: product.id
+      },
+      orderBy: [{ createdAt: 'asc' }]
+    })
+  ]);
   product.images = images.map(i => {
     if(i.path){
       i.path = convertToFullFilePath(i.path);
@@ -155,6 +185,7 @@ const getProductBySlug = async (slug) => {
   });
   product.colorCode = product.Color.code;
   product.sizeTitle = product.Size.title;
+  product.stock = parseInt(soldQty);
   product.Color = undefined;
   product.Size = undefined;
   return product;
@@ -163,7 +194,7 @@ const getProductBySlug = async (slug) => {
 /**
  * Update Product
  */
-const updateProduct = async (id, { title, fileIds, deletedFileIds, categoryId, hsnId, mrp, price, stock, status, sizeId, colorId, variant }) => {
+const updateProduct = async (id, { title, fileIds, deletedFileIds, categoryId, hsnId, mrp, price, stock, status, sizeId, colorId, variant, stockVersion }) => {
   let updated = null;
   let deletedFiles = [];
   
@@ -181,15 +212,13 @@ const updateProduct = async (id, { title, fileIds, deletedFileIds, categoryId, h
       }),
       fileService.updateFilesByIds({ tx, feature: FEATURE_TYPES.PRODUCT, featureId: id, fileIds, deletedFileIds })
     ]);
+    if (!updated) {
+      const err = new Error("Product not found");
+      err.statusCode = 404;
+      throw err;
+    }
     deletedFiles = deletedRecords;
   })
-
-  if (!updated) {
-    const err = new Error("Product not found");
-    err.statusCode = 404;
-    throw err;
-  }
-
   deleteFiles(deletedFiles.map(i => i.path));
   return updated;
 };

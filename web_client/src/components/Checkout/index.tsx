@@ -18,12 +18,19 @@ const Checkout = () => {
     }
     navigateGuestUser();
   },[]);
+  const handleSubmit = async (e) => {
+    try {
+      // const response = 
+    } catch (error) {
+      
+    }
+  };
   return (
     <>
       <Breadcrumb title={"Checkout"} pages={["checkout"]} />
       <section className="overflow-hidden py-20 pt-5 bg-gray-2">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="flex flex-col lg:flex-row gap-7.5 xl:gap-11">
               {/* <!-- checkout left --> */}
               <div className="lg:max-w-[670px] w-full">

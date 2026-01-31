@@ -20,3 +20,12 @@ export const OTP_TYPES = {
     RESET_PASSWORD: 'RESET_PASSWORD'
 }
 
+export const STOCK_TYPES = {
+    PRODUCT: 'PRODUCT',
+    ORDER: 'ORDER',
+    PAYMENT_PENDING: 'PAYMENT_PENDING'
+}
+
+export const SQL_VALUE_CONFIG = {
+    PAYMENT_PENDING_TIME: '5 minutes'
+}

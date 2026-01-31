@@ -1,0 +1,5 @@
+-- AlterEnum
+ALTER TYPE "StockType" ADD VALUE 'PAYMENT_PENDING';
+
+-- AlterTable
+ALTER TABLE "Product" ALTER COLUMN "stockId" DROP NOT NULL;

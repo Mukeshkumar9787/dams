@@ -7,7 +7,7 @@ const Notes = () => {
       <div className="bg-white shadow-1 rounded-[10px] p-4 sm:p-8.5">
         <div className="mb-5">
           <label className="block mb-2.5">
-            Other Notes <span className="text-red">*</span>
+            Other Additional Notes
           </label>
           <textarea
             name="notes"
