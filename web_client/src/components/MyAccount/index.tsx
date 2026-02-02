@@ -42,6 +42,7 @@ const MyAccount = () => {
       const values = Object.fromEntries(formData.entries());
       const response = await updateProfile(values);
       window.alert(response.message);
+      window.location.reload();
     } catch (error) {
       
     }
