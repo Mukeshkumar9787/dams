@@ -29,3 +29,7 @@ export const STOCK_TYPES = {
 export const SQL_VALUE_CONFIG = {
     PAYMENT_PENDING_TIME: '5 minutes'
 }
+
+export const ERR_CODES = {
+    STOCK_CHANGED: "STOCK_CHANGED"
+}

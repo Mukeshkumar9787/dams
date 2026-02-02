@@ -1,6 +1,6 @@
 import prisma, { PrismaConfig } from "../prisma/client.js";
 
-import { FEATURE_TYPES, SQL_VALUE_CONFIG, STOCK_TYPES } from "../utils/constants.js";
+import { ERR_CODES, FEATURE_TYPES, STOCK_TYPES } from "../utils/constants.js";
 import { convertToFullFilePath, deleteFiles, slugText } from "../utils/helpers.js";
 import { fileService } from "./index.js";
 
@@ -12,8 +12,7 @@ const createProduct = async ({ title, fileIds, deletedFileIds, categoryId, hsnId
 
   await prisma.$transaction( async (tx) => {
     product = await tx.Product.create({ data: { title, slug: slugText(title), categoryId, hsnId, mrp, price, status, sizeId, colorId, variant }});
-    stock = await tx.stock.create({ data: { type: STOCK_TYPES.PRODUCT, productId: product.id, quantity: stock } })
-    await tx.Product.update({ data: { stockId: stock.id }, where: { id : product.id } })
+    await tx.stock.create({ data: { type: STOCK_TYPES.PRODUCT, productId: product.id, quantity: stock } })
     await fileService.updateFilesByIds({ tx, feature: FEATURE_TYPES.PRODUCT, featureId: product.id, fileIds, deletedFileIds })
   })
 
@@ -83,18 +82,6 @@ const getProducts = async ({ status, pageNumber=1, pageSize=10, search='', color
         p.mrp,
         p.price,
         p.variant,
-        (
-          SELECT COALESCE(SUM(COALESCE(quantity, 0)), 0)
-          FROM "Stock"
-          WHERE
-            "productId" = p.id 
-            AND 
-            type != ${STOCK_TYPES.PAYMENT_PENDING}
-            OR (
-              type = ${STOCK_TYPES.PAYMENT_PENDING}
-              AND "createdAt" > NOW() - INTERVAL '5 minutes'
-            )
-        ) as stock,
         c.title as "categoryName",
         s.title as "sizeName",
         color.code as "colorCode",
@@ -119,9 +106,13 @@ const getProducts = async ({ status, pageNumber=1, pageSize=10, search='', color
     `
     : [{ count: 0 }]
   ]);
-
+  const finalProducts = await Promise.all(products.map(async i => 
+    ({...i, 
+      img: convertToFullFilePath(i.img), 
+      stock: await getProductStockById({ productId: i.id})
+    })));
   return { 
-    products: products.map(i => ({ ...i, stock: parseInt(i.stock), img: convertToFullFilePath(i.img) })),
+    products: finalProducts,
     totalCount: parseInt(totalCount[0].count)
   }
 };
@@ -152,19 +143,8 @@ const getProductBySlug = async (slug) => {
     err.statusCode = 404;
     throw err;
   }
-  const [soldQty, images] = await Promise.all([
-      prisma.$queryRaw`
-        SELECT COALESCE(SUM(COALESCE(quantity, 0)), 0)
-        FROM "Stock"
-        WHERE
-          "productId" = ${product.id}
-          AND 
-          type != ${STOCK_TYPES.PAYMENT_PENDING}
-          OR (
-            type = ${STOCK_TYPES.PAYMENT_PENDING}
-            AND "createdAt" > NOW() - INTERVAL '5 minutes'
-          )
-      `,
+  const [stockQty, images] = await Promise.all([
+      getProductStockById({ productId: product.id}),
       prisma.file.findMany({
       select: {
         id: true,
@@ -185,22 +165,32 @@ const getProductBySlug = async (slug) => {
   });
   product.colorCode = product.Color.code;
   product.sizeTitle = product.Size.title;
-  product.stock = parseInt(soldQty);
+  product.stock = stockQty;
   product.Color = undefined;
   product.Size = undefined;
+  console.log(product.stock, stockQty, "stock")
   return product;
 };
 
 /**
  * Update Product
  */
-const updateProduct = async (id, { title, fileIds, deletedFileIds, categoryId, hsnId, mrp, price, stock, status, sizeId, colorId, variant, stockVersion }) => {
+const updateProduct = async (id, { title, fileIds, deletedFileIds, categoryId, hsnId, mrp, price, stock, status, sizeId, colorId, variant, oldStockQty }) => {
   let updated = null;
   let deletedFiles = [];
   
+  
   await prisma.$transaction(async (tx) => {
+    const dbStockQty = await getProductStockById({ productId: id, tx });
+    if(dbStockQty !== oldStockQty){
+      const err = new Error("Stock changed");
+      err.statusCode = 400;
+      err.code = ERR_CODES.STOCK_CHANGED;
+      err.data = { currentStockQty : dbStockQty };
+      throw err;
+    }
     let deletedRecords;
-    [updated, { deletedRecords }] = await Promise.all([
+    const promises = [
       tx.Product.update({
         where: { id },
         data: {
@@ -211,10 +201,17 @@ const updateProduct = async (id, { title, fileIds, deletedFileIds, categoryId, h
         },
       }),
       fileService.updateFilesByIds({ tx, feature: FEATURE_TYPES.PRODUCT, featureId: id, fileIds, deletedFileIds })
-    ]);
+    ];
+    if(dbStockQty !== stock) {
+      promises.push(
+        tx.stock.create({ data: { type: STOCK_TYPES.PRODUCT, productId: product.id, quantity: dbStockQty - stock } }),
+      )
+    }
+    [updated, { deletedRecords }] = await Promise.all(promises);
     if (!updated) {
       const err = new Error("Product not found");
       err.statusCode = 404;
+      err.data = {stockQty: dbStockQty}
       throw err;
     }
     deletedFiles = deletedRecords;
@@ -242,10 +239,27 @@ const deleteProduct = async (id) => {
   };
 };
 
+const getProductStockById = async({ productId, tx = prisma }) => {
+  const productStock = await tx.$queryRaw`
+      SELECT COALESCE(SUM(COALESCE(quantity, 0)), 0) as stock
+      FROM "Stock"
+      WHERE
+        "productId" = ${productId}
+        AND 
+        type != ${STOCK_TYPES.PAYMENT_PENDING}
+        OR (
+          type = ${STOCK_TYPES.PAYMENT_PENDING}
+          AND "createdAt" > NOW() - INTERVAL '5 minutes'
+        )
+    `;
+  return parseInt(productStock[0].stock)
+}
+
 export default {
   createProduct,
   getProducts,
   getProductBySlug,
   updateProduct,
   deleteProduct,
+  getProductStockById
 };

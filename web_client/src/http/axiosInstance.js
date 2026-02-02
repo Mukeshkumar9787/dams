@@ -30,7 +30,9 @@ axiosInstance.interceptors.response.use((response) => {
 }, (error) => {
   try {
     if(error.status === 401){
-      redirectToSignIn();
+      if(window.location.pathname !== '/signin'){
+        redirectToSignIn();
+      }
     }else{
       window.alert(error?.response?.data?.errors || error?.response?.data?.message || 'Something went wrong');
     }

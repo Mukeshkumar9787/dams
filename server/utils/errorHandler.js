@@ -17,6 +17,8 @@ function errorHandler(err, res) {
   return res.status(err.statusCode || 500).json({
       success: false,
       message: err.message || "Something went wrong",
+      data: err.data || null,
+      code: err.code || null
     });
 }
 

@@ -43,6 +43,10 @@ export const productBodySchema = Joi.object({
     .default(STATUS_TYPES.ACTIVE),
 });
 
+export const productUpdateSchema = productBodySchema.keys({
+  oldStockQty: Joi.number().min(0).required(),
+});
+
 export const sizeBodySchema = Joi.object({
   title: Joi.string().min(1).max(100).required(),
   status: Joi.string()

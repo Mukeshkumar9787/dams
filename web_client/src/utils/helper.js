@@ -76,6 +76,7 @@ export const logout = () => {
 }
 
 export const redirectToSignIn = (next=null) => {
+  localStorage.clear();
   if(next){
     localStorage.setItem("next", next);
   }else{

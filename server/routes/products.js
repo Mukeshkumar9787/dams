@@ -1,7 +1,7 @@
 import express from "express";
 import productController from "../controllers/products.js"; 
 import validateInput from "../middlewares/requestValidationMiddleware.js"
-import { productBodySchema } from "../utils/validation.js";
+import { productBodySchema, productUpdateSchema } from "../utils/validation.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
@@ -18,7 +18,7 @@ router.post("/", validateInput(productBodySchema),productController.createProduc
 router.get("/:slug", productController.getProductBySlug);
 
 // Update product
-router.put("/:id", validateInput(productBodySchema), productController.updateProduct);
+router.put("/:id", validateInput(productUpdateSchema), productController.updateProduct);
 
 // Delete product
 router.delete("/:id", productController.deleteProduct);

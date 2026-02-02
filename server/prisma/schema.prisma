@@ -92,7 +92,6 @@ model Product {
   status        Status          @default(ACTIVE)
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
-  stockVersion  Int             @default(1)
   orderProducts OrderProducts[]
   stocks        Stock[]
 }
@@ -173,7 +172,7 @@ model OrderProducts {
   price     Int
   mrp       Int
   stock     Stock    @relation(fields: [stockId], references: [id])
-  stockId   Int
+  stockId   Int      @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -185,12 +184,12 @@ enum StockType {
 }
 
 model Stock {
-  id            Int             @id @default(autoincrement())
+  id            Int            @id @default(autoincrement())
   type          StockType
-  product       Product         @relation(fields: [productId], references: [id])
+  product       Product        @relation(fields: [productId], references: [id])
   productId     Int
   quantity      Int
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  orderProducts OrderProducts[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  orderProducts OrderProducts?
 }
