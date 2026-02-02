@@ -2,14 +2,14 @@ import express from "express";
 import productController from "../controllers/products.js"; 
 import validateInput from "../middlewares/requestValidationMiddleware.js"
 import { productBodySchema, productUpdateSchema } from "../utils/validation.js";
-import authMiddleware from "../middlewares/authMiddleware.js";
+import { adminMiddleware, conditionAdminMiddleware } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
 // Get all categories
-router.get("/", productController.getProducts);
+router.get("/", conditionAdminMiddleware, productController.getProducts);
 
-router.use(authMiddleware);
+router.use(adminMiddleware);
 
 // Create product
 router.post("/", validateInput(productBodySchema),productController.createProduct);

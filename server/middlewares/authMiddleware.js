@@ -1,7 +1,8 @@
 import jwt from "jsonwebtoken";
 import userService from "../services/users.js";
+import { ROLE_TYPES, STATUS_TYPES } from "../utils/constants.js";
 
-const authMiddleware = async (req, res, next) => {
+export const authMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
@@ -32,4 +33,23 @@ const authMiddleware = async (req, res, next) => {
   }
 };
 
-export default authMiddleware;
+export const adminMiddleware = async (req, res, next) => {
+  try {
+    await authMiddleware(req, res, () => {});
+
+    if (req.user?.role !== ROLE_TYPES.ADMIN) {
+      return res.status(403).json({ message: "Admin access required" });
+    }
+
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: error.message || "Unauthorized" });
+  }
+};
+
+export const conditionAdminMiddleware = (req, res, next) => {
+  if(req.query.status && (req.query.status === STATUS_TYPES.ACTIVE)){
+    return next();
+  }
+  return adminMiddleware(req, res, next);
+}

@@ -2,14 +2,14 @@ import express from "express";
 import colorController from "../controllers/color.js"; 
 import validateInput from "../middlewares/requestValidationMiddleware.js"
 import { colorBodySchema } from "../utils/validation.js";
-import authMiddleware from "../middlewares/authMiddleware.js";
+import { adminMiddleware, conditionAdminMiddleware } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
 // Get all categories
-router.get("/", colorController.getAll);
+router.get("/", conditionAdminMiddleware, colorController.getAll);
 
-router.use(authMiddleware);
+router.use(adminMiddleware);
 
 // Create size
 router.post("/", validateInput(colorBodySchema),colorController.create);
