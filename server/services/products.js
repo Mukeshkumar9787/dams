@@ -168,7 +168,6 @@ const getProductBySlug = async (slug) => {
   product.stock = stockQty;
   product.Color = undefined;
   product.Size = undefined;
-  console.log(product.stock, stockQty, "stock")
   return product;
 };
 
@@ -183,7 +182,7 @@ const updateProduct = async (id, { title, fileIds, deletedFileIds, categoryId, h
   await prisma.$transaction(async (tx) => {
     const dbStockQty = await getProductStockById({ productId: id, tx });
     if(dbStockQty !== oldStockQty){
-      const err = new Error("Stock changed");
+      const err = new Error(`Current Stock changed ${oldStockQty} to ${dbStockQty}. Stock resetted to current stock, Please check and Change it again...!`);
       err.statusCode = 400;
       err.code = ERR_CODES.STOCK_CHANGED;
       err.data = { currentStockQty : dbStockQty };
@@ -196,7 +195,7 @@ const updateProduct = async (id, { title, fileIds, deletedFileIds, categoryId, h
         data: {
           title,
           slug: slugText(title),
-          categoryId, hsnId, mrp: parseFloat(mrp), price: parseFloat(price), stock,
+          categoryId, hsnId, mrp: parseFloat(mrp), price: parseFloat(price),
           status, sizeId, colorId, variant
         },
       }),
@@ -204,7 +203,7 @@ const updateProduct = async (id, { title, fileIds, deletedFileIds, categoryId, h
     ];
     if(dbStockQty !== stock) {
       promises.push(
-        tx.stock.create({ data: { type: STOCK_TYPES.PRODUCT, productId: product.id, quantity: dbStockQty - stock } }),
+        tx.stock.create({ data: { type: STOCK_TYPES.PRODUCT, productId: id, quantity: stock - dbStockQty } }),
       )
     }
     [updated, { deletedRecords }] = await Promise.all(promises);

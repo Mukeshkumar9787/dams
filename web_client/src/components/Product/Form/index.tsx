@@ -98,10 +98,15 @@ const ProductForm = ({ params }) => {
     if(isNew){
       response = await createProduct(data);
     }else {
-      response = await updateProduct({...data, id: editDataRef.current.id })
+      response = await updateProduct({...data, id: editDataRef.current.id, oldStockQty: editDataRef.current.stock })
     }
+    console.log(response, "response")
     if(response.success){
-       router.replace(PRODUCT_URL);
+      router.replace(PRODUCT_URL);
+    }else{
+      let currentStock = response.data.currentStockQty;
+      setStock(currentStock);
+      editDataRef.current.stock = currentStock;
     }
   };
   
