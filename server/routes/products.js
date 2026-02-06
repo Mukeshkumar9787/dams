@@ -1,15 +1,16 @@
 import express from "express";
 import productController from "../controllers/products.js"; 
 import validateInput from "../middlewares/requestValidationMiddleware.js"
-import { productBodySchema, productUpdateSchema } from "../utils/validation.js";
-import { adminMiddleware, conditionAdminMiddleware } from "../middlewares/authMiddleware.js";
+import { productBodySchema, productUpdateSchema, statusValidationForCommonUser } from "../utils/validation.js";
+import { getAuthMiddleware } from "../middlewares/authMiddleware.js";
+import { ROLE_TYPES } from "../utils/constants.js";
 
 const router = express.Router();
 
 // Get all categories
-router.get("/", conditionAdminMiddleware, productController.getProducts);
+router.get("/", getAuthMiddleware([ROLE_TYPES.ADMIN], statusValidationForCommonUser), productController.getProducts);
 
-router.use(adminMiddleware);
+router.use(getAuthMiddleware([ROLE_TYPES.ADMIN]));
 
 // Create product
 router.post("/", validateInput(productBodySchema),productController.createProduct);

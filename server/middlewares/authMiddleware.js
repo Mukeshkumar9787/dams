@@ -1,9 +1,12 @@
 import jwt from "jsonwebtoken";
 import userService from "../services/users.js";
-import { ROLE_TYPES, STATUS_TYPES } from "../utils/constants.js";
 
-export const authMiddleware = async (req, res, next) => {
-  try {
+export const getAuthMiddleware = (allowedRoles=[], isPassThrough = null) => {
+  return async(req, res, next) => {
+    if(isPassThrough(req)){
+      next();
+      return;
+    }
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -21,35 +24,11 @@ export const authMiddleware = async (req, res, next) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    next();
-  } catch (error) {
-    console.error("JWT Verify Error:", error);
-
-    if (error.name === "TokenExpiredError") {
-      return res.status(401).json({ message: "Token expired" });
+    if ((allowedRoles.length === 0) || allowedRoles.includes(req.user.role)) {
+      next();      
+      return; 
     }
-
-    return res.status(401).json({ message: "Invalid token" });
-  }
+    return res.status(403).json({ message: "Forbidden" });
+  };
 };
 
-export const adminMiddleware = async (req, res, next) => {
-  try {
-    await authMiddleware(req, res, () => {});
-
-    if (req.user?.role !== ROLE_TYPES.ADMIN) {
-      return res.status(403).json({ message: "Admin access required" });
-    }
-
-    next();
-  } catch (error) {
-    return res.status(401).json({ message: error.message || "Unauthorized" });
-  }
-};
-
-export const conditionAdminMiddleware = (req, res, next) => {
-  if(req.query.status && (req.query.status === STATUS_TYPES.ACTIVE)){
-    return next();
-  }
-  return adminMiddleware(req, res, next);
-}

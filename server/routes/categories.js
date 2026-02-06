@@ -1,15 +1,16 @@
 import express from "express";
 import categoryController from "../controllers/categories.js"; 
 import validateInput from "../middlewares/requestValidationMiddleware.js"
-import { categoryBodySchema } from "../utils/validation.js";
-import { adminMiddleware, conditionAdminMiddleware } from "../middlewares/authMiddleware.js";
+import { categoryBodySchema, statusValidationForCommonUser } from "../utils/validation.js";
+import { getAuthMiddleware } from "../middlewares/authMiddleware.js";
+import { ROLE_TYPES } from "../utils/constants.js";
 
 const router = express.Router();
 
 // Get all categories
-router.get("/", conditionAdminMiddleware, categoryController.getCategories);
+router.get("/",getAuthMiddleware([ROLE_TYPES.ADMIN], statusValidationForCommonUser), categoryController.getCategories);
 
-router.use(adminMiddleware);
+router.use(getAuthMiddleware([ROLE_TYPES.ADMIN]));
 
 // Create category
 router.post("/", validateInput(categoryBodySchema),categoryController.createCategory);

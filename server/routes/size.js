@@ -1,15 +1,16 @@
 import express from "express";
 import sizeController from "../controllers/size.js"; 
 import validateInput from "../middlewares/requestValidationMiddleware.js"
-import { sizeBodySchema } from "../utils/validation.js";
-import { adminMiddleware, conditionAdminMiddleware } from "../middlewares/authMiddleware.js";
+import { sizeBodySchema, statusValidationForCommonUser } from "../utils/validation.js";
+import { ROLE_TYPES } from "../utils/constants.js";
+import { getAuthMiddleware } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
 // Get all categories
-router.get("/", conditionAdminMiddleware, sizeController.getSizes);
+router.get("/", getAuthMiddleware([ROLE_TYPES.ADMIN], statusValidationForCommonUser), sizeController.getSizes);
 
-router.use(adminMiddleware);
+router.use(getAuthMiddleware([ROLE_TYPES.ADMIN]));
 
 // Create size
 router.post("/", validateInput(sizeBodySchema),sizeController.createSize);

@@ -98,3 +98,30 @@ export const verifyOTPSchema = Joi.object({
 export const loginWithOTPSchema = Joi.object({
   email: Joi.string().min(1).max(100).required(),
 });
+
+export const createOrderSchema = Joi.object({
+  name: Joi.string().min(1).max(100).required(),
+  mobile: Joi.string().min(1).max(12).required(),
+  address: Joi.string().min(1).max(100).required(),
+  city: Joi.string().min(1).max(100).required(),
+  pincode: Joi.string().min(1).max(100).required(),
+  country: Joi.string().min(1).max(100).required(),
+  state: Joi.string().min(1).max(100).required(),
+  billingName: Joi.string().min(1).max(100),
+  billingMobile: Joi.string().min(1).max(12),
+  billingAddress: Joi.string().min(1).max(100),
+  billingCity: Joi.string().min(1).max(100),
+  billingPincode: Joi.string().min(1).max(100),
+  billingCountry: Joi.string().min(1).max(100),
+  billingState: Joi.string().min(1).max(100),
+  notes: Joi.string().max(100).optional(),
+  orderProducts: Joi.array().items(
+    Joi.object({
+      productId: Joi.string().required(),
+      quantity: Joi.number().integer().min(1).required(),
+      price: Joi.number().positive().required(),
+    })
+  ).min(1)
+});
+
+export const statusValidationForCommonUser = (req) => req?.query?.status && (req?.query?.status === STATUS_TYPES.ACTIVE);

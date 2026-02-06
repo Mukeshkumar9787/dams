@@ -7,7 +7,9 @@ import productRoutes from "./products.js"
 import sizeRoutes from "./size.js"
 import colorRoutes from "./color.js"
 import userRoutes from "./users.js"
-import { adminMiddleware, authMiddleware } from "../middlewares/authMiddleware.js";
+import orderRoutes from "./orders.js"
+import { getAuthMiddleware } from "../middlewares/authMiddleware.js";
+import { ROLE_TYPES } from "../utils/constants.js";
 
 
 const router = express.Router();
@@ -23,8 +25,6 @@ router.use(
 
 router.use("/auth", authRoutes);
 
-router.use("/users", authMiddleware, userRoutes);
-
 router.use("/products", productRoutes);
 
 router.use("/categories", categoryRoutes);
@@ -33,7 +33,11 @@ router.use("/sizes", sizeRoutes);
 
 router.use("/colors", colorRoutes);
 
-router.use(adminMiddleware);
+router.use("/users",getAuthMiddleware(), userRoutes);
+
+router.use("/orders",getAuthMiddleware(), orderRoutes);
+
+router.use(getAuthMiddleware([ROLE_TYPES.ADMIN]));
 
 router.use("/files", fileRoutes);
 
