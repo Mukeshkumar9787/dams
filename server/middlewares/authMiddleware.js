@@ -3,7 +3,7 @@ import userService from "../services/users.js";
 
 export const getAuthMiddleware = (allowedRoles=[], isPassThrough = null) => {
   return async(req, res, next) => {
-    if(isPassThrough(req)){
+    if(isPassThrough && isPassThrough(req)){
       next();
       return;
     }
