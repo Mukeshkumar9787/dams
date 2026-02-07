@@ -6,7 +6,7 @@ const EmptyCart = () => {
   const { closeCartModal } = useCartModalContext();
 
   return (
-    <div className="text-center">
+    <div className="text-center bg-white p-3">
       <div className="mx-auto pb-7.5">
         <svg
           className="mx-auto"

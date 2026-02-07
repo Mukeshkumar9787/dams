@@ -336,7 +336,7 @@ const ShopDetails = ({params}) => {
                     </div>
 
                     <div className="flex flex-wrap items-center w-full">
-                      <AddToCart align="right" id={product.id} stack={false} />
+                      <AddToCart align="right" id={product.id} stack={false} stock={product.stock} />
                     </div>
                 </div>
               </div>

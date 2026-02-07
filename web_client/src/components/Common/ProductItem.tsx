@@ -23,7 +23,7 @@ const ProductItem = ({ item }: { item: Product }) => {
             <span className="text-dark-4 line-through">{getCurrencyDetails().currencySymbol}{item.mrp}</span>
           </span>
         </Link>
-        <AddToCart id={item.id} />
+        <AddToCart id={item.id} stock={item.stock} />
     </div>
   );
 };

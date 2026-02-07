@@ -114,12 +114,15 @@ export const createOrderSchema = Joi.object({
   billingPincode: Joi.string().min(1).max(100),
   billingCountry: Joi.string().min(1).max(100),
   billingState: Joi.string().min(1).max(100),
-  notes: Joi.string().max(100).optional(),
+  notes: Joi.string().max(100).optional().empty(''),
+  isDiffBillAdd: Joi.boolean().default(false),
   orderProducts: Joi.array().items(
     Joi.object({
-      productId: Joi.string().required(),
+      productId: Joi.number().required(),
+      title: Joi.string().required(),
       quantity: Joi.number().integer().min(1).required(),
       price: Joi.number().positive().required(),
+      mrp: Joi.number().positive().required(),
     })
   ).min(1)
 });

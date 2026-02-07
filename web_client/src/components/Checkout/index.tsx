@@ -1,14 +1,57 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Breadcrumb from "../Common/Breadcrumb";
 import PaymentMethod from "./PaymentMethod";
-import { getLoggedInUserData, redirectToSignIn } from "@/utils/helper";
-import CartSidebarModal from "../Common/CartSidebarModal";
+import { getLoggedInUserData, getProductCountFromCart, redirectToSignIn } from "@/utils/helper";
 import Address from "./Address";
-import { ADDRESS_TYPES } from "@/utils/constants";
+import { ADDRESS_TYPES, STATUS_TYPES } from "@/utils/constants";
 import Notes from "./Notes";
+import { Button } from "antd";
+import { AppDispatch, useAppSelector } from "@/redux/store";
+import { createOrder, getProducts } from "@/http/apiCalls";
+import OrderList from "./OrderList";
+import { useDispatch } from "react-redux";
+import { removeItemFromCart } from "@/redux/features/cart-slice";
 const Checkout = () => {
-  const [isDiffBillAddress, setIsDiffBillAddress] = React.useState(false);
+  const dispatch = useDispatch<AppDispatch>();
+
+  const [isDiffBillAdd, setIsDiffBillAddress] = React.useState(false);
+  const [productItems, setProductItems] = useState([]);
+
+  const cartItems = useAppSelector((state) => state.cartReducer.items);
+  const totalPrice = parseFloat(productItems.reduce((acc, c) => acc + (c.price * getProductCountFromCart(c.id, cartItems)), 0));
+  const handleRemoveFromCart = (id) => {
+      dispatch(removeItemFromCart(id));
+    };
+  const fetchProducts = useCallback(async () => {
+    try {
+      if(cartItems.length === 0){
+        setProductItems([]);
+        return;
+      }
+      const data = await getProducts({
+        productIds: cartItems.map(i => i.id),
+        pagination: false,
+        status: STATUS_TYPES.ACTIVE
+      });
+      const products = (data?.data || []).map(i => ({
+        ...i, 
+        quantity: getProductCountFromCart(i.id, cartItems),
+       }))
+      const currentRemovedItems = cartItems.filter(i => products.findIndex(p => p.id === i.id) === -1);
+      currentRemovedItems.forEach(p => {
+        handleRemoveFromCart(p.id);
+      });
+      setProductItems(products);
+    } catch (err) {
+      console.error(err);
+    }
+  }, [cartItems]);
+
+  useEffect(() => {
+    fetchProducts();
+  },[fetchProducts])
+  
   useEffect(()=> {
     const navigateGuestUser = async() => {
       let user = await getLoggedInUserData();
@@ -20,9 +63,27 @@ const Checkout = () => {
   },[]);
   const handleSubmit = async (e) => {
     try {
-      // const response = 
+      e.preventDefault()
+      const formData = new FormData(e.target);
+      const values = Object.fromEntries(formData.entries());
+      const response = await createOrder({
+        ...values, 
+        isDiffBillAdd,
+        orderProducts: productItems.map(i => ({
+          productId: i.id, 
+          title: i.title,
+          price: i.price,
+          mrp: i.mrp,
+          quantity: i.quantity
+        }))
+      })
+      if(response.success){
+        
+      }else{
+        fetchProducts()
+      }
     } catch (error) {
-      
+      fetchProducts();
     }
   };
   return (
@@ -35,15 +96,15 @@ const Checkout = () => {
               {/* <!-- checkout left --> */}
               <div className="lg:max-w-[670px] w-full">
                 {/* <!-- billing details --> */}
-                <Address type={ADDRESS_TYPES.SHIP} isDiffBillAddress={isDiffBillAddress} setIsDiffBillAddress={setIsDiffBillAddress} />
-                {isDiffBillAddress && <Address type={ADDRESS_TYPES.BILL} />}
+                <Address type={ADDRESS_TYPES.SHIP} isDiffBillAddress={isDiffBillAdd} setIsDiffBillAddress={setIsDiffBillAddress} />
+                {isDiffBillAdd && <Address type={ADDRESS_TYPES.BILL} />}
                 <Notes />
               </div>
 
               {/* // <!-- checkout right --> */}
               <div className="max-w-[455px] w-full">
                 {/* <!-- order list box --> */}
-                <CartSidebarModal isOrderSummary />
+                <OrderList productItems={productItems} totalPrice={totalPrice} />
 
                 {/* <!-- coupon box --> */}
                 {/* <Coupon /> */}
@@ -52,12 +113,13 @@ const Checkout = () => {
                 <PaymentMethod />
 
                 {/* <!-- checkout button --> */}
-                <button
-                  type="submit"
-                  className="w-full flex justify-center font-medium text-white bg-blue py-3 px-6 rounded-md ease-out duration-200 hover:bg-blue-dark mt-7.5"
+                <Button
+                  disabled={productItems.length === 0}
+                  htmlType="submit"
+                  className="w-full flex justify-center font-medium text-white bg-blue py-3 px-6 rounded-md ease-out duration-200 mt-7.5"
                 >
                   Place Order
-                </button>
+                </Button>
               </div>
             </div>
           </form>
