@@ -7,4 +7,6 @@ const router = express.Router();
 
 router.post("/", validateInput(createOrderSchema), orderController.createOrder);
 
+router.get("/", orderController.getOrdersByUserId);
+
 export default router;

@@ -11,7 +11,7 @@ import { AppDispatch, useAppSelector } from "@/redux/store";
 import { createOrder, getProducts } from "@/http/apiCalls";
 import OrderList from "./OrderList";
 import { useDispatch } from "react-redux";
-import { removeItemFromCart } from "@/redux/features/cart-slice";
+import { removeAllItemsFromCart, removeItemFromCart } from "@/redux/features/cart-slice";
 const Checkout = () => {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -78,7 +78,8 @@ const Checkout = () => {
         }))
       })
       if(response.success){
-        
+        window.location.href = '/my-account';
+        dispatch(removeAllItemsFromCart())
       }else{
         fetchProducts()
       }

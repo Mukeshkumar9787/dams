@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import OrderDetails from "./OrderDetails";
-import EditOrder from "./EditOrder";
+// import EditOrder from "./EditOrder";
 
 const OrderModal = ({ showDetails, showEdit, toggleModal, order }: any) => {
   if (!showDetails && !showEdit) {
@@ -34,7 +34,7 @@ const OrderModal = ({ showDetails, showEdit, toggleModal, order }: any) => {
           <>
             {showDetails && <OrderDetails orderItem={order} />}
 
-            {showEdit && <EditOrder order={order} toggleModal={toggleModal} />}
+            {/* {showEdit && <EditOrder order={order} toggleModal={toggleModal} />} */}
           </>
         </div>
       </div>

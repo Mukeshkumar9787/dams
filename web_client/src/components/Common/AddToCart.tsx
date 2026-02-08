@@ -15,9 +15,6 @@ const AddToCart = ({ id, align='center', stack = true, purchase = true, stock=0,
     const quantity = useMemo(()=>getProductCountFromCart(id, cartItems),[cartItems]);
 
     const setQuantity = (quantity) => {
-        if(quantity > stock){
-            return;
-        }
         dispatch(addItemToCart({id,quantity}));
     }
     // add to cart

@@ -85,3 +85,14 @@ export const redirectToSignIn = (next=null) => {
   localStorage.setItem("loginToProceed", "true");
   window.location.href = '/signin';
 }
+
+export const dateFormatter = (value) => {
+  return new Date(value).toLocaleString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  });
+}

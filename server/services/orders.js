@@ -59,6 +59,49 @@ const createOrder = async ({ name, mobile, address, city, pincode, country, stat
   })
 };
 
+const getOrders = async ({ userId=null, skip=0, take=10 }) => {
+  const where = { 
+      userId: userId ? userId : undefined,
+  };
+  const [orders, totalCount] = await Promise.all([
+      prisma.order.findMany({
+        where,
+        include: {
+          orderProducts: {
+            select: {
+              product: {
+                select: { title: true }
+              },
+              price: true
+            },
+            orderBy: { id: 'asc' }
+          }
+        },
+        orderBy: {
+          createdAt: 'desc'
+        },
+        skip,
+        take
+      }),
+      prisma.order.count({
+        where
+      })
+  ]) ;
+
+  return {
+    data: orders.map(i => ({
+        orderNo: i.orderNo,
+        createdAt: i.createdAt,
+        status: i.status,
+        title: i.orderProducts.map(i => i.product.title).join(','),
+        price: i.orderProducts.reduce((a, c) => a + c.price, 0)
+      }
+    )),
+    totalCount
+  };
+}
+
 export default {
-  createOrder
+  createOrder,
+  getOrders
 };

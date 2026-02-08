@@ -180,3 +180,8 @@ export async function createOrder(data) {
   const res = await axiosInstance.post(API_ORDERS, data );
   return res.data;
 }
+
+export async function getOrdersForUser(data) {
+  const res = await axiosInstance.get(API_ORDERS, data );
+  return res.data;
+}

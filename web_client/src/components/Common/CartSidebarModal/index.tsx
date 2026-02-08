@@ -5,7 +5,7 @@ import { useCartModalContext } from "@/app/context/CartSidebarModalContext";
 import {
   removeItemFromCart,
 } from "@/redux/features/cart-slice";
-import { useAppSelector } from "@/redux/store";
+import { AppDispatch, useAppSelector } from "@/redux/store";
 import SingleItem from "./SingleItem";
 import Link from "next/link";
 import EmptyCart from "./EmptyCart";
@@ -13,11 +13,16 @@ import { STATUS_TYPES } from "@/utils/constants";
 import { getProducts } from "@/http/apiCalls";
 import { getCurrencyDetails, getProductCountFromCart } from "@/utils/helper";
 import { Button } from "antd";
+import { useDispatch } from "react-redux";
 
 const CartSidebarModal = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const { isCartModalOpen, closeCartModal } = useCartModalContext();
   const cartItems = useAppSelector((state) => state.cartReducer.items);
   const [productItems, setProductItems] = useState([]);
+  const handleRemoveFromCart = (id) => {
+    dispatch(removeItemFromCart(id));
+  };
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -30,7 +35,12 @@ const CartSidebarModal = () => {
         pagination: false,
         status: STATUS_TYPES.ACTIVE
       });
-      setProductItems(data?.data || []);
+      const products = data?.data || [];
+      const currentRemovedItems = cartItems.filter(i => products.findIndex(p => p.id === i.id) === -1);
+      currentRemovedItems.forEach(p => {
+        handleRemoveFromCart(p.id);
+      });
+      setProductItems(products);
     } catch (err) {
       console.error(err);
     }
