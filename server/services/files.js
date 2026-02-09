@@ -51,7 +51,18 @@ const updateFilesByIds = async ({ tx=prisma, feature, featureId, fileIds=[], del
   }
 }
 
+const getFilesByFeatureIds = async ({ tx= prisma, feature, featureIds = [] }) => {
+  const files = await tx.file.findMany({
+    where: {
+      feature,
+      featureId: { in: featureIds}
+    }
+  })
+  return files.map(i => ({id: i.id, feature:i.feature, featureId: i.featureId, path: convertToFullFilePath(i.path)}))
+}
+
 export default {
   createFile,
-  updateFilesByIds
+  updateFilesByIds,
+  getFilesByFeatureIds
 };

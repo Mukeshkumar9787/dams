@@ -26,7 +26,7 @@ const Orders = () => {
     <>
       <div className="w-full flex flex-wrap gap-2 p-3">
         {ordersData.length > 0 ? (
-          ordersData.map((orderItem, key) => (
+          ordersData.map((orderItem) => (
             <SingleOrder key={orderItem.id} orderItem={orderItem} smallView={true} />
           ))
         ) : (

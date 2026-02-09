@@ -1,29 +1,15 @@
-import React, { useState } from "react";
-import OrderActions from "./OrderActions";
-import OrderModal from "./OrderModal";
+import React from "react";
+
 import { dateFormatter, getCurrencyDetails } from "@/utils/helper";
 
-const SingleOrder = ({ orderItem, smallView }: any) => {
-  const [showDetails, setShowDetails] = useState(false);
-  const [showEdit, setShowEdit] = useState(false);
-
-  const toggleDetails = () => {
-    setShowDetails(!showDetails);
-  };
-
-  const toggleEdit = () => {
-    setShowEdit(!showEdit);
-  };
-
-  const toggleModal = (status: boolean) => {
-    setShowDetails(status);
-    setShowEdit(status);
-  };
-
+const SingleOrder = ({ orderItem }: any) => {
   return (
     <>
-      <div className="border border-rounded">
-        <div className="py-4.5 px-7.5">
+      <div className="border rounded-md py-3 px-2 md:flex gap-2 w-full">
+          <div className="flex justify-center">
+            <img src={orderItem.filePath} alt="" className="w-full md:w-50" />
+          </div>
+        <div className="">
           <div className="">
             <p className="text-custom-sm text-dark">
               <span className="font-bold pr-2"> Order:</span> #
@@ -48,7 +34,7 @@ const SingleOrder = ({ orderItem, smallView }: any) => {
                     ? "text-red bg-red-light-6"
                     : orderItem.status === "processing"
                     ? "text-yellow bg-yellow-light-4"
-                    : "Unknown Status"
+                    : "text-yellow bg-yellow-light-4"
                 }`}
               >
                 {orderItem.status}
@@ -76,12 +62,6 @@ const SingleOrder = ({ orderItem, smallView }: any) => {
           </div>
         </div>
       </div>
-      <OrderModal
-        showDetails={showDetails}
-        showEdit={showEdit}
-        toggleModal={toggleModal}
-        order={orderItem}
-      />
     </>
   );
 };

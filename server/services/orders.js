@@ -1,6 +1,7 @@
 import prisma from "../prisma/client.js";
-import { ERR_CODES, ORDER_STATUS, PAYMENT_TYPES, STATUS_TYPES, STOCK_TYPES } from "../utils/constants.js";
-import { productService } from "./index.js";
+import { ERR_CODES, FEATURE_TYPES, ORDER_STATUS, PAYMENT_TYPES, STATUS_TYPES, STOCK_TYPES } from "../utils/constants.js";
+import { getFullAddress } from "../utils/helpers.js";
+import { fileService, productService } from "./index.js";
 
 const createOrder = async ({ name, mobile, address, city, pincode, country, state, isDiffBillAdd, billingName, billingMobile, billingCity, billingPincode, billingCountry, billingState, notes, orderProducts = [], userId }) => {
   return await prisma.$transaction(async (tx) => {
@@ -69,6 +70,7 @@ const getOrders = async ({ userId=null, skip=0, take=10 }) => {
         include: {
           orderProducts: {
             select: {
+              productId: true,
               product: {
                 select: { title: true }
               },
@@ -87,6 +89,7 @@ const getOrders = async ({ userId=null, skip=0, take=10 }) => {
         where
       })
   ]) ;
+  const files = await fileService.getFilesByFeatureIds({ feature: FEATURE_TYPES.PRODUCT, featureIds: orders.map(i => i.orderProducts[0].productId)})
 
   return {
     data: orders.map(i => ({
@@ -94,7 +97,12 @@ const getOrders = async ({ userId=null, skip=0, take=10 }) => {
         createdAt: i.createdAt,
         status: i.status,
         title: i.orderProducts.map(i => i.product.title).join(','),
-        price: i.orderProducts.reduce((a, c) => a + c.price, 0)
+        price: i.orderProducts.reduce((a, c) => a + c.price, 0),
+        address: getFullAddress(i),
+        get billingAddress(){ 
+          return i.isDiffBillAdd ? getFullAddress(i.billingInfo) : this.address 
+        },
+        filePath: files.find(f => i.orderProducts[0].productId === f.featureId)?.path || null
       }
     )),
     totalCount
