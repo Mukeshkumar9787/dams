@@ -1,7 +1,7 @@
 import express from "express";
 import colorController from "../controllers/color.js"; 
 import validateInput from "../middlewares/requestValidationMiddleware.js"
-import { colorBodySchema, statusValidationForCommonUser } from "../utils/validation.js";
+import { colorBodySchema } from "../utils/validation.js";
 import { ROLE_TYPES } from "../utils/constants.js";
 import { getAuthMiddleware } from "../middlewares/authMiddleware.js";
 

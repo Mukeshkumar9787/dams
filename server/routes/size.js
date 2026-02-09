@@ -1,7 +1,7 @@
 import express from "express";
 import sizeController from "../controllers/size.js"; 
 import validateInput from "../middlewares/requestValidationMiddleware.js"
-import { sizeBodySchema, statusValidationForCommonUser } from "../utils/validation.js";
+import { sizeBodySchema } from "../utils/validation.js";
 import { ROLE_TYPES } from "../utils/constants.js";
 import { getAuthMiddleware } from "../middlewares/authMiddleware.js";
 

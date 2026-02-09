@@ -126,5 +126,3 @@ export const createOrderSchema = Joi.object({
     })
   ).min(1)
 });
-
-export const statusValidationForCommonUser = (req) => req?.query?.status && (req?.query?.status === STATUS_TYPES.ACTIVE);

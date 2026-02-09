@@ -1,7 +1,7 @@
 import express from "express";
 import categoryController from "../controllers/categories.js"; 
 import validateInput from "../middlewares/requestValidationMiddleware.js"
-import { categoryBodySchema, statusValidationForCommonUser } from "../utils/validation.js";
+import { categoryBodySchema } from "../utils/validation.js";
 import { getAuthMiddleware } from "../middlewares/authMiddleware.js";
 import { ROLE_TYPES } from "../utils/constants.js";
 

@@ -1,7 +1,7 @@
 import express from "express";
 import productController from "../controllers/products.js"; 
 import validateInput from "../middlewares/requestValidationMiddleware.js"
-import { productBodySchema, productUpdateSchema, statusValidationForCommonUser } from "../utils/validation.js";
+import { productBodySchema, productUpdateSchema } from "../utils/validation.js";
 import { getAuthMiddleware } from "../middlewares/authMiddleware.js";
 import { ROLE_TYPES } from "../utils/constants.js";
 
