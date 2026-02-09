@@ -8,9 +8,11 @@ import { getAuthMiddleware } from "../middlewares/authMiddleware.js";
 const router = express.Router();
 
 // Get all categories
-router.get("/", getAuthMiddleware([ROLE_TYPES.ADMIN], statusValidationForCommonUser), colorController.getAll);
+router.get("/active", colorController.getActive);
 
 router.use(getAuthMiddleware([ROLE_TYPES.ADMIN]));
+
+router.get("/", colorController.getAll);
 
 // Create size
 router.post("/", validateInput(colorBodySchema),colorController.create);

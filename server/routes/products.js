@@ -8,9 +8,11 @@ import { ROLE_TYPES } from "../utils/constants.js";
 const router = express.Router();
 
 // Get all categories
-router.get("/", getAuthMiddleware([ROLE_TYPES.ADMIN], statusValidationForCommonUser), productController.getProducts);
+router.get("/active", productController.getActiveProducts);
 
 router.use(getAuthMiddleware([ROLE_TYPES.ADMIN]));
+
+router.get("/", productController.getProducts);
 
 // Create product
 router.post("/", validateInput(productBodySchema),productController.createProduct);

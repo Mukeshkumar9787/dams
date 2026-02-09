@@ -8,9 +8,11 @@ import { ROLE_TYPES } from "../utils/constants.js";
 const router = express.Router();
 
 // Get all categories
-router.get("/",getAuthMiddleware([ROLE_TYPES.ADMIN], statusValidationForCommonUser), categoryController.getCategories);
+router.get("/active", categoryController.getActiveCategories);
 
 router.use(getAuthMiddleware([ROLE_TYPES.ADMIN]));
+
+router.get("/", categoryController.getCategories);
 
 // Create category
 router.post("/", validateInput(categoryBodySchema),categoryController.createCategory);

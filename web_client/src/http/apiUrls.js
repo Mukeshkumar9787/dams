@@ -1,3 +1,4 @@
+import { STATUS_TYPES } from "@/utils/constants";
 
 export const API_CATEGORIES = '/categories';
 export const API_FILES = '/files';
@@ -16,3 +17,4 @@ export const API_USER_INFO = '/users/getUserInfo';
 export const API_USER_UPDATE_PROFILE = '/users/updateProfile';
 export const API_ADDRESS = '/address';
 export const API_ORDERS = '/orders';
+export const GET_ACTIVE_API = (API, params) => (params?.status === STATUS_TYPES.ACTIVE) ? `${API}/active` : API ; 

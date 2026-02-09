@@ -1,9 +1,9 @@
 
-import { API_ADDRESS, API_CATEGORIES, API_COLOR, API_FILES, API_HSN, API_LOGIN, API_LOGIN_WITH_OTP, API_ORDERS, API_PRODUCTS, API_REGISTER, API_RESET_PASSWORD, API_SIZE, API_USER_INFO, API_USER_UPDATE_PROFILE, API_VERIFY_OTP } from './apiUrls';
+import { API_ADDRESS, API_CATEGORIES, API_COLOR, API_FILES, API_HSN, API_LOGIN, API_LOGIN_WITH_OTP, API_ORDERS, API_PRODUCTS, API_REGISTER, API_RESET_PASSWORD, API_SIZE, API_USER_INFO, API_USER_UPDATE_PROFILE, API_VERIFY_OTP, GET_ACTIVE_API } from './apiUrls';
 import axiosInstance from './axiosInstance';
 
 export async function getCategories(params) {
-  const res = await axiosInstance.get(API_CATEGORIES, { params });
+  const res = await axiosInstance.get(GET_ACTIVE_API(API_CATEGORIES, params), { params });
   return res?.data || [];
 }
 
@@ -37,7 +37,7 @@ export async function deleteCategory(data) {
 }
 
 export async function getProducts(params) {
-  const res = await axiosInstance.get(API_PRODUCTS,{ params });
+  const res = await axiosInstance.get(GET_ACTIVE_API(API_PRODUCTS, params),{ params });
   return res?.data || [];
 }
 
@@ -87,7 +87,7 @@ export async function deleteHsn(data) {
 }
 
 export async function getSizes(params) {
-  const res = await axiosInstance.get(API_SIZE, { params });
+  const res = await axiosInstance.get(GET_ACTIVE_API(API_SIZE, params), { params });
   return res?.data || [];
 }
 
@@ -112,7 +112,7 @@ export async function deleteSize(data) {
 }
 
 export async function getColors(params) {
-  const res = await axiosInstance.get(API_COLOR, { params });
+  const res = await axiosInstance.get(GET_ACTIVE_API(API_COLOR, params), { params });
   return res?.data || [];
 }
 

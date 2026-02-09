@@ -1,4 +1,5 @@
 import { colorService } from "../services/index.js";
+import { STATUS_TYPES } from "../utils/constants.js";
 import { errorHandler } from "../utils/errorHandler.js";
 
 const create = async (req, res) => {
@@ -18,6 +19,19 @@ const create = async (req, res) => {
 const getAll = async (req, res) => {
   try {
     const result = await colorService.getAll(req.query);
+
+    return res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (err) {
+    return errorHandler(err, res);
+  }
+};
+
+const getActive = async (req, res) => {
+  try {
+    const result = await colorService.getAll({...req.query, status: STATUS_TYPES.ACTIVE});
 
     return res.status(200).json({
       success: true,
@@ -76,6 +90,7 @@ const deleteById = async (req, res) => {
 export default {
   create,
   getAll,
+  getActive,
   getBySlug,
   update,
   deleteById

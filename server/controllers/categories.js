@@ -1,4 +1,5 @@
 import { categoryService } from "../services/index.js";
+import { STATUS_TYPES } from "../utils/constants.js";
 import { errorHandler } from "../utils/errorHandler.js";
 
 const createCategory = async (req, res) => {
@@ -10,6 +11,19 @@ const createCategory = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: "Category created successfully",
+      data: result,
+    });
+  } catch (err) {
+    return errorHandler(err, res);
+  }
+};
+
+const getActiveCategories = async (req, res) => {
+  try {
+    const result = await categoryService.getCategories({...req.query, status: STATUS_TYPES.ACTIVE });
+
+    return res.status(200).json({
+      success: true,
       data: result,
     });
   } catch (err) {
@@ -78,6 +92,7 @@ const deleteCategory = async (req, res) => {
 export default {
   createCategory,
   getCategories,
+  getActiveCategories,
   getCategoryBySlug,
   updateCategory,
   deleteCategory,

@@ -1,4 +1,5 @@
 import { sizeService } from "../services/index.js";
+import { STATUS_TYPES } from "../utils/constants.js";
 import { errorHandler } from "../utils/errorHandler.js";
 
 const createSize = async (req, res) => {
@@ -8,6 +9,19 @@ const createSize = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: "Size created successfully",
+      data: result,
+    });
+  } catch (err) {
+    return errorHandler(err, res);
+  }
+};
+
+const getActiveSizes = async (req, res) => {
+  try {
+    const result = await sizeService.getSizes({...req.query, status: STATUS_TYPES.ACTIVE});
+
+    return res.status(200).json({
+      success: true,
       data: result,
     });
   } catch (err) {
@@ -76,6 +90,7 @@ const deleteSize = async (req, res) => {
 export default {
   createSize,
   getSizes,
+  getActiveSizes,
   getSizeBySlug,
   updateSize,
   deleteSize,

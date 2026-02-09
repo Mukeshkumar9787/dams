@@ -1,4 +1,5 @@
 import { productService } from "../services/index.js";
+import { STATUS_TYPES } from "../utils/constants.js";
 import { errorHandler } from "../utils/errorHandler.js";
 
 const createProduct = async (req, res) => {
@@ -10,6 +11,19 @@ const createProduct = async (req, res) => {
       success: true,
       message: "product created successfully",
       data: result,
+    });
+  } catch (err) {
+    return errorHandler(err, res);
+  }
+};
+
+const getActiveProducts = async (req, res) => {
+  try {
+    const { products, totalCount} = await productService.getProducts({...req.query, status: STATUS_TYPES.ACTIVE });
+    return res.status(200).json({
+      success: true,
+      data: products,
+      totalCount
     });
   } catch (err) {
     return errorHandler(err, res);
@@ -77,6 +91,7 @@ const deleteProduct = async (req, res) => {
 export default {
   createProduct,
   getProducts,
+  getActiveProducts,
   getProductBySlug,
   updateProduct,
   deleteProduct,
