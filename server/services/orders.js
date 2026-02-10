@@ -68,6 +68,7 @@ const getOrders = async ({ userId=null, skip=0, take=10 }) => {
       prisma.order.findMany({
         where,
         include: {
+          user: { select: { name: true, email: true } },
           orderProducts: {
             select: {
               productId: true,
@@ -93,6 +94,7 @@ const getOrders = async ({ userId=null, skip=0, take=10 }) => {
 
   return {
     data: orders.map(i => ({
+        name: i.name,
         orderNo: i.orderNo,
         createdAt: i.createdAt,
         status: i.status,
@@ -102,7 +104,8 @@ const getOrders = async ({ userId=null, skip=0, take=10 }) => {
         get billingAddress(){ 
           return i.isDiffBillAdd ? getFullAddress(i.billingInfo) : this.address 
         },
-        filePath: files.find(f => i.orderProducts[0].productId === f.featureId)?.path || null
+        filePath: files.find(f => i.orderProducts[0].productId === f.featureId)?.path || null,
+        user: i.user
       }
     )),
     totalCount

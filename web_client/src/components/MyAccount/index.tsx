@@ -230,7 +230,7 @@ const MyAccount = () => {
 
           <!-- orders tab content start --> */}
             <div
-              className={`w-full bg-white rounded-xl shadow-1 ${
+              className={`w-full rounded-xl shadow-1 ${
                 activeTab === "orders" ? "block" : "hidden"
               }`}
             >
@@ -243,7 +243,7 @@ const MyAccount = () => {
                 activeTab === "account-details" ? "block" : "hidden"
               } flex justify-center`}
             >
-              <form onSubmit={handleProfileUpdate} className="w-1/2">
+              <form onSubmit={handleProfileUpdate} className="w-full md:w-1/2">
                 <div className="bg-white shadow-1 rounded-xl p-4 sm:p-8.5">
                   <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5">
                     <div className="w-full">

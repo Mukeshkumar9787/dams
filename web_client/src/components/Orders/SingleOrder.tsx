@@ -5,7 +5,7 @@ import { dateFormatter, getCurrencyDetails } from "@/utils/helper";
 const SingleOrder = ({ orderItem }: any) => {
   return (
     <>
-      <div className="border rounded-md py-3 px-2 md:flex gap-2 w-full">
+      <div className="bg-white border-white border rounded-md py-3 px-2 md:flex gap-2 w-full">
           <div className="flex justify-center">
             <img src={orderItem.filePath} alt="" className="w-full md:w-50" />
           </div>
@@ -18,11 +18,15 @@ const SingleOrder = ({ orderItem }: any) => {
           </div>
           <div className="">
             <p className="text-custom-sm text-dark">
+              <span className="font-bold pr-2">Item(s):</span> {orderItem.title}
+            </p>
+          </div>
+          <div className="">
+            <p className="text-custom-sm text-dark">
               <span className="font-bold pr-2">Date:</span>{" "}
               {dateFormatter(orderItem.createdAt)}
             </p>
           </div>
-
           <div className="">
             <p className="text-custom-sm text-dark">
               <span className="font-bold pr-2">Status:</span>{" "}
@@ -39,18 +43,6 @@ const SingleOrder = ({ orderItem }: any) => {
               >
                 {orderItem.status}
               </span>
-            </p>
-          </div>
-
-          <div className="">
-            <p className="text-custom-sm text-dark">
-              <span className="font-bold pr-2">Title:</span> {orderItem.title}
-            </p>
-          </div>
-
-          <div className="">
-            <p className="text-custom-sm text-dark">
-              <span className="font-bold pr-2">Address:</span> {orderItem.address}
             </p>
           </div>
 

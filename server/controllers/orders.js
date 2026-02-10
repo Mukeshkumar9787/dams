@@ -29,9 +29,26 @@ const getOrdersByUserId = async (req, res) => {
   }
 };
 
+const getAdminOrders = async (req, res) => {
+  try {
+    const page = req.query.page || 1;
+    const pageSize = req.query.pageSize || 10;
+    const skip = (page - 1) * pageSize;
+    const { data, totalCount} = await orderService.getOrders({ skip, take: pageSize});
+    return res.status(200).json({
+      success: true,
+      data,
+      totalCount
+    });
+  } catch (err) {
+    return errorHandler(err, res);
+  }
+};
+
 
 
 export default {
   createOrder,
-  getOrdersByUserId
+  getOrdersByUserId,
+  getAdminOrders
 };

@@ -12,3 +12,5 @@ export const SIZE_NEW_URL = `${SIZE_URL}/new`;
 
 export const COLOR_URL = '/color';
 export const COLOR_NEW_URL = `${COLOR_URL}/new`;
+
+export const ORDER_URL = '/orders';

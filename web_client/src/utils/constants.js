@@ -25,6 +25,10 @@ export const STATUS_COLOR = {
     INACTIVE: "red"
 }
 
+export const PAYMENT_STATUS = {
+    PAYMENT_PENDING: { name: "PAYMENT_PENDING", color: "bg-yellow-light"}
+}
+
 export const PROJECT_DETAILS = {
     name: "DAMS",
     description: "ecommerce platform"

@@ -1,5 +1,5 @@
 
-import { API_ADDRESS, API_CATEGORIES, API_COLOR, API_FILES, API_HSN, API_LOGIN, API_LOGIN_WITH_OTP, API_ORDERS, API_PRODUCTS, API_REGISTER, API_RESET_PASSWORD, API_SIZE, API_USER_INFO, API_USER_UPDATE_PROFILE, API_VERIFY_OTP, GET_ACTIVE_API } from './apiUrls';
+import { API_ADDRESS, API_ADMIN_ORDERS, API_CATEGORIES, API_COLOR, API_FILES, API_HSN, API_LOGIN, API_LOGIN_WITH_OTP, API_ORDERS, API_PRODUCTS, API_REGISTER, API_RESET_PASSWORD, API_SIZE, API_USER_INFO, API_USER_UPDATE_PROFILE, API_VERIFY_OTP, GET_ACTIVE_API } from './apiUrls';
 import axiosInstance from './axiosInstance';
 
 export async function getCategories(params) {
@@ -183,5 +183,10 @@ export async function createOrder(data) {
 
 export async function getOrdersForUser(data) {
   const res = await axiosInstance.get(API_ORDERS, data );
+  return res.data;
+}
+
+export async function getOrdersForAdmin(data) {
+  const res = await axiosInstance.get(API_ADMIN_ORDERS, data );
   return res.data;
 }
