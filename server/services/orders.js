@@ -19,7 +19,7 @@ const createOrder = async ({ name, mobile, address, city, pincode, country, stat
       }
     })
     await Promise.all(orderProducts.map(async (prod) => {
-      const dbProduct = await productService.getProductById({ id: prod.productId, tx });
+      const dbProduct = await productService.getProductById({ id: prod.productId, tx, include: {Hsn: {select: {tax: true}}} });
       if(!dbProduct || dbProduct.status === STATUS_TYPES.INACTIVE){
         errors.push(`${prod.title} not found`);
       }
@@ -47,6 +47,7 @@ const createOrder = async ({ name, mobile, address, city, pincode, country, stat
           quantity: prod.quantity,
           price: prod.price,
           mrp: prod.mrp,
+          tax: dbProduct?.Hsn?.tax || 0,
           stockId: stock.id
         }
       })

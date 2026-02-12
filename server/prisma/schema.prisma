@@ -172,6 +172,7 @@ model OrderProducts {
   quantity  Int
   price     Int
   mrp       Int
+  tax       Int      @default(0)
   stock     Stock    @relation(fields: [stockId], references: [id])
   stockId   Int      @unique
   createdAt DateTime @default(now())

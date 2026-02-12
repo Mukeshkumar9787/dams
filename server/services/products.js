@@ -254,10 +254,10 @@ const getProductStockById = async({ productId, tx = prisma }) => {
   return parseInt(productStock[0].stock)
 }
 
-const getProductById = async({ id, tx = prisma }) => {
+const getProductById = async({ id, tx = prisma, include= null }) => {
   const [product, stock ] = await Promise.all([
     tx.product.findUnique({
-      select: { title: true, price: true, status: true },
+      include: include || undefined,
       where: { id }
     }),
     getProductStockById({ productId: id, tx })
