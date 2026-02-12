@@ -35,6 +35,21 @@ export function isOtpExpired(createdAt) {
   return (Date.now() - createdAt.getTime()) > OTP_EXPIRY_MINUTES;
 }
 
-export const getFullAddress = (address) => {
-  return `${address.address}, ${address.city}, ${address.state}, ${address.country} - ${address.pincode}`
+export const getFullAddress = (address, isBilling=false) => {
+  if(isBilling){
+    return `${address.billingName},${address.billingMobile},${address.billingAddress}, ${address.billingCity}, ${address.billingState}, ${address.billingCountry} - ${address.billingPincode}`
+  }
+  return `${address.name},${address.mobile},${address.address}, ${address.city}, ${address.state}, ${address.country} - ${address.pincode}`
+}
+
+export const generateOrderNo = (userId) => {
+  const date = new Date();
+  const formatted = String(userId) + date.getFullYear() +
+        String(date.getMonth() + 1).padStart(2, '0') +
+        String(date.getDate()).padStart(2, '0') +
+        String(date.getHours()).padStart(2, '0') +
+        String(date.getMinutes()).padStart(2, '0') +
+        String(date.getSeconds()).padStart(2, '0') +
+        String(date.getMilliseconds()).padStart(3, '0');
+  return formatted;
 }

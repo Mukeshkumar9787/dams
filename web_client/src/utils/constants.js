@@ -25,9 +25,42 @@ export const STATUS_COLOR = {
     INACTIVE: "red"
 }
 
-export const PAYMENT_STATUS = {
-    PAYMENT_PENDING: { name: "PAYMENT_PENDING", color: "bg-yellow-light"}
+export const ORDER_STATUS = {
+    PAYMENT_PENDING: 'PAYMENT_PENDING',
+    PLACED: 'PLACED',
+    CONFIRMED: 'CONFIRMED',
+    SHIPPED: 'SHIPPED',
+    CANCELLED: 'CANCELLED',
+    DELIVERED: 'DELIVERED'
 }
+
+export const ORDER_STATUS_COLOR = {
+    PAYMENT_PENDING: {
+        backgroundColor: '#FFF7E6',
+        color: '#FA8C16'
+    },
+    PLACED: {
+        backgroundColor: '#E6F4FF',
+        color: '#1677FF'
+    },
+    CONFIRMED: {
+        backgroundColor: '#E6FFFB',
+        color: '#13C2C2'
+    },
+    SHIPPED: {
+        backgroundColor: '#F0F5FF',
+        color: '#2F54EB'
+    },
+    DELIVERED: {
+        backgroundColor: '#F6FFED',
+        color: '#52C41A'
+    },
+    CANCELLED: {
+        backgroundColor: '#FFF1F0',
+        color: '#FF4D4F'
+    }
+}
+
 
 export const PROJECT_DETAILS = {
     name: "DAMS",

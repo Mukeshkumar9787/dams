@@ -107,22 +107,63 @@ export const createOrderSchema = Joi.object({
   pincode: Joi.string().min(1).max(100).required(),
   country: Joi.string().min(1).max(100).required(),
   state: Joi.string().min(1).max(100).required(),
-  billingName: Joi.string().min(1).max(100),
-  billingMobile: Joi.string().min(1).max(12),
-  billingAddress: Joi.string().min(1).max(100),
-  billingCity: Joi.string().min(1).max(100),
-  billingPincode: Joi.string().min(1).max(100),
-  billingCountry: Joi.string().min(1).max(100),
-  billingState: Joi.string().min(1).max(100),
-  notes: Joi.string().max(100).optional().empty(''),
+
   isDiffBillAdd: Joi.boolean().default(false),
-  orderProducts: Joi.array().items(
-    Joi.object({
-      productId: Joi.number().required(),
-      title: Joi.string().required(),
-      quantity: Joi.number().integer().min(1).required(),
-      price: Joi.number().positive().required(),
-      mrp: Joi.number().positive().required(),
-    })
-  ).min(1)
+
+  billingName: Joi.when('isDiffBillAdd', {
+    is: true,
+    then: Joi.string().min(1).max(100).required(),
+    otherwise: Joi.string().min(1).max(100).optional().allow(null, '')
+  }),
+
+  billingMobile: Joi.when('isDiffBillAdd', {
+    is: true,
+    then: Joi.string().min(1).max(12).required(),
+    otherwise: Joi.string().min(1).max(12).optional().allow(null, '')
+  }),
+
+  billingAddress: Joi.when('isDiffBillAdd', {
+    is: true,
+    then: Joi.string().min(1).max(100).required(),
+    otherwise: Joi.string().min(1).max(100).optional().allow(null, '')
+  }),
+
+  billingCity: Joi.when('isDiffBillAdd', {
+    is: true,
+    then: Joi.string().min(1).max(100).required(),
+    otherwise: Joi.string().min(1).max(100).optional().allow(null, '')
+  }),
+
+  billingPincode: Joi.when('isDiffBillAdd', {
+    is: true,
+    then: Joi.string().min(1).max(100).required(),
+    otherwise: Joi.string().min(1).max(100).optional().allow(null, '')
+  }),
+
+  billingCountry: Joi.when('isDiffBillAdd', {
+    is: true,
+    then: Joi.string().min(1).max(100).required(),
+    otherwise: Joi.string().min(1).max(100).optional().allow(null, '')
+  }),
+
+  billingState: Joi.when('isDiffBillAdd', {
+    is: true,
+    then: Joi.string().min(1).max(100).required(),
+    otherwise: Joi.string().min(1).max(100).optional().allow(null, '')
+  }),
+
+  notes: Joi.string().max(100).optional().empty(''),
+
+  orderProducts: Joi.array()
+    .items(
+      Joi.object({
+        productId: Joi.number().required(),
+        title: Joi.string().required(),
+        quantity: Joi.number().integer().min(1).required(),
+        price: Joi.number().positive().required(),
+        mrp: Joi.number().positive().required(),
+      })
+    )
+    .min(1)
+    .required()
 });

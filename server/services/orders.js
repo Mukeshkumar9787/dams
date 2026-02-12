@@ -1,16 +1,17 @@
 import prisma from "../prisma/client.js";
 import { ERR_CODES, FEATURE_TYPES, ORDER_STATUS, PAYMENT_TYPES, STATUS_TYPES, STOCK_TYPES } from "../utils/constants.js";
-import { getFullAddress } from "../utils/helpers.js";
+import { generateOrderNo, getFullAddress } from "../utils/helpers.js";
 import { fileService, productService } from "./index.js";
 
-const createOrder = async ({ name, mobile, address, city, pincode, country, state, isDiffBillAdd, billingName, billingMobile, billingCity, billingPincode, billingCountry, billingState, notes, orderProducts = [], userId }) => {
+const createOrder = async ({ name, mobile, address, city, pincode, country, state, isDiffBillAdd, billingName, billingMobile, billingAddress, billingCity, billingPincode, billingCountry, billingState, notes, orderProducts = [], userId }) => {
   return await prisma.$transaction(async (tx) => {
     const errors = [];
     const order = await tx.order.create({
       data: {
+        orderNo: generateOrderNo(userId),
         name, mobile, address, city, pincode, country, state, 
         isDiffBillAdd,
-        billingInfo: isDiffBillAdd ? { billingName, billingMobile, billingCity, billingPincode, billingCountry, billingState } : null, 
+        billingInfo: isDiffBillAdd ? { billingName, billingMobile, billingAddress, billingCity, billingPincode, billingCountry, billingState } : null, 
         notes: notes || null,
         userId,
         paymentType: PAYMENT_TYPES.ONLINE,
@@ -127,7 +128,7 @@ const getOrder = async ({ userId=null, orderNo }) => {
           price: true,
           quantity: true,
           product: {
-            select: { title: true }
+            select: { title: true, slug: true }
           },
         },
         orderBy: { id: 'asc' }
@@ -140,7 +141,7 @@ const getOrder = async ({ userId=null, orderNo }) => {
 
   if(orders.length === 0) {
     let err =  new Error("Order Not found");
-    err.status = 404;
+    err.statusCode = 404;
     throw err;
   }
 
@@ -153,15 +154,18 @@ const getOrder = async ({ userId=null, orderNo }) => {
     createdAt: order.createdAt,
     status: order.status,
     totalPrice: order.orderProducts.reduce((a, c) => a + (c.price * c.quantity), 0),
+    notes: order.notes,
     address: getFullAddress(order),
+    paymentType: order.paymentType,
     get billingAddress(){ 
-      return order.isDiffBillAdd ? getFullAddress(order.billingInfo) : this.address 
+      return order.isDiffBillAdd ? getFullAddress(order.billingInfo, true) : this.address 
     },
     products: order.orderProducts.map(i => ({
+      slug: i.product.slug,
       title: i.product.title,
       price: i.price,
       quantity: i.quantity,
-      files: files.filter(f => f.featureId === i.productId).map( i => ({path: i.path}))
+      img: files.filter(f => f.featureId === i.productId).map( i => ({path: i.path}))?.[0]?.path || null
     })),
     user: order.user
   };

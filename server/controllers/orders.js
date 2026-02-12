@@ -15,8 +15,8 @@ const createOrder = async (req, res) => {
 
 const getOrdersByUserId = async (req, res) => {
   try {
-    const page = req.query.page || 1;
-    const pageSize = req.query.pageSize || 10;
+    const page = parseInt(req.query.page || 1);
+    const pageSize = parseInt(req.query.pageSize || 5);
     const skip = (page - 1) * pageSize;
     const { data, totalCount} = await orderService.getOrders({ userId: req.user.id, skip, take: pageSize});
     return res.status(200).json({
@@ -31,7 +31,7 @@ const getOrdersByUserId = async (req, res) => {
 
 const getAdminOrders = async (req, res) => {
   try {
-    const page = req.query.page || 1;
+    const page = parseInt(req.query.page || 1);
     const pageSize = req.query.pageSize || 10;
     const skip = (page - 1) * pageSize;
     const { data, totalCount} = await orderService.getOrders({ skip, take: pageSize});

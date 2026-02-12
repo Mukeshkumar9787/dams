@@ -182,12 +182,12 @@ export async function createOrder(data) {
 }
 
 export async function getOrdersForUser(data) {
-  const res = await axiosInstance.get(API_ORDERS, data );
+  const res = await axiosInstance.get(API_ORDERS, {params: data} );
   return res.data;
 }
 
 export async function getOrdersForAdmin(data) {
-  const res = await axiosInstance.get(API_ADMIN_ORDERS, data );
+  const res = await axiosInstance.get(API_ADMIN_ORDERS, {params: data} );
   return res.data;
 }
 

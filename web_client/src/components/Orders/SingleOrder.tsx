@@ -4,11 +4,12 @@ import { dateFormatter, getCurrencyDetails } from "@/utils/helper";
 import Link from "next/link";
 import { ORDER_URL } from "@/utils/appUrls";
 import { ExportOutlined } from "@ant-design/icons";
+import { ORDER_STATUS_COLOR } from "@/utils/constants";
 
 const SingleOrder = ({ orderItem }: any) => {
   return (
     <>
-      <div className="bg-white border-white border rounded-md py-3 px-2 md:flex gap-2 w-full">
+      <div className="bg-white border-white border rounded-md py-3 px-2 md:flex gap-2">
           <div className="flex justify-center">
             <img src={orderItem.filePath} alt="" className="w-full md:w-50" />
           </div>
@@ -16,7 +17,7 @@ const SingleOrder = ({ orderItem }: any) => {
           <div className="">
             <p className="text-custom-sm text-dark">
               <span className="font-bold pr-2"> Order:</span> #
-              {orderItem.orderNo.slice(-8)}
+              {orderItem.orderNo}
             </p>
           </div>
           <div className="">
@@ -34,15 +35,8 @@ const SingleOrder = ({ orderItem }: any) => {
             <p className="text-custom-sm text-dark">
               <span className="font-bold pr-2">Status:</span>{" "}
               <span
-                className={`inline-block text-custom-sm  py-0.5 px-2.5 rounded-[30px] capitalize ${
-                  orderItem.status === "delivered"
-                    ? "text-green bg-green-light-6"
-                    : orderItem.status === "on-hold"
-                    ? "text-red bg-red-light-6"
-                    : orderItem.status === "processing"
-                    ? "text-yellow bg-yellow-light-4"
-                    : "text-yellow bg-yellow-light-4"
-                }`}
+                className={`inline-block text-custom-sm  py-0.5 px-2.5 rounded-[30px] capitalize`}
+                style={ORDER_STATUS_COLOR[orderItem.status]}
               >
                 {orderItem.status}
               </span>

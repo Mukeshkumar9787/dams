@@ -4,13 +4,13 @@ import Breadcrumb from "../Common/Breadcrumb";
 import Link from "next/link";
 import { getOrdersForAdmin } from "../../http/apiCalls.js";
 import { Input, Table } from "antd"
-import { PAYMENT_STATUS } from "../../utils/constants.js"
+import { ORDER_STATUS_COLOR } from "../../utils/constants.js"
 import { ORDER_URL } from "@/utils/appUrls";
 import { ExportOutlined } from "@ant-design/icons";
 
 
 const AdminOrders = () => {
-  const [OrderItems, setOrderItems] = React.useState([]);
+  const [orderItems, setOrderItems] = React.useState([]);
   const [totalCount, setTotalCount] = React.useState(0);
   const [pagination, setPagination] = React.useState({ pageNumber: 1, pageSize: 10});
   const [search, setSearch] = React.useState('');
@@ -63,7 +63,7 @@ const AdminOrders = () => {
       render: (text) => {
         return (
           <div className="w-full flex flex-row">
-            <div className={` ${PAYMENT_STATUS[text].color} text-white px-4 py-2 rounded`}>{text}</div>
+            <div className={`text-white px-4 py-2 rounded`} style={ORDER_STATUS_COLOR[text]}>{text}</div>
           </div> )
       },
     },
@@ -101,7 +101,7 @@ const AdminOrders = () => {
                 <Input placeholder="Search" type="text" value={search} onChange={(e) => setSearch(e.target.value)} />
               </div>
             </div>
-            <Table dataSource={OrderItems} columns={columns} rowKey="id"
+            <Table dataSource={orderItems} columns={columns} rowKey="id"
              pagination={{
                 current: pagination.pageNumber,
                 pageSize: pagination.pageSize,

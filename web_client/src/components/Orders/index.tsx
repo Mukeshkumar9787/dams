@@ -6,7 +6,7 @@ import { Pagination } from "antd";
 const Orders = () => {
   const [ordersData, setOrdersData] = useState<any>([]);
   const [totalCount, setTotalCount] = React.useState(0);
-  const [pagination, setPagination] = React.useState({ page: 1, pageSize: 10});
+  const [pagination, setPagination] = React.useState({ page: 1, pageSize: 5});
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -16,7 +16,7 @@ const Orders = () => {
     } catch (err) {
       console.error(err);
     }
-  }, []);
+  }, [pagination]);
 
   useEffect(() => {
     fetchProducts();
@@ -27,7 +27,7 @@ const Orders = () => {
       <div className="w-full flex flex-wrap gap-2 p-3">
         {ordersData.length > 0 ? (
           ordersData.map((orderItem) => (
-            <SingleOrder key={orderItem.id} orderItem={orderItem} smallView={true} />
+            <SingleOrder key={orderItem.orderNo} orderItem={orderItem} smallView={true} />
           ))
         ) : (
           <p className="py-9.5 px-4 sm:px-7.5 xl:px-10">

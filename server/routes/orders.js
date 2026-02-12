@@ -11,12 +11,10 @@ router.post("/",getAuthMiddleware(), validateInput(createOrderSchema), orderCont
 
 router.get("/",getAuthMiddleware(), orderController.getOrdersByUserId);
 
+router.get("/admin", getAuthMiddleware([ROLE_TYPES.ADMIN]), orderController.getAdminOrders);
+
 router.get("/:slug",getAuthMiddleware(), orderController.getOrderBySlugUser);
 
-router.use(getAuthMiddleware([ROLE_TYPES.ADMIN]));
-
-router.get("/admin", orderController.getAdminOrders);
-
-router.get("/:slug/admin", orderController.getOrderBySlugAdmin);
+router.get("/:slug/admin", getAuthMiddleware([ROLE_TYPES.ADMIN]), orderController.getOrderBySlugAdmin);
 
 export default router;

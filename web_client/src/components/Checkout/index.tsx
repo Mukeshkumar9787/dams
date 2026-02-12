@@ -12,6 +12,7 @@ import { createOrder, getProducts } from "@/http/apiCalls";
 import OrderList from "./OrderList";
 import { useDispatch } from "react-redux";
 import { removeAllItemsFromCart, removeItemFromCart } from "@/redux/features/cart-slice";
+import { ORDER_URL } from "@/utils/appUrls";
 const Checkout = () => {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -78,7 +79,7 @@ const Checkout = () => {
         }))
       })
       if(response.success){
-        window.location.href = '/my-account';
+        window.location.href = ORDER_URL + '/' + response?.data?.orderNo;
         dispatch(removeAllItemsFromCart())
       }else{
         fetchProducts()
