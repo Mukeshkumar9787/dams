@@ -1,6 +1,9 @@
 import React from "react";
 
 import { dateFormatter, getCurrencyDetails } from "@/utils/helper";
+import Link from "next/link";
+import { ORDER_URL } from "@/utils/appUrls";
+import { ExportOutlined } from "@ant-design/icons";
 
 const SingleOrder = ({ orderItem }: any) => {
   return (
@@ -50,6 +53,17 @@ const SingleOrder = ({ orderItem }: any) => {
             <p className="text-custom-sm text-dark">
               <span className="font-bold pr-2">Total:</span>
               {getCurrencyDetails().currencySymbol}{orderItem.price}
+            </p>
+          </div>
+          <div className="">
+            <p className="text-custom-sm text-dark">
+              <Link
+                  href={ORDER_URL + `/${orderItem.orderNo}`}
+                  className="inline-flex items-center gap-2 text-dark hover:text-green transition"
+                  >
+                  <span className="font-bold pr-2">View:</span>
+                  <ExportOutlined  size={20}/>
+              </Link>
             </p>
           </div>
         </div>

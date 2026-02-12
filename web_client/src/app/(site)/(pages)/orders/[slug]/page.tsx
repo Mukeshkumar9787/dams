@@ -1,16 +1,17 @@
 import React from "react";
 import { Metadata } from "next";
-import ProductForm from "@/components/Product/Form";
+import OrderDetails from "@/components/Orders/OrderDetails";
+
 export const metadata: Metadata = {
-  title: "Product",
+  title: "Orders",
 };
 
-const ProductPage = async ({params}) => {
+const OrdersPage = async ({params}) => {
   return (
-    <>
-      <ProductForm params={ await params} />
-    </>
+    <main>
+      <OrderDetails params={await params} />
+    </main>
   );
 };
 
-export default ProductPage;
+export default OrdersPage;

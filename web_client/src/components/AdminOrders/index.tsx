@@ -69,13 +69,13 @@ const AdminOrders = () => {
     },
     {
       title: 'View',
-      dataIndex: 'slug',
+      dataIndex: 'orderNo',
       key: 'action',
-      render: (slug) => {
+      render: (orderNo) => {
         return(
           <>
             <Link
-                  href={ORDER_URL + `/${slug}`}
+                  href={ORDER_URL + `/${orderNo}`}
                   className="inline-flex items-center gap-2 text-dark hover:text-green transition"
                   >
                   <ExportOutlined  size={20}/>

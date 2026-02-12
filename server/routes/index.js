@@ -35,7 +35,7 @@ router.use("/colors", colorRoutes);
 
 router.use("/users",getAuthMiddleware(), userRoutes);
 
-router.use("/orders",getAuthMiddleware(), orderRoutes);
+router.use("/orders", orderRoutes);
 
 router.use(getAuthMiddleware([ROLE_TYPES.ADMIN]));
 

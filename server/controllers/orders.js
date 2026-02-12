@@ -45,10 +45,36 @@ const getAdminOrders = async (req, res) => {
   }
 };
 
+const getOrderBySlugAdmin = async (req, res) => {
+  try {
+    const data = await orderService.getOrder({ orderNo: req.params.slug });
+    return res.status(200).json({
+      success: true,
+      data
+    });
+  } catch (err) {
+    return errorHandler(err, res);
+  }
+};
+
+const getOrderBySlugUser = async (req, res) => {
+  try {
+    const data = await orderService.getOrder({ orderNo: req.params.slug, userId: req.user.id });
+    return res.status(200).json({
+      success: true,
+      data
+    });
+  } catch (err) {
+    return errorHandler(err, res);
+  }
+};
+
 
 
 export default {
   createOrder,
   getOrdersByUserId,
-  getAdminOrders
+  getAdminOrders,
+  getOrderBySlugAdmin,
+  getOrderBySlugUser
 };

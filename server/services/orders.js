@@ -112,7 +112,63 @@ const getOrders = async ({ userId=null, skip=0, take=10 }) => {
   };
 }
 
+const getOrder = async ({ userId=null, orderNo }) => {
+  const where = { 
+      orderNo,
+      userId: userId ? userId : undefined,
+  };
+  const orders = await prisma.order.findMany({
+    where,
+    include: {
+      user: { select: { name: true, email: true } },
+      orderProducts: {
+        select: {
+          productId: true,
+          price: true,
+          quantity: true,
+          product: {
+            select: { title: true }
+          },
+        },
+        orderBy: { id: 'asc' }
+      }
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  })
+
+  if(orders.length === 0) {
+    let err =  new Error("Order Not found");
+    err.status = 404;
+    throw err;
+  }
+
+  const order = orders[0];
+
+  const files = await fileService.getFilesByFeatureIds({ feature: FEATURE_TYPES.PRODUCT, featureIds: order.orderProducts.map(i => i.productId)})
+  return {
+    name: order.name,
+    orderNo: order.orderNo,
+    createdAt: order.createdAt,
+    status: order.status,
+    totalPrice: order.orderProducts.reduce((a, c) => a + (c.price * c.quantity), 0),
+    address: getFullAddress(order),
+    get billingAddress(){ 
+      return order.isDiffBillAdd ? getFullAddress(order.billingInfo) : this.address 
+    },
+    products: order.orderProducts.map(i => ({
+      title: i.product.title,
+      price: i.price,
+      quantity: i.quantity,
+      files: files.filter(f => f.featureId === i.productId).map( i => ({path: i.path}))
+    })),
+    user: order.user
+  };
+}
+
 export default {
   createOrder,
-  getOrders
+  getOrders,
+  getOrder
 };

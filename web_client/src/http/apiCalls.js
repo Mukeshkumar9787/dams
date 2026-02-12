@@ -190,3 +190,13 @@ export async function getOrdersForAdmin(data) {
   const res = await axiosInstance.get(API_ADMIN_ORDERS, data );
   return res.data;
 }
+
+export async function getOrderDetailsBySlug(values) {
+  const res = await axiosInstance.get(`${API_ORDERS}/${values.slug}`, values);
+  return res?.data || [];
+}
+
+export async function getOrderDetailsBySlugAdmin(values) {
+  const res = await axiosInstance.get(`${API_ORDERS}/${values.slug}/admin`, values);
+  return res?.data || [];
+}

@@ -7,13 +7,16 @@ import { ROLE_TYPES } from "../utils/constants.js";
 
 const router = express.Router();
 
-router.post("/", validateInput(createOrderSchema), orderController.createOrder);
+router.post("/",getAuthMiddleware(), validateInput(createOrderSchema), orderController.createOrder);
 
-router.get("/", orderController.getOrdersByUserId);
+router.get("/",getAuthMiddleware(), orderController.getOrdersByUserId);
+
+router.get("/:slug",getAuthMiddleware(), orderController.getOrderBySlugUser);
 
 router.use(getAuthMiddleware([ROLE_TYPES.ADMIN]));
 
 router.get("/admin", orderController.getAdminOrders);
 
+router.get("/:slug/admin", orderController.getOrderBySlugAdmin);
 
 export default router;
