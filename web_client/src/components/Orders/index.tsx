@@ -6,7 +6,7 @@ import { Pagination } from "antd";
 const Orders = () => {
   const [ordersData, setOrdersData] = useState<any>([]);
   const [totalCount, setTotalCount] = React.useState(0);
-  const [pagination, setPagination] = React.useState({ page: 1, pageSize: 5});
+  const [pagination, setPagination] = React.useState({ pageNumber: 1, pageSize: 5});
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -37,7 +37,7 @@ const Orders = () => {
       </div>
       {ordersData.length > 0 && (
         <div className="w-full flex justify-end mb-2">
-          <Pagination total={totalCount} pageSize={pagination.pageSize} current={pagination.page} onChange={(page, pageSize) => setPagination({page, pageSize})} />
+          <Pagination total={totalCount} pageSize={pagination.pageSize} current={pagination.pageNumber} onChange={(page, pageSize) => setPagination({pageNumber: page, pageSize})} />
         </div>
       )}
     </>

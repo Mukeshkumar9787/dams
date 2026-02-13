@@ -33,16 +33,17 @@ enum Feature {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  mobile    String?
-  role      Role     @default(USER)
-  status    Status   @default(ACTIVE)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  orders    Order[]
+  id                   Int                  @id @default(autoincrement())
+  name                 String
+  email                String               @unique
+  password             String
+  mobile               String?
+  role                 Role                 @default(USER)
+  status               Status               @default(ACTIVE)
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  orders               Order[]
+  orderStatusHistories OrderStatusHistory[]
 }
 
 model Category {
@@ -130,6 +131,7 @@ enum OrderStatus {
   PAYMENT_PENDING
   PLACED
   CONFIRMED
+  REJECTED
   SHIPPED
   CANCELLED
   DELIVERED
@@ -141,26 +143,27 @@ enum PaymentType {
 }
 
 model Order {
-  id            Int             @id @default(autoincrement())
-  user          User            @relation(fields: [userId], references: [id])
-  userId        Int
-  orderNo       String          @unique
-  name          String
-  mobile        String
-  address       String
-  city          String
-  pincode       String
-  country       String
-  state         String
-  isDiffBillAdd Boolean
-  status        OrderStatus
-  paymentType   PaymentType
-  billingInfo   Json?
-  notes         String?
-  discount      Int             @default(0)
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  orderProducts OrderProducts[]
+  id                   Int                  @id @default(autoincrement())
+  user                 User                 @relation(fields: [userId], references: [id])
+  userId               Int
+  orderNo              String               @unique
+  name                 String
+  mobile               String
+  address              String
+  city                 String
+  pincode              String
+  country              String
+  state                String
+  isDiffBillAdd        Boolean
+  status               OrderStatus
+  paymentType          PaymentType
+  billingInfo          Json?
+  notes                String?
+  discount             Int                  @default(0)
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  orderProducts        OrderProducts[]
+  orderStatusHistories OrderStatusHistory[]
 }
 
 model OrderProducts {
@@ -183,6 +186,7 @@ enum StockType {
   PRODUCT
   ORDER
   PAYMENT_PENDING
+  WITHDRAW
 }
 
 model Stock {
@@ -194,4 +198,15 @@ model Stock {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   orderProducts OrderProducts?
+}
+
+model OrderStatusHistory {
+  id        Int      @id @default(autoincrement())
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  meta      Json?
+  status    OrderStatus
+  createdAt DateTime @default(now())
 }

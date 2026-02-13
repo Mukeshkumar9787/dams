@@ -3,6 +3,7 @@ import EmptyCart from "../Common/CartSidebarModal/EmptyCart"
 import AddToCart from "../Common/AddToCart";
 import Link from "next/link";
 import { SHOP_DETAILS } from "@/utils/appUrls";
+import AvailableStock from "../Common/AvailableStock";
 
 const OrderList = ({ productItems, totalPrice }) => {
     if(productItems.length === 0) {
@@ -37,8 +38,11 @@ const OrderList = ({ productItems, totalPrice }) => {
           <div key={product.id} className="flex items-center justify-between py-5 border-b border-gray-3">
               <div className="flex w-full">
                 <div>
-                <Link href={`${SHOP_DETAILS}/${product.slug}`} > <img src={product.img} className="w-20" alt={product.title} /> </Link> 
-                <div className="text-dark">{product.title}({currency}{product.price})</div>
+                <Link href={`${SHOP_DETAILS}/${product.slug}`} > 
+                    <img src={product.img} className="w-20" alt={product.title} /> 
+                    <div>{product.title}({currency}{product.price})</div>
+                    <AvailableStock stock={product.stock} small />
+                </Link> 
                 </div>
               <AddToCart id={product.id} purchase={false} stack={false} isDelete stock={product.stock} />
               </div>

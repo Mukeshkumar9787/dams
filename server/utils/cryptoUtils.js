@@ -31,3 +31,5 @@ export function generateAlphaNumericToken(length = 6) {
 }
 
 export const hashedPassword = async (password) =>  await bcrypt.hash(password, 10);
+
+export const generateRandom = () => crypto.randomInt(1000);

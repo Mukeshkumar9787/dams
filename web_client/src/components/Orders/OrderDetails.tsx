@@ -1,29 +1,63 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Breadcrumb from "../Common/Breadcrumb";
 import { getCurrencyDetails, getLoggedInUserData } from "@/utils/helper";
-import { getOrderDetailsBySlug, getOrderDetailsBySlugAdmin } from "@/http/apiCalls";
-import { ORDER_STATUS_COLOR, ROLE_TYPES } from "@/utils/constants";
+import { getOrderDetailsBySlug, getOrderDetailsBySlugAdmin, updateOrderStatusBySlugAdmin } from "@/http/apiCalls";
+import { getNextOrderStatuses, ORDER_STATUS, ORDER_STATUS_COLOR, ROLE_TYPES } from "@/utils/constants";
 import Link from "next/link";
-import { PRODUCT_URL, SHOP_DETAILS } from "@/utils/appUrls";
+import { SHOP_DETAILS } from "@/utils/appUrls";
+import { Input, Select } from "antd";
+import ModalInfo from "../Common/ModalInfo";
+import OrderStatusTimeline from "./OrderStatusHistory";
 const OrderDetails = ({params}) => {
   const [data, setData] = useState(null);
-  useEffect(()=>{
-    const fetchOrder = async () => {
+  const [statusInfo, setStatusInfo] = useState(null);
+
+  const fetchOrder = useCallback(async () => {
+    try {
       const userData = await getLoggedInUserData();
       let response = null;
-      if(userData.role === ROLE_TYPES.ADMIN){
+
+      if (userData.role === ROLE_TYPES.ADMIN) {
         response = await getOrderDetailsBySlugAdmin(params);
-      }else{
+
+        const modifiedData = {
+          ...response?.data
+        };
+
+        setStatusInfo({ status: modifiedData?.status });
+        setData(modifiedData);
+      } else {
         response = await getOrderDetailsBySlug(params);
+        setData(response?.data);
       }
-      setData(response?.data);
+    } catch (error) {
+      console.error("Failed to fetch order:", error);
     }
-    fetchOrder()
-  },[])
+  }, []);
+
+  const handleUpdateStatus = async() => {
+    try {
+      const response = await updateOrderStatusBySlugAdmin({slug: params.slug, ...statusInfo});
+      if(response.success){
+        window.alert("Order status changed successfully");
+        fetchOrder();
+      }
+    } catch (error) {
+      
+    }
+  }
+
+  useEffect(() => {
+    fetchOrder();
+  }, [fetchOrder]);
+
   const productItems = data?.products || [];
   const totalPrice = data?.totalPrice || 0;
   const currency = getCurrencyDetails().currencySymbol;
+  const nextSteps = getNextOrderStatuses(data?.status);
+  const orderStatusHistory = (data?.orderStatusHistory || []);
+  const currentComments = orderStatusHistory.find(i => i.status === data?.status)?.meta?.comments || '';
   return (
     <>
       <Breadcrumb title={"Order"} pages={["Order/", params?.slug]} />
@@ -39,7 +73,7 @@ const OrderDetails = ({params}) => {
                       Order-{data?.orderNo}
                     </h3>
                     <span className="font-medium text-xl text-dark" style={ORDER_STATUS_COLOR[data?.status]}>
-                      {data?.status}
+                      {data?.status}{currentComments && `(${currentComments})`}
                     </span>
                   </div>
 
@@ -120,6 +154,59 @@ const OrderDetails = ({params}) => {
                           {getCurrencyDetails().currencySymbol} {totalPrice.toFixed(2)}
                         </p>
                       </div>
+                    </div>
+
+
+                    {
+                      statusInfo?.status && (nextSteps.length > 0)
+                      && 
+                      <>
+                      <div className="flex items-center justify-between pt-5">
+                        <div>
+                          <p className="font-medium text-lg text-dark">Change Status</p>
+                        </div>
+                        <div>
+                        <p className="font-medium text-lg text-dark text-right">
+                          <Select value={statusInfo?.status} onChange={(value) => setStatusInfo({status: value, isConfirm: true})} style={{ width: 200 }} className="h-13 bg-gray">
+                            {nextSteps.map(item => (
+                              <Select.Option key={item} value={item}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                  <span
+                                    style={{
+                                      width: 16,
+                                      height: 16,
+                                      display: 'inline-block',
+                                      borderRadius: 4,
+                                      border: '1px solid #ccc',
+                                      ...ORDER_STATUS_COLOR[item]
+                                    }}
+                                  />
+                                  {item}
+                                </div>
+                              </Select.Option>
+                            ))}
+                          </Select>
+                        </p>
+                        </div>
+                      </div>
+                      <ModalInfo content={
+                          <div>
+                            <div>
+                              Are you proceed to <span style={ORDER_STATUS_COLOR[statusInfo.status]}> {statusInfo.status} </span> this order ?
+                            </div>
+                            {
+                              [ORDER_STATUS.SHIPPED, ORDER_STATUS.REJECTED].includes(statusInfo.status)
+                              &&
+                              <Input className="mt-3" type="text" placeholder="Enter comments" value={statusInfo?.meta?.comments || ''} 
+                                onChange={(e) => setStatusInfo(prev => ({...prev, meta: {comments: e.target.value}}))} 
+                              />
+                            }
+                          </div>} isOpen={statusInfo.isConfirm} 
+                        onClose={()=>{setStatusInfo({status: data?.status})}} onOk={handleUpdateStatus} />
+                      </>
+                    }
+                    <div className="pt-5 border-t border-gray-3">
+                      <OrderStatusTimeline history={orderStatusHistory} />
                     </div>
                   </div>
                 </div>

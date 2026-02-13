@@ -10,6 +10,7 @@ import userRoutes from "./users.js"
 import orderRoutes from "./orders.js"
 import { getAuthMiddleware } from "../middlewares/authMiddleware.js";
 import { ROLE_TYPES } from "../utils/constants.js";
+import { paginationMiddleware } from "../middlewares/paginationValidationMiddleware.js";
 
 
 const router = express.Router();
@@ -22,6 +23,8 @@ router.use(
   },
   express.static("uploads")
 );
+
+router.use(paginationMiddleware);
 
 router.use("/auth", authRoutes);
 

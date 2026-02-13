@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { OTP_TYPES, STATUS_TYPES } from "./constants.js";
+import { ORDER_STATUS, OTP_TYPES, STATUS_TYPES } from "./constants.js";
 
 export const categoryBodySchema = Joi.object({
   title: Joi.string().min(1).max(100).required(),
@@ -166,4 +166,10 @@ export const createOrderSchema = Joi.object({
     )
     .min(1)
     .required()
+});
+
+export const updateOrderStatusSchema = Joi.object({
+  status: Joi.string()
+    .valid(...Object.values(ORDER_STATUS)).required(),
+  meta: Joi.optional()
 });

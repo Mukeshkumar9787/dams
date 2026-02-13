@@ -29,10 +29,36 @@ export const ORDER_STATUS = {
     PAYMENT_PENDING: 'PAYMENT_PENDING',
     PLACED: 'PLACED',
     CONFIRMED: 'CONFIRMED',
+    REJECTED: 'REJECTED',
     SHIPPED: 'SHIPPED',
     CANCELLED: 'CANCELLED',
     DELIVERED: 'DELIVERED'
 }
+
+export const ORDER_STATUS_NEXT_STEPS = {
+    [ORDER_STATUS.PAYMENT_PENDING]: [
+        ORDER_STATUS.PLACED,
+        ORDER_STATUS.REJECTED
+    ],
+    [ORDER_STATUS.PLACED]: [
+        ORDER_STATUS.CONFIRMED,
+        ORDER_STATUS.REJECTED
+    ],
+    [ORDER_STATUS.CONFIRMED]: [
+        ORDER_STATUS.SHIPPED
+    ],
+    [ORDER_STATUS.SHIPPED]: [
+        ORDER_STATUS.DELIVERED
+    ],
+    [ORDER_STATUS.DELIVERED]: [],
+    [ORDER_STATUS.CANCELLED]: [],
+    [ORDER_STATUS.REJECTED]: []
+}
+
+export function getNextOrderStatuses(currentStatus) {
+    return ORDER_STATUS_NEXT_STEPS[currentStatus] || [];
+}
+
 
 export const ORDER_STATUS_COLOR = {
     PAYMENT_PENDING: {
@@ -56,6 +82,10 @@ export const ORDER_STATUS_COLOR = {
         color: '#52C41A'
     },
     CANCELLED: {
+        backgroundColor: '#FFF1F0',
+        color: '#FF4D4F'
+    },
+    REJECTED: {
         backgroundColor: '#FFF1F0',
         color: '#FF4D4F'
     }

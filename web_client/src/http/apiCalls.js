@@ -22,7 +22,7 @@ export async function uploadFile(data) {
 }
 
 export async function getCategoryBySlug(values) {
-  const res = await axiosInstance.get(`${API_CATEGORIES}/${values.slug}`, values);
+  const res = await axiosInstance.get(`${API_CATEGORIES}/${values.slug}`, {params: values});
   return res?.data || [];
 }
 
@@ -47,7 +47,7 @@ export async function createProduct(data) {
 }
 
 export async function getProductBySlug(values) {
-  const res = await axiosInstance.get(`${API_PRODUCTS}/${values.slug}`, values);
+  const res = await axiosInstance.get(`${API_PRODUCTS}/${values.slug}`, {params: values});
   return res?.data || [];
 }
 
@@ -192,11 +192,16 @@ export async function getOrdersForAdmin(data) {
 }
 
 export async function getOrderDetailsBySlug(values) {
-  const res = await axiosInstance.get(`${API_ORDERS}/${values.slug}`, values);
+  const res = await axiosInstance.get(`${API_ORDERS}/${values.slug}`, {params: values});
   return res?.data || [];
 }
 
 export async function getOrderDetailsBySlugAdmin(values) {
-  const res = await axiosInstance.get(`${API_ORDERS}/${values.slug}/admin`, values);
+  const res = await axiosInstance.get(`${API_ORDERS}/${values.slug}/admin`, {params: values});
+  return res?.data || [];
+}
+
+export async function updateOrderStatusBySlugAdmin(values) {
+  const res = await axiosInstance.patch(`${API_ORDERS}/${values.slug}/status/admin`, values);
   return res?.data || [];
 }

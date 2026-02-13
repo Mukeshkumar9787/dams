@@ -19,7 +19,7 @@ const AddToCart = ({ id, align='center', stack = true, purchase = true, stock=0,
     }
     // add to cart
     const handleAddToCart = (redirect = false) => {
-        dispatch(addItemToCart({id,quantity: 1}));
+        dispatch(addItemToCart({id,quantity: quantity || 1}));
         if(redirect){
             router.push('/checkout');
         }
@@ -90,6 +90,7 @@ const AddToCart = ({ id, align='center', stack = true, purchase = true, stock=0,
             </span>
 
             <button
+                disabled={quantity >= stock}
                 type="button"
                 onClick={() => setQuantity(quantity + 1)}
                 aria-label="button for add product"

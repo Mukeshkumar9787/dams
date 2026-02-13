@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { generateRandom } from "./cryptoUtils.js";
 
 export const toCamelCase = (row) => {
   const obj = {};
@@ -44,12 +45,14 @@ export const getFullAddress = (address, isBilling=false) => {
 
 export const generateOrderNo = (userId) => {
   const date = new Date();
+  const random = generateRandom();
   const formatted = String(userId) + date.getFullYear() +
         String(date.getMonth() + 1).padStart(2, '0') +
         String(date.getDate()).padStart(2, '0') +
         String(date.getHours()).padStart(2, '0') +
         String(date.getMinutes()).padStart(2, '0') +
         String(date.getSeconds()).padStart(2, '0') +
-        String(date.getMilliseconds()).padStart(3, '0');
+        String(date.getMilliseconds()).padStart(3, '0') +
+        String(random);
   return formatted;
 }

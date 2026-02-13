@@ -245,7 +245,7 @@ const getProductStockById = async({ productId, tx = prisma }) => {
       WHERE
         "productId" = ${productId}
         AND 
-        type != ${STOCK_TYPES.PAYMENT_PENDING}
+        type NOT IN (${STOCK_TYPES.PAYMENT_PENDING}, ${STOCK_TYPES.WITHDRAW})
         OR (
           type = ${STOCK_TYPES.PAYMENT_PENDING}
           AND "createdAt" > NOW() - INTERVAL '5 minutes'

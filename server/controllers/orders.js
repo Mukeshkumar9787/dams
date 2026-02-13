@@ -15,7 +15,7 @@ const createOrder = async (req, res) => {
 
 const getOrdersByUserId = async (req, res) => {
   try {
-    const page = parseInt(req.query.page || 1);
+    const page = parseInt(req.query.pageNumber || 1);
     const pageSize = parseInt(req.query.pageSize || 5);
     const skip = (page - 1) * pageSize;
     const { data, totalCount} = await orderService.getOrders({ userId: req.user.id, skip, take: pageSize});
@@ -31,10 +31,11 @@ const getOrdersByUserId = async (req, res) => {
 
 const getAdminOrders = async (req, res) => {
   try {
-    const page = parseInt(req.query.page || 1);
-    const pageSize = req.query.pageSize || 10;
+    const page = parseInt(req.query.pageNumber || 1);
+    const pageSize = parseInt(req.query.pageSize || 10);
     const skip = (page - 1) * pageSize;
-    const { data, totalCount} = await orderService.getOrders({ skip, take: pageSize});
+
+    const { data, totalCount} = await orderService.getOrders({ skip, take: pageSize, search: req.query.search});
     return res.status(200).json({
       success: true,
       data,
@@ -69,6 +70,18 @@ const getOrderBySlugUser = async (req, res) => {
   }
 };
 
+const updateOrderStatus = async (req, res) => {
+  try {
+    const data = await orderService.updateOrderStatus({ orderNo: req.params.slug, userId: req.user.id, ...req.body });
+    return res.status(200).json({
+      success: true,
+      data
+    });
+  } catch (err) {
+    return errorHandler(err, res);
+  }
+};
+
 
 
 export default {
@@ -76,5 +89,6 @@ export default {
   getOrdersByUserId,
   getAdminOrders,
   getOrderBySlugAdmin,
-  getOrderBySlugUser
+  getOrderBySlugUser,
+  updateOrderStatus
 };

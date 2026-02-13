@@ -1,5 +1,5 @@
 import prisma from "../prisma/client.js";
-import { ERR_CODES, FEATURE_TYPES, ORDER_STATUS, PAYMENT_TYPES, STATUS_TYPES, STOCK_TYPES } from "../utils/constants.js";
+import { ERR_CODES, FEATURE_TYPES, getNextOrderStatuses, ORDER_STATUS, PAYMENT_TYPES, STATUS_TYPES, STOCK_TYPES } from "../utils/constants.js";
 import { generateOrderNo, getFullAddress } from "../utils/helpers.js";
 import { fileService, productService } from "./index.js";
 
@@ -62,10 +62,15 @@ const createOrder = async ({ name, mobile, address, city, pincode, country, stat
   })
 };
 
-const getOrders = async ({ userId=null, skip=0, take=10 }) => {
+const getOrders = async ({ userId=null, skip=0, take=10, search }) => {
   const where = { 
       userId: userId ? userId : undefined,
+      orderNo: search ? {
+        contains: search,
+        mode: 'insensitive'
+      } : undefined
   };
+
   const [orders, totalCount] = await Promise.all([
       prisma.order.findMany({
         where,
@@ -149,6 +154,14 @@ const getOrder = async ({ userId=null, orderNo }) => {
   const order = orders[0];
 
   const files = await fileService.getFilesByFeatureIds({ feature: FEATURE_TYPES.PRODUCT, featureIds: order.orderProducts.map(i => i.productId)})
+  const isAdmin = !userId;
+  const orderStatusHistory = await prisma.orderStatusHistory.findMany({
+    where: { orderId: order.id },
+    select: { id:true, createdAt: true, status: true, user: isAdmin ? {select: { name: true }} : undefined, meta: true },
+    orderBy: {
+      createdAt: 'asc'
+    }
+  })
   return {
     name: order.name,
     orderNo: order.orderNo,
@@ -168,12 +181,60 @@ const getOrder = async ({ userId=null, orderNo }) => {
       quantity: i.quantity,
       img: files.filter(f => f.featureId === i.productId).map( i => ({path: i.path}))?.[0]?.path || null
     })),
-    user: order.user
+    user: order.user,
+    orderStatusHistory
   };
+}
+
+const updateOrderStatus = async ({ orderNo, status, userId, meta = null }) => {
+  return await prisma.$transaction(async (tx) => {
+      const dbOrder = await tx.order.findUnique({
+        where: {
+          orderNo
+        }
+      });
+      if(!dbOrder) {
+        let err =  new Error("Order Not found");
+        err.statusCode = 404;
+        throw err;
+      }
+      if(!getNextOrderStatuses(dbOrder.status).includes(status)){
+        let err =  new Error(`Order is ${dbOrder.status}, cannot be changed to ${status} !`);
+        err.statusCode = 403;
+        throw err;
+      }
+      const promises = [
+        tx.order.update({
+          where: {
+            orderNo
+          },
+          data: {
+            status
+          }
+        }),
+        tx.orderStatusHistory.create({ 
+            data: { orderId: dbOrder.id, status, userId, meta }
+        })
+      ];
+      if(status === ORDER_STATUS.REJECTED){
+        updateOrderProductStockStatus({tx, orderId: dbOrder.id, status: STOCK_TYPES.WITHDRAW })
+      }
+      await Promise.all(promises); 
+  })
+}
+
+const updateOrderProductStockStatus = async ({ tx, orderId, status }) => {
+  return await tx.$queryRaw`
+    update "Stock" s set "type" = ${status}
+    from "OrderProducts" op 
+    where s.id = op."stockId" and op."orderId" = ${orderId};
+  `
 }
 
 export default {
   createOrder,
   getOrders,
-  getOrder
+  getOrder,
+  updateOrderStatus,
+  updateOrderProductStockStatus
 };
