@@ -28,7 +28,7 @@ export const getAuthMiddleware = (allowedRoles=[], isPassThrough = null) => {
       next();      
       return; 
     }
-    return res.status(403).json({ message: "Forbidden" });
+    return res.status(401).json({ message: "Forbidden" });
   };
 };
 

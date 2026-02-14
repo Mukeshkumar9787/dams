@@ -8,11 +8,13 @@ import { ADDRESS_TYPES, STATUS_TYPES } from "@/utils/constants";
 import Notes from "./Notes";
 import { Button } from "antd";
 import { AppDispatch, useAppSelector } from "@/redux/store";
-import { createOrder, getProducts } from "@/http/apiCalls";
+import { createOrder, getProducts, verifyPayment } from "@/http/apiCalls";
 import OrderList from "./OrderList";
 import { useDispatch } from "react-redux";
 import { removeAllItemsFromCart, removeItemFromCart } from "@/redux/features/cart-slice";
+import { handlePayment } from "@/utils/payment";
 import { ORDER_URL } from "@/utils/appUrls";
+
 const Checkout = () => {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -62,12 +64,13 @@ const Checkout = () => {
     }
     navigateGuestUser();
   },[]);
+  
   const handleSubmit = async (e) => {
     try {
       e.preventDefault()
       const formData = new FormData(e.target);
       const values = Object.fromEntries(formData.entries());
-      const response = await createOrder({
+      const orderResponse = await createOrder({
         ...values, 
         isDiffBillAdd,
         orderProducts: productItems.map(i => ({
@@ -78,9 +81,21 @@ const Checkout = () => {
           quantity: i.quantity
         }))
       })
-      if(response.success){
-        window.location.href = ORDER_URL + '/' + response?.data?.orderNo;
-        dispatch(removeAllItemsFromCart())
+      if(orderResponse.success){
+        if(orderResponse.data.payment){
+          const onPaymentSuccess = async function (response) {
+            const verifyRes = await verifyPayment(response);
+            if (verifyRes) {
+              window.location.href = `${ORDER_URL}/${orderResponse.data.orderNo}`
+              if(verifyRes.success) {
+                dispatch(removeAllItemsFromCart());
+              }
+            }
+          }
+          await handlePayment(orderResponse.data.payment, onPaymentSuccess);
+        }else{
+          window.alert("Payment Failed");
+        }
       }else{
         fetchProducts()
       }
@@ -120,7 +135,7 @@ const Checkout = () => {
                   htmlType="submit"
                   className="w-full flex justify-center font-medium text-white bg-blue py-3 px-6 rounded-md ease-out duration-200 mt-7.5"
                 >
-                  Place Order
+                  Pay Now
                 </Button>
               </div>
             </div>

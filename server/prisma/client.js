@@ -10,5 +10,5 @@ const prisma = new PrismaClient({ adapter,  log: ['query', 'info', 'warn', 'erro
 
 
 export const PrismaConfig = Prisma;
-
+  
 export default prisma;

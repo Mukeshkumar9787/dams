@@ -129,6 +129,7 @@ model Otp {
 
 enum OrderStatus {
   PAYMENT_PENDING
+  PAYMENT_FAILED
   PLACED
   CONFIRMED
   REJECTED
@@ -157,6 +158,7 @@ model Order {
   isDiffBillAdd        Boolean
   status               OrderStatus
   paymentType          PaymentType
+  paymentOrderId       String?              @unique
   billingInfo          Json?
   notes                String?
   discount             Int                  @default(0)

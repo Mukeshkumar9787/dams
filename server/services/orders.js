@@ -2,6 +2,7 @@ import prisma from "../prisma/client.js";
 import { ERR_CODES, FEATURE_TYPES, getNextOrderStatuses, ORDER_STATUS, PAYMENT_TYPES, STATUS_TYPES, STOCK_TYPES } from "../utils/constants.js";
 import { generateOrderNo, getFullAddress } from "../utils/helpers.js";
 import { fileService, productService } from "./index.js";
+import { createPayment } from "./payment.js";
 
 const createOrder = async ({ name, mobile, address, city, pincode, country, state, isDiffBillAdd, billingName, billingMobile, billingAddress, billingCity, billingPincode, billingCountry, billingState, notes, orderProducts = [], userId }) => {
   return await prisma.$transaction(async (tx) => {
@@ -18,7 +19,7 @@ const createOrder = async ({ name, mobile, address, city, pincode, country, stat
         status: ORDER_STATUS.PAYMENT_PENDING,
       }
     })
-    await Promise.all(orderProducts.map(async (prod) => {
+    orderProducts.forEach(async (prod) => {
       const dbProduct = await productService.getProductById({ id: prod.productId, tx, include: {Hsn: {select: {tax: true}}} });
       if(!dbProduct || dbProduct.status === STATUS_TYPES.INACTIVE){
         errors.push(`${prod.title} not found`);
@@ -51,14 +52,17 @@ const createOrder = async ({ name, mobile, address, city, pincode, country, stat
           stockId: stock.id
         }
       })
-    }));
+    });
     if(errors.length > 0) {
       const err = new Error(errors.join(','));
       err.statusCode = 400;
       err.code = ERR_CODES.ORDER_VALIDATION;
       throw err;
     }
-    return order;
+    const amount = orderProducts.reduce((a,c) => a + (c.price * c.quantity), 0);
+    const payment = await createPayment({ amount });
+    await tx.order.update({ data: { paymentOrderId: payment.id }, where: {id: order.id}})
+    return {...order, payment };
   })
 };
 
@@ -231,10 +235,24 @@ const updateOrderProductStockStatus = async ({ tx, orderId, status }) => {
   `
 }
 
+const updateOrderStatusByPaymentId = async ({ paymentOrderId, status, stockStatus}) => {
+  return await prisma.$transaction(async (tx) => {
+    const order = await tx.order.update({ data: {status},where: { paymentOrderId }});
+    if(!order){
+      throw new Error("Order not found");
+    }
+    await updateOrderProductStockStatus({ tx, orderId: order.id, status: stockStatus })
+    await tx.orderStatusHistory.create({ 
+        data: { orderId: order.id, status, userId: order.userId }
+    })
+  })
+}
+
 export default {
   createOrder,
   getOrders,
   getOrder,
   updateOrderStatus,
-  updateOrderProductStockStatus
+  updateOrderProductStockStatus,
+  updateOrderStatusByPaymentId
 };

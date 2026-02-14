@@ -27,6 +27,7 @@ export const STATUS_COLOR = {
 
 export const ORDER_STATUS = {
     PAYMENT_PENDING: 'PAYMENT_PENDING',
+    PAYMENT_FAILED: 'PAYMENT_FAILED',
     PLACED: 'PLACED',
     CONFIRMED: 'CONFIRMED',
     REJECTED: 'REJECTED',
@@ -88,6 +89,10 @@ export const ORDER_STATUS_COLOR = {
     REJECTED: {
         backgroundColor: '#FFF1F0',
         color: '#FF4D4F'
+    },
+    PAYMENT_FAILED: {
+        backgroundColor: '#FFF1F0',
+        color: '#FF4D4F'
     }
 }
 
@@ -136,3 +141,5 @@ export const VERIFY_OTP_TYPES = {
     LOGIN: "LOGIN",
     RESET_PASSWORD: "RESET_PASSWORD"
 }
+
+export const PAYMENT_TIMEOUT_SECONDS = 180;
