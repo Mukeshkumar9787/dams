@@ -211,4 +211,5 @@ model OrderStatusHistory {
   meta      Json?
   status    OrderStatus
   createdAt DateTime @default(now())
+  @@unique([orderId, status])
 }

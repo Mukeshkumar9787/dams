@@ -2,10 +2,12 @@ import prisma from "../prisma/client.js";
 import { ERR_CODES, FEATURE_TYPES, getNextOrderStatuses, ORDER_STATUS, PAYMENT_TYPES, STATUS_TYPES, STOCK_TYPES } from "../utils/constants.js";
 import { generateOrderNo, getFullAddress } from "../utils/helpers.js";
 import { fileService, productService } from "./index.js";
-import { createPayment } from "./payment.js";
+import { createPayment, razorpayInstance } from "./payment.js";
 
 const createOrder = async ({ name, mobile, address, city, pincode, country, state, isDiffBillAdd, billingName, billingMobile, billingAddress, billingCity, billingPincode, billingCountry, billingState, notes, orderProducts = [], userId }) => {
-  return await prisma.$transaction(async (tx) => {
+  const amount = orderProducts.reduce((a,c) => a + (c.price * c.quantity), 0);
+  const payment = await createPayment({ amount });
+  const order = await prisma.$transaction(async (tx) => {
     const errors = [];
     const order = await tx.order.create({
       data: {
@@ -17,9 +19,10 @@ const createOrder = async ({ name, mobile, address, city, pincode, country, stat
         userId,
         paymentType: PAYMENT_TYPES.ONLINE,
         status: ORDER_STATUS.PAYMENT_PENDING,
+        paymentOrderId: payment.id
       }
     })
-    orderProducts.forEach(async (prod) => {
+    await Promise.all(orderProducts.map(async (prod) => {
       const dbProduct = await productService.getProductById({ id: prod.productId, tx, include: {Hsn: {select: {tax: true}}} });
       if(!dbProduct || dbProduct.status === STATUS_TYPES.INACTIVE){
         errors.push(`${prod.title} not found`);
@@ -52,18 +55,16 @@ const createOrder = async ({ name, mobile, address, city, pincode, country, stat
           stockId: stock.id
         }
       })
-    });
+    }));
     if(errors.length > 0) {
       const err = new Error(errors.join(','));
       err.statusCode = 400;
       err.code = ERR_CODES.ORDER_VALIDATION;
       throw err;
     }
-    const amount = orderProducts.reduce((a,c) => a + (c.price * c.quantity), 0);
-    const payment = await createPayment({ amount });
-    await tx.order.update({ data: { paymentOrderId: payment.id }, where: {id: order.id}})
-    return {...order, payment };
+    return order;
   })
+  return {...order, payment }
 };
 
 const getOrders = async ({ userId=null, skip=0, take=10, search }) => {
@@ -101,8 +102,7 @@ const getOrders = async ({ userId=null, skip=0, take=10, search }) => {
         where
       })
   ]) ;
-  const files = await fileService.getFilesByFeatureIds({ feature: FEATURE_TYPES.PRODUCT, featureIds: orders.map(i => i.orderProducts[0].productId)})
-
+  const files = await fileService.getFilesByFeatureIds({ feature: FEATURE_TYPES.PRODUCT, featureIds: orders.filter(i => i.orderProducts.length > 0).map(i => i.orderProducts?.[0]?.productId)});
   return {
     data: orders.map(i => ({
         name: i.name,
@@ -115,7 +115,7 @@ const getOrders = async ({ userId=null, skip=0, take=10, search }) => {
         get billingAddress(){ 
           return i.isDiffBillAdd ? getFullAddress(i.billingInfo) : this.address 
         },
-        filePath: files.find(f => i.orderProducts[0].productId === f.featureId)?.path || null,
+        filePath: files.find(f => i.orderProducts?.[0]?.productId === f.featureId)?.path || null,
         user: i.user
       }
     )),
@@ -166,6 +166,9 @@ const getOrder = async ({ userId=null, orderNo }) => {
       createdAt: 'asc'
     }
   })
+  if(order.status === ORDER_STATUS.PAYMENT_PENDING){
+    await fetchOrderStatusAndUpdateDB(order.paymentOrderId);
+  }
   return {
     name: order.name,
     orderNo: order.orderNo,
@@ -236,16 +239,27 @@ const updateOrderProductStockStatus = async ({ tx, orderId, status }) => {
 }
 
 const updateOrderStatusByPaymentId = async ({ paymentOrderId, status, stockStatus}) => {
-  return await prisma.$transaction(async (tx) => {
-    const order = await tx.order.update({ data: {status},where: { paymentOrderId }});
-    if(!order){
-      throw new Error("Order not found");
-    }
-    await updateOrderProductStockStatus({ tx, orderId: order.id, status: stockStatus })
-    await tx.orderStatusHistory.create({ 
-        data: { orderId: order.id, status, userId: order.userId }
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const order = await tx.order.update({ data: {status},where: { paymentOrderId }});
+      if(!order){
+        throw new Error("Order not found");
+      }
+      await updateOrderProductStockStatus({ tx, orderId: order.id, status: stockStatus })
+      await tx.orderStatusHistory.create({ 
+          data: { orderId: order.id, status, userId: order.userId }
+      })
     })
-  })
+  } catch (error) {
+    
+  }
+}
+
+const fetchOrderStatusAndUpdateDB = async (paymentOrderId) => {
+  const razorpayOrder = await razorpayInstance.orders.fetch(paymentOrderId);
+  if(razorpayOrder.status === 'paid'){
+    await updateOrderStatusByPaymentId({ paymentOrderId, status: ORDER_STATUS.PLACED, stockStatus: STOCK_TYPES.ORDER});
+  }
 }
 
 export default {
