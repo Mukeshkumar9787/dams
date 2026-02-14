@@ -4,11 +4,10 @@ import validateInput from "../middlewares/requestValidationMiddleware.js";
 import { createOrderSchema, updateOrderStatusSchema } from "../utils/validation.js";
 import { getAuthMiddleware } from "../middlewares/authMiddleware.js";
 import { ROLE_TYPES } from "../utils/constants.js";
-import { verifyPayment } from "../controllers/payment.js";
 
 const router = express.Router();
 
-router.post("/payment/verify", verifyPayment);
+router.post("/payment/verify", orderController.verifyPayment);
 
 router.post("/",getAuthMiddleware(), validateInput(createOrderSchema), orderController.createOrder);
 
