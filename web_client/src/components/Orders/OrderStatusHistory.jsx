@@ -8,7 +8,7 @@ const OrderStatusTimeline = ({ history }) => {
   return (
     <div className="rounded-xl pt-6">
       <h2 className="text-lg font-bold mb-6">
-        Order Status History
+        Order Timeline
       </h2>
 
       <div className="relative border-l-2 border-gray-200 ml-1">

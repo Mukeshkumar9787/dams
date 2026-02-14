@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 import { generateRandom } from "./cryptoUtils.js";
+import { ORDER_STATUS } from './constants.js';
+import { sendMail } from "./mailUtils.js";
 
 export const toCamelCase = (row) => {
   const obj = {};
@@ -56,3 +58,144 @@ export const generateOrderNo = (userId) => {
         String(random);
   return formatted;
 }
+
+export const getOrderStatusEmailTemplate = ({
+  status,
+  orderNo,
+  userName,
+}) => {
+
+  const orderLink = `${process.env.FRONTEND_URL}/orders/${orderNo}`;
+
+  const baseTemplate = (title, message) => `
+    <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; font-size: 18px;">
+      <h2 style="color:#333;">${title}</h2>
+
+      <p>Hi ${userName},</p>
+      <p>${message}</p>
+
+      <p><strong>Order No:</strong> ${orderNo}</p>
+
+      <div style="margin: 25px 0;">
+        <a href="${orderLink}" 
+           style="
+             background-color: #2563eb;
+             color: #ffffff;
+             padding: 6px 8px;
+             text-decoration: none;
+             border-radius: 6px;
+             display: inline-block;
+             font-weight: bold;
+           ">
+           View Order Details
+        </a>
+      </div>
+
+      <p style="font-size: 12px; color: #777;">
+        If the button doesn’t work, copy this link:<br/>
+        ${orderLink}
+      </p>
+
+      <br/>
+      <p>Thanks,<br/>${process.env.APP_NAME}</p>
+    </div>
+  `;
+
+  switch (status) {
+    case ORDER_STATUS.PLACED:
+      return {
+        subject: `Order Placed Successfully - ${orderNo}`,
+        html: baseTemplate(
+          "Order Placed",
+          "Your order has been placed successfully."
+        ),
+      };
+
+    case ORDER_STATUS.CONFIRMED:
+      return {
+        subject: `Order Confirmed - ${orderNo}`,
+        html: baseTemplate(
+          "Order Confirmed",
+          "Good news! Your order has been confirmed."
+        ),
+      };
+
+    case ORDER_STATUS.SHIPPED:
+      return {
+        subject: `Order Shipped - ${orderNo}`,
+        html: baseTemplate(
+          "Order Shipped",
+          "Your order is on the way 🚚"
+        ),
+      };
+
+    case ORDER_STATUS.DELIVERED:
+      return {
+        subject: `Order Delivered - ${orderNo}`,
+        html: baseTemplate(
+          "Order Delivered",
+          "Your order has been delivered. We hope you enjoy it!"
+        ),
+      };
+
+    case ORDER_STATUS.CANCELLED:
+      return {
+        subject: `Order Cancelled - ${orderNo}`,
+        html: baseTemplate(
+          "Order Cancelled",
+          "Your order has been cancelled successfully."
+        ),
+      };
+
+    case ORDER_STATUS.REJECTED:
+      return {
+        subject: `Order Rejected - ${orderNo}`,
+        html: baseTemplate(
+          "Order Rejected",
+          "Unfortunately, your order was rejected."
+        ),
+      };
+
+    case ORDER_STATUS.PAYMENT_FAILED:
+      return {
+        subject: `Payment Failed - ${orderNo}`,
+        html: baseTemplate(
+          "Payment Failed",
+          "Your payment attempt failed. Please try again."
+        ),
+      };
+
+    case ORDER_STATUS.PAYMENT_PENDING:
+      return {
+        subject: `Payment Pending - ${orderNo}`,
+        html: baseTemplate(
+          "Payment Pending",
+          "Your order is awaiting payment confirmation."
+        ),
+      };
+
+    default:
+      return null;
+  }
+};
+
+export const sendOrderStatusMail = async ({
+  email,
+  userName,
+  orderNo,
+  status,
+}) => {
+  const template = getOrderStatusEmailTemplate({
+    status,
+    orderNo,
+    userName,
+  });
+
+  if (!template) return;
+
+  await sendMail({
+    to: email,
+    subject: `${process.env.APP_NAME} - ${template.subject}`,
+    html: template.html,
+  });
+};

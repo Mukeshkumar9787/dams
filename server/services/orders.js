@@ -217,7 +217,8 @@ const updateOrderStatus = async ({ orderNo, status, userId, meta = null }) => {
           },
           data: {
             status
-          }
+          },
+          include: { user: { select: {name: true, email: true}}}
         }),
         tx.orderStatusHistory.create({ 
             data: { orderId: dbOrder.id, status, userId, meta }
@@ -226,7 +227,8 @@ const updateOrderStatus = async ({ orderNo, status, userId, meta = null }) => {
       if(status === ORDER_STATUS.REJECTED){
         updateOrderProductStockStatus({tx, orderId: dbOrder.id, status: STOCK_TYPES.WITHDRAW })
       }
-      await Promise.all(promises); 
+      const [order] = await Promise.all(promises); 
+      return order
   })
 }
 
@@ -241,7 +243,7 @@ const updateOrderProductStockStatus = async ({ tx, orderId, status }) => {
 const updateOrderStatusByPaymentId = async ({ paymentOrderId, status, stockStatus}) => {
   try {
     return await prisma.$transaction(async (tx) => {
-      const order = await tx.order.update({ data: {status},where: { paymentOrderId }});
+      const order = await tx.order.update({ data: {status},where: { paymentOrderId }, include: { user: { select: {name: true, email: true}} }});
       if(!order){
         throw new Error("Order not found");
       }
@@ -249,6 +251,7 @@ const updateOrderStatusByPaymentId = async ({ paymentOrderId, status, stockStatu
       await tx.orderStatusHistory.create({ 
           data: { orderId: order.id, status, userId: order.userId }
       })
+      return order;
     })
   } catch (error) {
     

@@ -2,6 +2,7 @@ import { errorHandler } from "../utils/errorHandler.js";
 import orderService from "../services/orders.js"
 import { ORDER_STATUS, STOCK_TYPES } from "../utils/constants.js";
 import crypto from 'crypto';
+import { sendOrderStatusMail } from "../utils/helpers.js";
 
 const createOrder = async (req, res) => {
   try {
@@ -74,7 +75,9 @@ const getOrderBySlugUser = async (req, res) => {
 
 const updateOrderStatus = async (req, res) => {
   try {
-    const data = await orderService.updateOrderStatus({ orderNo: req.params.slug, userId: req.user.id, ...req.body });
+    const orderNo = req.params.slug;
+    const data = await orderService.updateOrderStatus({ orderNo, userId: req.user.id, ...req.body });
+    sendOrderStatusMail({ email: data.user.email,userName: data.user.name, orderNo: data.orderNo, status: data.status  });
     return res.status(200).json({
       success: true,
       data
@@ -100,14 +103,16 @@ const verifyPayment = async (req, res) => {
       .digest("hex");
   
     if (expectedSignature === razorpay_signature) {
-      await orderService.updateOrderStatusByPaymentId({ paymentOrderId: razorpay_order_id, status: ORDER_STATUS.PLACED, stockStatus: STOCK_TYPES.ORDER});
+      const order = await orderService.updateOrderStatusByPaymentId({ paymentOrderId: razorpay_order_id, status: ORDER_STATUS.PLACED, stockStatus: STOCK_TYPES.ORDER});
+      sendOrderStatusMail({ email: order.user.email,userName: order.user.name, orderNo: order.orderNo, status: ORDER_STATUS.PLACED  });
       res.json({ success: true, message: "Payment verified" });
     } else {
       throw new Error("Signature not verified");
     }
   } catch (error) {
-      await orderService.updateOrderStatusByPaymentId({ paymentOrderId: razorpay_order_id, status: ORDER_STATUS.PAYMENT_FAILED, stockStatus: STOCK_TYPES.WITHDRAW});
-      res.status(400).json({ success: false, message: "Payment Failed" });
+    const order = await orderService.updateOrderStatusByPaymentId({ paymentOrderId: razorpay_order_id, status: ORDER_STATUS.PAYMENT_FAILED, stockStatus: STOCK_TYPES.WITHDRAW});
+    sendOrderStatusMail({ email: order.user.email,userName: order.user.name, orderNo: order.orderNo, status: ORDER_STATUS.PAYMENT_FAILED  });
+    res.status(400).json({ success: false, message: "Payment Failed" });
   }
 };
 
