@@ -6,7 +6,6 @@ import { getLoggedInUserData, getProductCountFromCart, redirectToSignIn } from "
 import Address from "./Address";
 import { ADDRESS_TYPES, STATUS_TYPES } from "@/utils/constants";
 import Notes from "./Notes";
-import { Button } from "antd";
 import { AppDispatch, useAppSelector } from "@/redux/store";
 import { createOrder, getProducts, verifyPayment } from "@/http/apiCalls";
 import OrderList from "./OrderList";
@@ -130,13 +129,13 @@ const Checkout = () => {
                 <PaymentMethod />
 
                 {/* <!-- checkout button --> */}
-                <Button
+                <button
                   disabled={productItems.length === 0}
-                  htmlType="submit"
-                  className="w-full flex justify-center font-medium text-white bg-blue py-3 px-6 rounded-md ease-out duration-200 mt-7.5"
+                  type="submit"
+                  className={`w-full flex justify-center font-medium text-white bg-blue py-3 px-6 rounded-md ease-out duration-200 mt-7.5 ${(productItems.length === 0) && "bg-gray-4 text-gray"}`} 
                 >
                   Pay Now
-                </Button>
+                </button>
               </div>
             </div>
           </form>
