@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { generateRandom } from "./cryptoUtils.js";
-import { ORDER_STATUS } from './constants.js';
+import { APP_NAME, ORDER_STATUS } from './constants.js';
 import { sendMail } from "./mailUtils.js";
 
 export const toCamelCase = (row) => {
@@ -97,7 +97,7 @@ export const getOrderStatusEmailTemplate = ({
       </p>
 
       <br/>
-      <p>Thanks,<br/>${process.env.APP_NAME}</p>
+      <p>Thanks,<br/>${APP_NAME}</p>
     </div>
   `;
 
@@ -195,7 +195,7 @@ export const sendOrderStatusMail = async ({
 
   await sendMail({
     to: email,
-    subject: `${process.env.APP_NAME} - ${template.subject}`,
+    subject: `${APP_NAME} - ${template.subject}`,
     html: template.html,
   });
 };

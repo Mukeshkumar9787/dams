@@ -12,7 +12,7 @@ const ProductItem = ({ item }: { item: Product }) => {
     <div className="bg-white p-3 shodow-2 rounded-lg">
         <Link href={`/shop-details/${item.slug}`}> 
           <div className="relative overflow-hidden flex items-center justify-center rounded-lg">
-            <img src={item.img} alt="" width={250} height={250} />
+            <img src={item.img} alt="" width={250} height={250} className="w-[300px] h-[200px]" />
           </div>
           <h3
             className="font-medium text-dark ease-out duration-200 hover:text-blue mb-1.5 mt-3"

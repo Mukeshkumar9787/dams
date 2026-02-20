@@ -72,3 +72,10 @@ export const ORDER_STATUS_NEXT_STEPS = {
 export function getNextOrderStatuses(currentStatus) {
     return ORDER_STATUS_NEXT_STEPS[currentStatus] || [];
 }
+
+export const CONFIG_KEYS = {
+    SHIPPING: 'SHIPPING',
+    COMP_INFO: 'COMP_INFO',
+}
+
+export const APP_NAME = process.env.APP_NAME;

@@ -20,3 +20,4 @@ export const API_ORDERS = '/orders';
 export const GET_ACTIVE_API = (API, params) => (params?.status === STATUS_TYPES.ACTIVE) ? `${API}/active` : API ; 
 export const API_ADMIN_ORDERS = `${API_ORDERS}/admin`
 export const API_PAYMENT_VERIFY = `${API_ORDERS}/payment/verify`;
+export const API_CONFIG = '/config';

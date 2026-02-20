@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { ORDER_STATUS, OTP_TYPES, STATUS_TYPES } from "./constants.js";
+import { CONFIG_KEYS, ORDER_STATUS, OTP_TYPES, STATUS_TYPES } from "./constants.js";
 
 export const categoryBodySchema = Joi.object({
   title: Joi.string().min(1).max(100).required(),
@@ -172,4 +172,37 @@ export const updateOrderStatusSchema = Joi.object({
   status: Joi.string()
     .valid(...Object.values(ORDER_STATUS)).required(),
   meta: Joi.optional()
+});
+
+export const configBodySchema = Joi.object({
+  config: Joi.object({
+    COMP_INFO: Joi.object({
+      name: Joi.string().required(),
+      mobile: Joi.string().required(),
+      email: Joi.string().required(),
+      address: Joi.string().required(),
+      facebook: Joi.string().allow("").optional(),
+      instagram: Joi.string().allow("").optional(),
+      twitter: Joi.string().allow("").optional(),
+    }).required(),
+
+    SHIPPING: Joi.object({
+      amount: Joi.number().required(),
+
+      countries: Joi.array().items(
+        Joi.object({
+          name: Joi.string().required(),
+          amount: Joi.number().required(),
+
+          states: Joi.array().items(
+            Joi.object({
+              name: Joi.string().required(),
+              amount: Joi.number().required()
+            })
+          ).optional()
+        })
+      ).optional()
+    }).required()
+
+  }).required()
 });

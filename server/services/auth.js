@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import prisma from "../prisma/client.js";
 import { generateSecureOTP, hashedPassword, hashOTP } from "../utils/cryptoUtils.js";
 import { sendMail } from "../utils/mailUtils.js";
-import { OTP_TYPES } from "../utils/constants.js";
+import { APP_NAME, OTP_TYPES } from "../utils/constants.js";
 import { isOtpExpired } from "../utils/helpers.js";
 
 const generateToken = (user) => {
@@ -24,7 +24,7 @@ const register = async ({ name, email, password, mobile }) => {
   }
   const otp = generateSecureOTP();
   sendMail({ to: email, 
-    subject: `${process.env.APP_NAME} OTP for Registration`, 
+    subject: `${APP_NAME} OTP for Registration`, 
     html: `
     <h2>OTP Verification</h2>
     <p>Your OTP is:</p>
@@ -59,7 +59,7 @@ const resetPassword = async ({ email, password }) => {
   }
   const otp = generateSecureOTP();
   sendMail({ to: email, 
-    subject: `${process.env.APP_NAME} OTP for Reset Password`, 
+    subject: `${APP_NAME} OTP for Reset Password`, 
     html: `
     <h2>OTP Verification</h2>
     <p>Your OTP is:</p>
@@ -92,7 +92,7 @@ const loginWithOTP = async ({ email }) => {
   }
   const otp = generateSecureOTP();
   sendMail({ to: email, 
-    subject: `${process.env.APP_NAME} OTP for Login`, 
+    subject: `${APP_NAME} OTP for Login`, 
     html: `
     <h2>OTP Verification</h2>
     <p>Your OTP is:</p>

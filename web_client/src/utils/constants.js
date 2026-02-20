@@ -140,3 +140,8 @@ export const VERIFY_OTP_TYPES = {
 }
 
 export const PAYMENT_TIMEOUT_SECONDS = process.env.NEXT_PUBLIC_PAYMENT_TIMEOUT_SECONDS;
+
+export const CONFIG_KEYS = {
+    SHIPPING: 'SHIPPING',
+    COMP_INFO: 'COMP_INFO',
+}

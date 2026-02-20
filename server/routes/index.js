@@ -8,6 +8,7 @@ import sizeRoutes from "./size.js"
 import colorRoutes from "./color.js"
 import userRoutes from "./users.js"
 import orderRoutes from "./orders.js"
+import configRoutes from "./config.js"
 import { getAuthMiddleware } from "../middlewares/authMiddleware.js";
 import { ROLE_TYPES } from "../utils/constants.js";
 import { paginationMiddleware } from "../middlewares/paginationValidationMiddleware.js";
@@ -45,5 +46,7 @@ router.use(getAuthMiddleware([ROLE_TYPES.ADMIN]));
 router.use("/files", fileRoutes);
 
 router.use("/hsn", hsnRoutes);
+
+router.use("/config", configRoutes);
 
 export default router;
