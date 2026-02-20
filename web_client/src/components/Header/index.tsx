@@ -7,7 +7,8 @@ import { useAppSelector } from "@/redux/store";
 import { useCartModalContext } from "@/app/context/CartSidebarModalContext";
 import Image from "next/image";
 import { getLoggedInUserData } from "@/utils/helper";
-import { ROLE_TYPES } from "@/utils/constants";
+import { CONFIG_KEYS, ROLE_TYPES } from "@/utils/constants";
+import { getConfig } from "@/http/apiCalls";
 
 const Header = () => {
   const [menuItems, setMenuItems] = useState(menuData);
@@ -15,12 +16,30 @@ const Header = () => {
   const [stickyMenu, setStickyMenu] = useState(false);
   const { openCartModal } = useCartModalContext();
   const [user, setUser] = useState(null);
+  const [compInfo, setCompInfo] = React.useState({});
 
   const product = useAppSelector((state) => state.cartReducer.items);
 
   const handleOpenCartModal = () => {
     openCartModal();
   };
+
+  
+  const fetchConfig = React.useCallback(async () => {
+    try {
+      const { success, data } = await getConfig();
+
+      if (!success) return;
+
+      setCompInfo(data?.[CONFIG_KEYS.COMP_INFO] ?? {});
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+  
+  React.useEffect(() => {
+    fetchConfig();
+  }, [fetchConfig]);
 
   // Sticky menu
   const handleStickyMenu = () => {
@@ -63,17 +82,16 @@ const Header = () => {
           }`}
         >
           {/* <!-- header top left --> */}
-          <div className="xl:w-auto flex-col sm:flex-row w-full flex sm:justify-between sm:items-center gap-5 sm:gap-10">
+          <div className="xl:w-auto flex-row w-full flex sm:justify-between items-center gap-5">
             <Link className="flex-shrink-0" href="/">
               <Image
-                src="/images/logo/logo.svg"
+                src="/images/logo/dams.jpg"
                 alt="Logo"
-                width={219}
+                width={50}
                 height={36}
               />
             </Link>
-
-            
+            <span className="font-bold">{compInfo?.name}</span>
           </div>
 
           {/* <!-- header top right --> */}

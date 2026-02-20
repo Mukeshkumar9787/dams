@@ -41,12 +41,13 @@ router.use("/users",getAuthMiddleware(), userRoutes);
 
 router.use("/orders", orderRoutes);
 
+router.use("/config", configRoutes);
+
 router.use(getAuthMiddleware([ROLE_TYPES.ADMIN]));
 
 router.use("/files", fileRoutes);
 
 router.use("/hsn", hsnRoutes);
 
-router.use("/config", configRoutes);
 
 export default router;

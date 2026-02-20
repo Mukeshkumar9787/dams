@@ -24,7 +24,7 @@ const CompanyInfo = ({ compInfo, setCompInfo }) => {
       key: "email",
       label: "Email",
       placeholder: "Enter email",
-      type: "text",
+      type: "email",
       required: true,
     },
     {

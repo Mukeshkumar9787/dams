@@ -77,5 +77,3 @@ export const CONFIG_KEYS = {
     SHIPPING: 'SHIPPING',
     COMP_INFO: 'COMP_INFO',
 }
-
-export const APP_NAME = process.env.APP_NAME;

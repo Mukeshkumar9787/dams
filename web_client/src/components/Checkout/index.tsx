@@ -13,6 +13,7 @@ import { useDispatch } from "react-redux";
 import { removeAllItemsFromCart, removeItemFromCart } from "@/redux/features/cart-slice";
 import { handlePayment } from "@/utils/payment";
 import { ORDER_URL } from "@/utils/appUrls";
+import Policy from "./Policy";
 
 const Checkout = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -127,7 +128,7 @@ const Checkout = () => {
 
                 {/* <!-- payment box --> */}
                 <PaymentMethod />
-
+                <Policy />
                 {/* <!-- checkout button --> */}
                 <button
                   disabled={productItems.length === 0}

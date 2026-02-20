@@ -3,8 +3,8 @@ import jwt from "jsonwebtoken";
 import prisma from "../prisma/client.js";
 import { generateSecureOTP, hashedPassword, hashOTP } from "../utils/cryptoUtils.js";
 import { sendMail } from "../utils/mailUtils.js";
-import { APP_NAME, OTP_TYPES } from "../utils/constants.js";
-import { isOtpExpired } from "../utils/helpers.js";
+import { CONFIG_KEYS, OTP_TYPES } from "../utils/constants.js";
+import { getAppName, isOtpExpired } from "../utils/helpers.js";
 
 const generateToken = (user) => {
   return jwt.sign(
@@ -23,8 +23,9 @@ const register = async ({ name, email, password, mobile }) => {
     throw err;
   }
   const otp = generateSecureOTP();
+  const appName = await getAppName();
   sendMail({ to: email, 
-    subject: `${APP_NAME} OTP for Registration`, 
+    subject: `${appName} OTP for Registration`, 
     html: `
     <h2>OTP Verification</h2>
     <p>Your OTP is:</p>
@@ -58,8 +59,10 @@ const resetPassword = async ({ email, password }) => {
     throw err;
   }
   const otp = generateSecureOTP();
+  const appName = await getAppName();
+
   sendMail({ to: email, 
-    subject: `${APP_NAME} OTP for Reset Password`, 
+    subject: `${appName} OTP for Reset Password`, 
     html: `
     <h2>OTP Verification</h2>
     <p>Your OTP is:</p>
@@ -90,9 +93,11 @@ const loginWithOTP = async ({ email }) => {
     err.statusCode = 404;
     throw err;
   }
+  const appName = await getAppName();
+
   const otp = generateSecureOTP();
   sendMail({ to: email, 
-    subject: `${APP_NAME} OTP for Login`, 
+    subject: `${appName} OTP for Login`, 
     html: `
     <h2>OTP Verification</h2>
     <p>Your OTP is:</p>

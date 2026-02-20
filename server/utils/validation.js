@@ -184,6 +184,9 @@ export const configBodySchema = Joi.object({
       facebook: Joi.string().allow("").optional(),
       instagram: Joi.string().allow("").optional(),
       twitter: Joi.string().allow("").optional(),
+      privacy: Joi.string().allow("").optional(),
+      refund: Joi.string().allow("").optional(),
+      terms: Joi.string().allow("").optional(),
     }).required(),
 
     SHIPPING: Joi.object({

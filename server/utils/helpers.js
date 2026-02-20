@@ -1,8 +1,9 @@
 import fs from "fs";
 import path from "path";
 import { generateRandom } from "./cryptoUtils.js";
-import { APP_NAME, ORDER_STATUS } from './constants.js';
+import { CONFIG_KEYS, ORDER_STATUS } from './constants.js';
 import { sendMail } from "./mailUtils.js";
+import configService from "../services/config.js";
 
 export const toCamelCase = (row) => {
   const obj = {};
@@ -59,14 +60,14 @@ export const generateOrderNo = (userId) => {
   return formatted;
 }
 
-export const getOrderStatusEmailTemplate = ({
+export const getOrderStatusEmailTemplate = async({
   status,
   orderNo,
   userName,
 }) => {
 
   const orderLink = `${process.env.FRONTEND_URL}/orders/${orderNo}`;
-
+  const appName = await getAppName();
   const baseTemplate = (title, message) => `
     <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; font-size: 18px;">
       <h2 style="color:#333;">${title}</h2>
@@ -97,7 +98,7 @@ export const getOrderStatusEmailTemplate = ({
       </p>
 
       <br/>
-      <p>Thanks,<br/>${APP_NAME}</p>
+      <p>Thanks,<br/>${appName}</p>
     </div>
   `;
 
@@ -185,7 +186,7 @@ export const sendOrderStatusMail = async ({
   orderNo,
   status,
 }) => {
-  const template = getOrderStatusEmailTemplate({
+  const template = await getOrderStatusEmailTemplate({
     status,
     orderNo,
     userName,
@@ -193,9 +194,17 @@ export const sendOrderStatusMail = async ({
 
   if (!template) return;
 
+  const appName = await getAppName();
+
   await sendMail({
     to: email,
-    subject: `${APP_NAME} - ${template.subject}`,
+    subject: `${appName} - ${template.subject}`,
     html: template.html,
   });
 };
+
+export const getAppName = async() => {
+  const config = await configService.getAll();
+  const appName = await config[CONFIG_KEYS.COMP_INFO]?.name || '';
+  return appName;
+}
