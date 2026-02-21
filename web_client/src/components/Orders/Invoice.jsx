@@ -1,5 +1,5 @@
 "use client";
-import { calculateInvoice, dateFormatter, getCurrencyDetails, getPriceWithoutTax } from "@/utils/helper";
+import { dateFormatter, getCurrencyDetails, getPriceWithoutTax } from "@/utils/helper";
 import React, { forwardRef } from "react";
 
 const OrderInvoice = forwardRef(({ data }, ref) => {
@@ -13,13 +13,15 @@ const OrderInvoice = forwardRef(({ data }, ref) => {
     notes,
     products = [],
     shippingAmount = 0,
-    totalPrice = 0,
+    totalAmount = 0,
     user,
+    totalAmountWithoutTax,
+    totalTaxAmount,
+    totalProductAmount,
     compInfo
   } = data;
 
   const currency = getCurrencyDetails().currencySymbol;
-  const total = calculateInvoice(products);
   return (
     <div
       ref={ref}
@@ -38,7 +40,7 @@ const OrderInvoice = forwardRef(({ data }, ref) => {
 
       {/* Order Info */}
       <div className="mt-6 text-sm space-y-1">
-        <p><strong>Invoice No:</strong> {orderNo}</p>
+        <p><strong>Order No:</strong> {orderNo}</p>
         <p><strong>Order Date:</strong> {dateFormatter(createdAt)}</p>
       </div>
 
@@ -78,8 +80,6 @@ const OrderInvoice = forwardRef(({ data }, ref) => {
               <th className="border p-2 text-left">Product</th>
               <th className="border p-2 text-center">Qty</th>
               <th className="border p-2 text-right">Price</th>
-              <th className="border p-2 text-right">Tax</th>
-              <th className="border p-2 text-right">Price (Including Tax)</th>
             </tr>
           </thead>
 
@@ -88,12 +88,12 @@ const OrderInvoice = forwardRef(({ data }, ref) => {
               <tr key={index}>
                 <td className="border p-2">{index + 1}</td>
 
-                <td className="border p-2 flex items-center gap-3">
-                  <img
+                <td className="p-2 flex items-center gap-3">
+                  {/* <img
                     src={product.img}
                     alt={product.title}
                     className="w-12 h-12 object-cover"
-                  />
+                  /> */}
                   {product.title}
                 </td>
 
@@ -105,14 +105,6 @@ const OrderInvoice = forwardRef(({ data }, ref) => {
                   {currency} {getPriceWithoutTax(product.price, product.tax)}
                 </td>
 
-                 <td className="border p-2 text-right">
-                  {product.tax}
-                </td>
-
-                {/* IMPORTANT: assuming backend already calculates item subtotal */}
-                <td className="border p-2 text-right">
-                  {currency} {product.price * product.quantity}
-                </td>
               </tr>
             ))}
           </tbody>
@@ -125,8 +117,20 @@ const OrderInvoice = forwardRef(({ data }, ref) => {
           <div className="flex justify-between py-1 font-bold">
             <span>Sub Total</span>
             <span>
-              {`${currency} ${total.subtotal}`}
+              {`${currency} ${totalAmountWithoutTax}`}
             </span>
+          </div>
+          
+          <div className="flex justify-between py-1 font-bold">
+            <span>Tax</span>
+            <span>
+              {`${currency} ${totalTaxAmount}`}
+            </span>
+          </div>
+
+          <div className="flex justify-between py-2 font-bold border-t text-sm">
+            <span>Total</span>
+            <span>{currency} {totalProductAmount}</span>
           </div>
 
           <div className="flex justify-between py-1">
@@ -138,9 +142,9 @@ const OrderInvoice = forwardRef(({ data }, ref) => {
             </span>
           </div>
 
-          <div className="flex justify-between py-2 font-bold border-t">
-            <span>Total</span>
-            <span>{currency} {totalPrice}</span>
+          <div className="flex justify-between py-2 font-bold border-t text-xl">
+            <span>Grand Total</span>
+            <span>{currency} {totalAmount}</span>
           </div>
 
         </div>

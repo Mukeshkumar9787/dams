@@ -121,25 +121,6 @@ export const getPriceWithoutTax = (priceWithTax, taxPercent) => {
   return Number(priceWithoutTax.toFixed(2));
 }
 
-export function calculateInvoice(products) {
-  let subtotal = 0;
-  let totalTax = 0;
-
-  products.forEach(item => {
-    const itemTotal = getPriceWithoutTax(item.price) * item.quantity;
-    const tax = (itemTotal * item.tax) / 100;
-
-    subtotal += itemTotal;
-    totalTax += tax;
-  });
-
-  return {
-    subtotal: Number(subtotal.toFixed(2)),
-    totalTax: Number(totalTax.toFixed(2)),
-    grandTotal: Number((subtotal + totalTax).toFixed(2))
-  };
-}
-
 export const isPrintEnable = (status) => {
   return [ORDER_STATUS.PLACED, ORDER_STATUS.CONFIRMED, ORDER_STATUS.DELIVERED, ORDER_STATUS.SHIPPED, ORDER_STATUS.DELIVERED].includes(status);
 }

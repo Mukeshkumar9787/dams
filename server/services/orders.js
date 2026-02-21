@@ -1,6 +1,6 @@
 import prisma from "../prisma/client.js";
 import { CONFIG_KEYS, ERR_CODES, FEATURE_TYPES, getNextOrderStatuses, ORDER_STATUS, PAYMENT_TYPES, STATUS_TYPES, STOCK_TYPES } from "../utils/constants.js";
-import { generateOrderNo, getFullAddress, getShippingAmount } from "../utils/helpers.js";
+import { calculateInvoice, generateOrderNo, getFullAddress, getShippingAmount } from "../utils/helpers.js";
 import { fileService, productService } from "./index.js";
 import { createPayment, razorpayInstance } from "./payment.js";
 
@@ -26,7 +26,6 @@ const createOrder = async ({ name, mobile, address, city, pincode, country, stat
     })
     const dbShippingInfo = await tx.config.findUnique({where: { key: CONFIG_KEYS.SHIPPING }});
     const dbShippingCost = getShippingAmount(dbShippingInfo?.value, { country, state });
-    console.log(dbShippingCost, shippingAmount)
     if(dbShippingCost !== shippingAmount) {
       const err = new Error("Shipping Amount Changed");
       err.statusCode = 400;
@@ -181,13 +180,19 @@ const getOrder = async ({ userId=null, orderNo }) => {
   if(order.status === ORDER_STATUS.PAYMENT_PENDING){
     await fetchOrderStatusAndUpdateDB(order.paymentOrderId);
   }
+  const {totalAmountWithoutTax, totalTaxAmount} = calculateInvoice(order.orderProducts);
   return {
     name: order.name,
     orderNo: order.orderNo,
     createdAt: order.createdAt,
     status: order.status,
-    totalPrice: order.totalAmount,
+    totalAmount: order.totalAmount,
     shippingAmount: order.shippingAmount,
+    totalAmountWithoutTax,
+    totalTaxAmount,
+    get totalProductAmount () {
+      return this.totalAmount - this.shippingAmount
+    },
     notes: order.notes,
     address: getFullAddress(order),
     paymentType: order.paymentType,

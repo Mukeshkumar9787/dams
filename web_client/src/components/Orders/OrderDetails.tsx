@@ -77,7 +77,7 @@ const OrderDetails = ({params}) => {
     }, [fetchConfig]);
 
   const productItems = data?.products || [];
-  const totalPrice = data?.totalPrice || 0;
+  const totalAmount = data?.totalAmount || 0;
   const currency = getCurrencyDetails().currencySymbol;
   const nextSteps = getNextOrderStatuses(data?.status);
   const orderStatusHistory = (data?.orderStatusHistory || []);
@@ -193,7 +193,7 @@ const OrderDetails = ({params}) => {
                       </div>
                       <div>
                         <p className="font-medium text-lg text-dark text-right">
-                          {getCurrencyDetails().currencySymbol} {totalPrice.toFixed(2)}
+                          {getCurrencyDetails().currencySymbol} {totalAmount.toFixed(2)}
                         </p>
                       </div>
                     </div>

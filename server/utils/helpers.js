@@ -204,7 +204,7 @@ export const sendOrderStatusMail = async ({
 };
 
 export const getAppName = async() => {
-  const config = await configService.getAll();
+  const config = await configService.getAll({});
   const appName = await config[CONFIG_KEYS.COMP_INFO]?.name || '';
   return appName;
 }
@@ -217,4 +217,38 @@ export const getShippingAmount = (shipData, shippingInfo) => {
   if(stateWiseAmount) return stateWiseAmount?.amount || 0; 
   if(countryData) return countryData?.amount || 0; 
   return shipData?.amount || 0; 
+}
+
+export const getPriceWithoutTax = (priceWithTax, taxPercent) => {
+  if (!priceWithTax || !taxPercent) return priceWithTax;
+
+  const priceWithoutTax = priceWithTax / (1 + taxPercent / 100);
+  return Number(priceWithoutTax.toFixed(2));
+}
+
+export function calculateInvoice(products) {
+  let totalAmount = 0;
+  let totalAmountWithoutTax = 0;
+  let totalTaxAmount = 0;
+
+  products.forEach(item => {
+    const itemTotal = item.price * item.quantity;
+
+    // base price per item
+    const basePrice = getPriceWithoutTax(item.price, item.tax);
+
+    const itemTotalWithoutTax = basePrice * item.quantity;
+
+    const taxAmount = itemTotal - itemTotalWithoutTax;
+
+    totalAmountWithoutTax += itemTotalWithoutTax;
+    totalTaxAmount += taxAmount;
+    totalAmount += itemTotal;
+  });
+
+  return {
+    totalAmountWithoutTax: Number(totalAmountWithoutTax.toFixed(2)),
+    totalTaxAmount: Number(totalTaxAmount.toFixed(2)),
+    totalAmount: Number(totalAmount.toFixed(2)),
+  };
 }
