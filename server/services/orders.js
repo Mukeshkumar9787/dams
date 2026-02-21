@@ -148,6 +148,7 @@ const getOrder = async ({ userId=null, orderNo }) => {
           productId: true,
           price: true,
           quantity: true,
+          tax: true,
           product: {
             select: { title: true, slug: true }
           },
@@ -198,6 +199,7 @@ const getOrder = async ({ userId=null, orderNo }) => {
       title: i.product.title,
       price: i.price,
       quantity: i.quantity,
+      tax: i.tax,
       img: files.filter(f => f.featureId === i.productId).map( i => ({path: i.path}))?.[0]?.path || null
     })),
     user: order.user,

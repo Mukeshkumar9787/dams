@@ -1,17 +1,24 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Breadcrumb from "../Common/Breadcrumb";
-import { getCurrencyDetails, getLoggedInUserData, getShippingDisplay } from "@/utils/helper";
-import { getOrderDetailsBySlug, getOrderDetailsBySlugAdmin, updateOrderStatusBySlugAdmin } from "@/http/apiCalls";
-import { getNextOrderStatuses, ORDER_STATUS, ORDER_STATUS_COLOR, ROLE_TYPES } from "@/utils/constants";
+import { getCurrencyDetails, getLoggedInUserData, getShippingDisplay, isPrintEnable } from "@/utils/helper";
+import { getConfig, getOrderDetailsBySlug, getOrderDetailsBySlugAdmin, updateOrderStatusBySlugAdmin } from "@/http/apiCalls";
+import { CONFIG_KEYS, getNextOrderStatuses, ORDER_STATUS, ORDER_STATUS_COLOR, ROLE_TYPES } from "@/utils/constants";
 import Link from "next/link";
 import { SHOP_DETAILS } from "@/utils/appUrls";
-import { Input, Select } from "antd";
+import { Button, Input, Select } from "antd";
 import ModalInfo from "../Common/ModalInfo";
 import OrderStatusTimeline from "./OrderStatusHistory";
+import OrderInvoice from "./Invoice";
+import { useReactToPrint } from "react-to-print";
+
 const OrderDetails = ({params}) => {
   const [data, setData] = useState(null);
   const [statusInfo, setStatusInfo] = useState(null);
+  const componentRef = useRef(null);
+  const [compInfo, setCompInfo] = React.useState({});
+
+  const handlePrint = useReactToPrint({contentRef: componentRef});
 
   const fetchOrder = useCallback(async () => {
     try {
@@ -52,15 +59,36 @@ const OrderDetails = ({params}) => {
     fetchOrder();
   }, [fetchOrder]);
 
+  
+    const fetchConfig = React.useCallback(async () => {
+      try {
+        const { success, data } = await getConfig({ configs: [CONFIG_KEYS.COMP_INFO]});
+  
+        if (!success) return;
+  
+        setCompInfo(data?.[CONFIG_KEYS.COMP_INFO] ?? {});
+      } catch (error) {
+        console.error(error);
+      }
+    }, []);
+    
+    React.useEffect(() => {
+      fetchConfig();
+    }, [fetchConfig]);
+
   const productItems = data?.products || [];
   const totalPrice = data?.totalPrice || 0;
   const currency = getCurrencyDetails().currencySymbol;
   const nextSteps = getNextOrderStatuses(data?.status);
   const orderStatusHistory = (data?.orderStatusHistory || []);
   const currentComments = orderStatusHistory.find(i => i.status === data?.status)?.meta?.comments || '';
+  if(!data) return null;
   return (
     <>
       <Breadcrumb title={"Order"} pages={["Order/", params?.slug]} />
+      <div ref={componentRef} className="hidden print:block">
+        <OrderInvoice data={{...data, compInfo}} />
+      </div>
       <section className="overflow-hidden py-20 pt-5 bg-gray-2">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
           <form>
@@ -72,11 +100,15 @@ const OrderDetails = ({params}) => {
                     <h3 className="font-medium text-xl text-dark">
                       Order-{data?.orderNo}
                     </h3>
-                    <span className="font-medium text-xl text-dark" style={ORDER_STATUS_COLOR[data?.status]}>
-                      {data?.status}{currentComments && `(${currentComments})`}
+                    <span className="font-medium text-xl text-dark flex justify-between items-center">
+                      <p style={ORDER_STATUS_COLOR[data?.status]}>
+                      {data?.status}{currentComments && `(${currentComments})`} 
+                      </p>
+                      {isPrintEnable(data?.status) && 
+                        <button type="button" onClick={handlePrint} className="bg-blue text-white p-2 text-sm rounded-md"> Print Bill</button>
+                      }
                     </span>
                   </div>
-
                   <div className="border-b border-gray-3 py-5 px-4 sm:px-8.5">
                     <h2 className="font-medium text-dark">
                       Shipping&nbsp;Address:

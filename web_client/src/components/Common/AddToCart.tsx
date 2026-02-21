@@ -75,7 +75,7 @@ const AddToCart = ({ id, align='center', stack = true, purchase = true, stock=0,
     }
   return (
     <div className={`flex items-center ${stack ? "flex-col" : ""} gap-2 justify-${align} w-full`}>
-        <div className="flex items-center rounded-md border border-gray-3 bg-white w-1/2 h-7 text-custom-sm">
+        <div className="flex items-center rounded-md border border-gray-3 bg-white w-1/2 h-9 text-custom-sm">
             <button
                 type="button"
                 aria-label="button for remove product"
