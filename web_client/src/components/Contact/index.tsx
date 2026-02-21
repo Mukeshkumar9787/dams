@@ -3,13 +3,14 @@ import React from "react";
 import Breadcrumb from "../Common/Breadcrumb";
 import { getConfig } from "@/http/apiCalls";
 import { CONFIG_KEYS } from "@/utils/constants";
+import ContactInfo from "../Common/ContactInfo";
 
 const Contact = () => {
   const [compInfo, setCompInfo] = React.useState({});
 
   const fetchConfig = React.useCallback(async () => {
     try {
-      const { success, data } = await getConfig();
+      const { success, data } = await getConfig({ configs: [CONFIG_KEYS.COMP_INFO]});
       if (!success) return;
 
       setCompInfo(data?.[CONFIG_KEYS.COMP_INFO] ?? {});
@@ -38,24 +39,7 @@ const Contact = () => {
                 Contact Information
               </h2>
 
-              <div className="flex flex-col gap-6 text-lg">
-
-                <p>
-                  <span className="font-semibold">Email:</span>{" "}
-                  {compInfo?.email || "Loading..."}
-                </p>
-
-                <p>
-                  <span className="font-semibold">Phone:</span>{" "}
-                  {compInfo?.mobile || "Loading..."}
-                </p>
-
-                <p>
-                  <span className="font-semibold">Address:</span>{" "}
-                  {compInfo?.address || "Loading..."}
-                </p>
-
-              </div>
+              <ContactInfo compInfo={compInfo} />
             </div>
 
             {/* RIGHT SIDE - GOOGLE MAP */}

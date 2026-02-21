@@ -35,12 +35,11 @@ const Ship = ({ shipInfo, setShipInfo }) => {
 
             <div className="mb-5 ">
                 <label className="block mb-2.5">Default Amount</label>
-                <span className="flex">
-
+                <span className="flex justify-center items-center gap-5">
                     <input
                         type="number"
                         placeholder="Enter amount"
-                        value={shipInfo?.amount || ""}
+                        value={shipInfo?.amount || 0}
                         name="amount"
                         min={0}
                         onChange={(e) => handleChange(e)}

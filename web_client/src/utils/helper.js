@@ -96,3 +96,19 @@ export const dateFormatter = (value) => {
     hour12: true,
   });
 }
+
+export const getShippingAmount = (shipData, shippingInfo) => {
+  if(!shippingInfo?.country) return "Choose Country";
+  if(!shippingInfo?.state) return "Choose State";
+  const countryData = shipData?.countries?.find(i => i.name === shippingInfo.country)
+  const stateWiseAmount = countryData?.states?.find(j => j.name === shippingInfo.state);
+  if(stateWiseAmount) return stateWiseAmount?.amount || 0; 
+  if(countryData) return countryData?.amount || 0; 
+  return shipData?.amount || 0; 
+}
+
+export const getShippingDisplay = (shippingAmount) => {
+  if(!shippingAmount) return "Free";
+  if(typeof(shippingAmount) === "number") return `${getCurrencyDetails().currencySymbol} ${shippingAmount.toFixed(2)}` 
+  return shippingAmount;
+}

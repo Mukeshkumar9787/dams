@@ -208,3 +208,13 @@ export const getAppName = async() => {
   const appName = await config[CONFIG_KEYS.COMP_INFO]?.name || '';
   return appName;
 }
+
+export const getShippingAmount = (shipData, shippingInfo) => {
+  if(!shippingInfo?.country) throw new Error("Shipping Country is missing");
+  if(!shippingInfo?.state) throw new Error("Shipping State is missing");
+  const countryData = shipData?.countries?.find(i => i.name === shippingInfo.country)
+  const stateWiseAmount = countryData?.states?.find(j => j.name === shippingInfo.state);
+  if(stateWiseAmount) return stateWiseAmount?.amount || 0; 
+  if(countryData) return countryData?.amount || 0; 
+  return shipData?.amount || 0; 
+}

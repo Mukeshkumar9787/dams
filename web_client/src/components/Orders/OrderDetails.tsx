@@ -1,7 +1,7 @@
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
 import Breadcrumb from "../Common/Breadcrumb";
-import { getCurrencyDetails, getLoggedInUserData } from "@/utils/helper";
+import { getCurrencyDetails, getLoggedInUserData, getShippingDisplay } from "@/utils/helper";
 import { getOrderDetailsBySlug, getOrderDetailsBySlugAdmin, updateOrderStatusBySlugAdmin } from "@/http/apiCalls";
 import { getNextOrderStatuses, ORDER_STATUS, ORDER_STATUS_COLOR, ROLE_TYPES } from "@/utils/constants";
 import Link from "next/link";
@@ -145,6 +145,16 @@ const OrderDetails = ({params}) => {
                     )}
 
                     {/* <!-- total --> */}
+                    <div className="flex items-center justify-between pt-5 border-b border-gray-3">
+                      <div>
+                        <p className="">Shipping Amount</p>
+                      </div>
+                      <div>
+                        <p className="text-dark text-right">
+                          {getShippingDisplay(data?.shippingAmount)}
+                        </p>
+                      </div>
+                    </div>
                     <div className="flex items-center justify-between pt-5">
                       <div>
                         <p className="font-medium text-lg text-dark">Total</p>

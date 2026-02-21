@@ -211,8 +211,8 @@ export async function verifyPayment(data) {
   return res.data;
 }
 
-export async function getConfig() {
-  const res = await axiosInstance.get(API_CONFIG);
+export async function getConfig(values) {
+  const res = await axiosInstance.get(API_CONFIG, { params: values});
   return res?.data || [];
 }
 

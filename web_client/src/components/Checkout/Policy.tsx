@@ -10,7 +10,7 @@ const Policy = (props: Props) => {
 
     const fetchConfig = React.useCallback(async () => {
     try {
-        const { success, data } = await getConfig();
+        const { success, data } = await getConfig({ configs: [CONFIG_KEYS.COMP_INFO]});
 
         if (!success) return;
 

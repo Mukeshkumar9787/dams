@@ -158,6 +158,8 @@ model Order {
   isDiffBillAdd        Boolean
   status               OrderStatus
   paymentType          PaymentType
+  totalAmount          Float                @default(0)
+  shippingAmount       Float                @default(0)
   paymentOrderId       String?              @unique
   billingInfo          Json?
   notes                String?

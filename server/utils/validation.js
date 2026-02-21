@@ -110,6 +110,8 @@ export const createOrderSchema = Joi.object({
 
   isDiffBillAdd: Joi.boolean().default(false),
 
+  shippingAmount: Joi.number().default(0),
+
   billingName: Joi.when('isDiffBillAdd', {
     is: true,
     then: Joi.string().min(1).max(100).required(),

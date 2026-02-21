@@ -49,7 +49,7 @@ function State({ country, state, setShipInfo, countryIndex, rowIndex }) {
             <input
                 type="number"
                 placeholder="Enter amount"
-                value={state?.amount || ""}
+                value={state?.amount || 0}
                 name="amount"
                 min={0}
                 onChange={handleChange}

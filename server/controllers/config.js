@@ -17,7 +17,7 @@ const createOrUpdate = async (req, res) => {
 
 const getAll = async (req, res) => {
   try {
-    const result = await configService.getAll();
+    const result = await configService.getAll({ ...req.query});
     return res.status(200).json({
       success: true,
       data: result,

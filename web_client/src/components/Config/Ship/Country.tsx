@@ -55,14 +55,14 @@ function Country({ country, setShipInfo, rowIndex }) {
                     type="number"
                     disabled={!country?.name}
                     placeholder="Enter amount"
-                    value={country?.amount || ""}
+                    value={country?.amount || 0}
                     name="amount"
                     min={0}
                     onChange={handleChange}
                     required
                     className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
                 />
-                <div className="flex justify-end">
+                <div className="flex justify-end gap-1">
                     <Button className="bg-red text-white p-5" onClick={handleRemove}>Remove</Button>
                     <Button className="bg-blue text-white p-5" disabled={!country?.name} onClick={handleAddState}>Add State</Button>
                 </div>

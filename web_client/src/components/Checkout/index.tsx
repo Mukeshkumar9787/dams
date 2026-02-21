@@ -2,12 +2,12 @@
 import React, { useCallback, useEffect, useState } from "react";
 import Breadcrumb from "../Common/Breadcrumb";
 import PaymentMethod from "./PaymentMethod";
-import { getLoggedInUserData, getProductCountFromCart, redirectToSignIn } from "@/utils/helper";
+import { getLoggedInUserData, getProductCountFromCart, getShippingAmount, redirectToSignIn } from "@/utils/helper";
 import Address from "./Address";
-import { ADDRESS_TYPES, STATUS_TYPES } from "@/utils/constants";
+import { ADDRESS_TYPES, CONFIG_KEYS, STATUS_TYPES } from "@/utils/constants";
 import Notes from "./Notes";
 import { AppDispatch, useAppSelector } from "@/redux/store";
-import { createOrder, getProducts, verifyPayment } from "@/http/apiCalls";
+import { createOrder, getConfig, getProducts, verifyPayment } from "@/http/apiCalls";
 import OrderList from "./OrderList";
 import { useDispatch } from "react-redux";
 import { removeAllItemsFromCart, removeItemFromCart } from "@/redux/features/cart-slice";
@@ -20,12 +20,35 @@ const Checkout = () => {
 
   const [isDiffBillAdd, setIsDiffBillAddress] = React.useState(false);
   const [productItems, setProductItems] = useState([]);
+  const [shippingInfo, setShippingInfo] = useState({country: '', state: ''});
+  const [shipData, setShipData] = React.useState({});
+  const [shippingAmount, setShippingAmount] = React.useState("");
 
   const cartItems = useAppSelector((state) => state.cartReducer.items);
-  const totalPrice = parseFloat(productItems.reduce((acc, c) => acc + (c.price * getProductCountFromCart(c.id, cartItems)), 0));
+  const shippingCost = (typeof(shippingAmount) === 'number') ? shippingAmount : 0; 
+  const totalPrice = parseFloat(productItems.reduce((acc, c) => acc + (c.price * getProductCountFromCart(c.id, cartItems)), 0)) + (shippingCost);
   const handleRemoveFromCart = (id) => {
       dispatch(removeItemFromCart(id));
     };
+
+    const fetchConfig = React.useCallback(async () => {
+    try {
+        const { success, data } = await getConfig({ configs: [CONFIG_KEYS.SHIPPING]});
+        if (!success) return;
+        setShipData(data?.[CONFIG_KEYS.SHIPPING] ?? {});
+    } catch (error) {
+        console.error(error);
+    }
+    }, []);
+    
+  React.useEffect(() => {
+      fetchConfig();
+  }, [fetchConfig]);
+
+  useEffect(()=> {
+    setShippingAmount(getShippingAmount(shipData, shippingInfo))
+  }, [shipData, shippingInfo])
+
   const fetchProducts = useCallback(async () => {
     try {
       if(cartItems.length === 0){
@@ -72,6 +95,7 @@ const Checkout = () => {
       const values = Object.fromEntries(formData.entries());
       const orderResponse = await createOrder({
         ...values, 
+        shippingAmount,
         isDiffBillAdd,
         orderProducts: productItems.map(i => ({
           productId: i.id, 
@@ -97,9 +121,11 @@ const Checkout = () => {
           window.alert("Payment Failed");
         }
       }else{
-        fetchProducts()
+        fetchProducts();
+        fetchConfig();
       }
     } catch (error) {
+      fetchConfig();
       fetchProducts();
     }
   };
@@ -113,7 +139,7 @@ const Checkout = () => {
               {/* <!-- checkout left --> */}
               <div className="lg:max-w-[670px] w-full">
                 {/* <!-- billing details --> */}
-                <Address type={ADDRESS_TYPES.SHIP} isDiffBillAddress={isDiffBillAdd} setIsDiffBillAddress={setIsDiffBillAddress} />
+                <Address type={ADDRESS_TYPES.SHIP} isDiffBillAddress={isDiffBillAdd} setIsDiffBillAddress={setIsDiffBillAddress} setShippingInfo={setShippingInfo} />
                 {isDiffBillAdd && <Address type={ADDRESS_TYPES.BILL} />}
                 <Notes />
               </div>
@@ -121,7 +147,7 @@ const Checkout = () => {
               {/* // <!-- checkout right --> */}
               <div className="max-w-[455px] w-full">
                 {/* <!-- order list box --> */}
-                <OrderList productItems={productItems} totalPrice={totalPrice} />
+                <OrderList productItems={productItems} totalPrice={totalPrice} shippingAmount={shippingAmount} />
 
                 {/* <!-- coupon box --> */}
                 {/* <Coupon /> */}

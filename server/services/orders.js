@@ -1,12 +1,12 @@
 import prisma from "../prisma/client.js";
-import { ERR_CODES, FEATURE_TYPES, getNextOrderStatuses, ORDER_STATUS, PAYMENT_TYPES, STATUS_TYPES, STOCK_TYPES } from "../utils/constants.js";
-import { generateOrderNo, getFullAddress } from "../utils/helpers.js";
+import { CONFIG_KEYS, ERR_CODES, FEATURE_TYPES, getNextOrderStatuses, ORDER_STATUS, PAYMENT_TYPES, STATUS_TYPES, STOCK_TYPES } from "../utils/constants.js";
+import { generateOrderNo, getFullAddress, getShippingAmount } from "../utils/helpers.js";
 import { fileService, productService } from "./index.js";
 import { createPayment, razorpayInstance } from "./payment.js";
 
-const createOrder = async ({ name, mobile, address, city, pincode, country, state, isDiffBillAdd, billingName, billingMobile, billingAddress, billingCity, billingPincode, billingCountry, billingState, notes, orderProducts = [], userId }) => {
-  const amount = orderProducts.reduce((a,c) => a + (c.price * c.quantity), 0);
-  const payment = await createPayment({ amount });
+const createOrder = async ({ name, mobile, address, city, pincode, country, state, isDiffBillAdd, billingName, billingMobile, billingAddress, billingCity, billingPincode, billingCountry, billingState, notes, orderProducts = [], userId, shippingAmount=0 }) => {
+  const totalAmount = orderProducts.reduce((a,c) => a + (c.price * c.quantity), 0) + shippingAmount;
+  const payment = await createPayment({ amount: totalAmount });
   const order = await prisma.$transaction(async (tx) => {
     const errors = [];
     const order = await tx.order.create({
@@ -19,9 +19,20 @@ const createOrder = async ({ name, mobile, address, city, pincode, country, stat
         userId,
         paymentType: PAYMENT_TYPES.ONLINE,
         status: ORDER_STATUS.PAYMENT_PENDING,
-        paymentOrderId: payment.id
+        paymentOrderId: payment.id,
+        totalAmount,
+        shippingAmount
       }
     })
+    const dbShippingInfo = await tx.config.findUnique({where: { key: CONFIG_KEYS.SHIPPING }});
+    const dbShippingCost = getShippingAmount(dbShippingInfo?.value, { country, state });
+    console.log(dbShippingCost, shippingAmount)
+    if(dbShippingCost !== shippingAmount) {
+      const err = new Error("Shipping Amount Changed");
+      err.statusCode = 400;
+      err.code = ERR_CODES.ORDER_VALIDATION;
+      throw err;
+    }
     await Promise.all(orderProducts.map(async (prod) => {
       const dbProduct = await productService.getProductById({ id: prod.productId, tx, include: {Hsn: {select: {tax: true}}} });
       if(!dbProduct || dbProduct.status === STATUS_TYPES.INACTIVE){
@@ -174,7 +185,8 @@ const getOrder = async ({ userId=null, orderNo }) => {
     orderNo: order.orderNo,
     createdAt: order.createdAt,
     status: order.status,
-    totalPrice: order.orderProducts.reduce((a, c) => a + (c.price * c.quantity), 0),
+    totalPrice: order.totalAmount,
+    shippingAmount: order.shippingAmount,
     notes: order.notes,
     address: getFullAddress(order),
     paymentType: order.paymentType,

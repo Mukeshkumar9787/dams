@@ -1,15 +1,19 @@
-import { getCurrencyDetails, getProductCountFromCart } from "@/utils/helper";
+import { getCurrencyDetails, getShippingDisplay } from "@/utils/helper";
 import EmptyCart from "../Common/CartSidebarModal/EmptyCart"
 import AddToCart from "../Common/AddToCart";
 import Link from "next/link";
 import { SHOP_DETAILS } from "@/utils/appUrls";
 import AvailableStock from "../Common/AvailableStock";
+import React from "react";
 
-const OrderList = ({ productItems, totalPrice }) => {
+const OrderList = ({ productItems, totalPrice, shippingAmount }) => {
+    
+
     if(productItems.length === 0) {
       return <EmptyCart />
     }
     const currency = getCurrencyDetails().currencySymbol;
+
     return (
       <div className="bg-white shadow-1 rounded-[10px]">
         <div className="border-b border-gray-3 py-5 px-4 sm:px-8.5">
@@ -51,7 +55,17 @@ const OrderList = ({ productItems, totalPrice }) => {
               </div>
           </div>
         )}
-
+        {/* <!-- total --> */}
+        <div className="flex items-center justify-between pt-5">
+            <div>
+            <p className="font-medium text-lg">Shipping Amount</p>
+            </div>
+            <div>
+            <p className="font-medium text-right">
+                {getShippingDisplay(shippingAmount)}
+            </p>
+            </div>
+        </div>
         {/* <!-- total --> */}
         <div className="flex items-center justify-between pt-5">
             <div>

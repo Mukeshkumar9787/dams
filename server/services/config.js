@@ -11,8 +11,16 @@ const createOrUpdate = async ({ config }) => {
   })
 };
 
-const getAll = async () => {
-  const config = await prisma.config.findMany({ select: {key: true, value: true}});
+const getAll = async ({'configs[]': configs = null}) => {
+  let where = {}
+  if(configs) {
+    if(typeof(configs) === 'string'){
+      where = { key: configs };
+    }else{
+      where = { key: { in : configs } };
+    }
+  }
+  const config = await prisma.config.findMany({ select: {key: true, value: true}, where});
   return config.reduce((a,c) => {a[c.key] = c.value; return a}, {});
 };
 

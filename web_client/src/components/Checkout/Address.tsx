@@ -4,13 +4,10 @@ import { getLoggedInUserData } from "@/utils/helper";
 import { ADDRESS_TYPES } from "@/utils/constants";
 import { Button } from "antd";
 
-const Address = ({ type = ADDRESS_TYPES.SHIP, isDiffBillAddress = false, setIsDiffBillAddress = null }) => {
+const Address = ({ type = ADDRESS_TYPES.SHIP, isDiffBillAddress = false, setIsDiffBillAddress = null, setShippingInfo=null }) => {
   const [userData, setUserData] = useState(null);
   const [selectedCountry, setSelectedCountry] = useState(null);
 
-  const handleCountryChange = (e) => {
-    setSelectedCountry(e.target.value);
-  };
 
   const stateList = selectedCountry
     ? countryList.find((i) => i.name === selectedCountry)?.states || []
@@ -29,6 +26,19 @@ const Address = ({ type = ADDRESS_TYPES.SHIP, isDiffBillAddress = false, setIsDi
     fetchUser();
   }, []);
   const isShip = type === ADDRESS_TYPES.SHIP;
+
+  const handleCountryChange = (e) => {
+    setSelectedCountry(e.target.value);
+    if(isShip){
+      setShippingInfo({country: e.target.value, state: ''});
+    };
+  }
+
+  const handleStateChange = (e) => {
+    if(isShip){
+      setShippingInfo(prev => ({ ...prev, state: e.target.value }));
+    }
+  }
 
   return (
     <div id="addressForm" className="mt-3">
@@ -133,6 +143,7 @@ const Address = ({ type = ADDRESS_TYPES.SHIP, isDiffBillAddress = false, setIsDi
               State <span className="text-red">*</span>
             </label>
             <select
+              onChange={handleStateChange}
               name={isShip ? "state": "billingState"}
               required
               className="w-full bg-gray-1 rounded-md border border-gray-3 py-3 pl-5 pr-9 outline-none focus:ring-2 focus:ring-blue/20"
