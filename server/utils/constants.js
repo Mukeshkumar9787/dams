@@ -76,4 +76,5 @@ export function getNextOrderStatuses(currentStatus) {
 export const CONFIG_KEYS = {
     SHIPPING: 'SHIPPING',
     COMP_INFO: 'COMP_INFO',
+    COURIER: 'COURIER'
 }

@@ -6,14 +6,16 @@ import { CONFIG_KEYS } from "@/utils/constants";
 import React, { useState } from "react";
 import Ship from "./Ship";
 import CompanyInfo from "./CompanyInfo";
+import CourierList from "./Courier";
 
 const ConfigForm = () => {
   const [compInfo, setCompInfo] = useState({});
   const [shipInfo, setShipInfo] = useState({});
+  const [couriers, setCouriers] = useState([]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await updateConfig({config: { [CONFIG_KEYS.COMP_INFO]: compInfo, [CONFIG_KEYS.SHIPPING]: shipInfo }});
+    const response = await updateConfig({config: { [CONFIG_KEYS.COMP_INFO]: compInfo, [CONFIG_KEYS.SHIPPING]: shipInfo, [CONFIG_KEYS.COURIER]: couriers }});
     if (response.success) {
       window.alert("Updated Successfully");
       fetchConfig();
@@ -28,6 +30,7 @@ const ConfigForm = () => {
 
     setCompInfo(data?.[CONFIG_KEYS.COMP_INFO] ?? {});
     setShipInfo(data?.[CONFIG_KEYS.SHIPPING] ?? {});
+    setCouriers(data?.[CONFIG_KEYS.COURIER] ?? []);
   } catch (error) {
     console.error(error);
   }
@@ -48,6 +51,7 @@ const ConfigForm = () => {
             <form onSubmit={handleSubmit}>
               <CompanyInfo compInfo={compInfo} setCompInfo={setCompInfo} />
               <Ship shipInfo={shipInfo} setShipInfo={setShipInfo} />
+              <CourierList couriers={couriers} setCouriers={setCouriers} />
               <div className="w-full flex justify-end mt-4">
                 <button
                   type="submit"
