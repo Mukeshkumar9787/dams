@@ -7,6 +7,7 @@ import { afterSucessfullLogin } from "@/utils/helper";
 import { login } from "@/http/apiCalls";
 import PasswordInput from "@/components/Common/PasswordInput";
 import { getAlertContent, PASSWORD_REGEX } from "@/utils/constants";
+import GoogleLoginButton from "./GoogleLoginButton";
 
 const Signin = () => {
   const [alert, setAlert] = useState(null);
@@ -90,6 +91,10 @@ const Signin = () => {
                 >
                   Sign in to account
                 </button>
+
+                <div className="p-3 mt-5">
+                  <GoogleLoginButton />
+                </div>
 
                 <Link
                   href="/signin-otp"

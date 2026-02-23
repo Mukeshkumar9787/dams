@@ -77,6 +77,20 @@ const verifyOTP = async (req, res) => {
   }
 };
 
+const verifyGoogleToken = async (req, res) => {
+  try {
+    const result = await authService.verifyGoogleToken(req.body.token);
+    return res.status(200).json({
+      success: true,
+      message: "Google token verified successfully",
+      data: result
+    });
+  } catch (err) {
+      return errorHandler(err, res);
+  }
+};
+
+
 
 // Export as default object for easier import in routes
 export default {
@@ -84,5 +98,6 @@ export default {
   login,
   verifyOTP,
   loginWithOTP,
-  resetPassword
+  resetPassword,
+  verifyGoogleToken
 };

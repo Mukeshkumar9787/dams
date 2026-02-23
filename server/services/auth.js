@@ -3,8 +3,11 @@ import jwt from "jsonwebtoken";
 import prisma from "../prisma/client.js";
 import { generateSecureOTP, hashedPassword, hashOTP } from "../utils/cryptoUtils.js";
 import { sendMail } from "../utils/mailUtils.js";
-import { CONFIG_KEYS, OTP_TYPES } from "../utils/constants.js";
+import { OTP_TYPES } from "../utils/constants.js";
 import { getAppName, isOtpExpired } from "../utils/helpers.js";
+import { OAuth2Client } from 'google-auth-library';
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const generateToken = (user) => {
   return jwt.sign(
@@ -126,6 +129,12 @@ const login = async ({ email, password }) => {
     throw err;
   }
 
+  if (!user.password) {
+    const err = new Error("You have registered with Google account. 1. Please login with Google. 2. Reset password and Login. 3. Login with OTP");
+    err.statusCode = 400;
+    throw err;
+  }
+
   const match = await bcrypt.compare(password, user.password);
 
   if (!match) {
@@ -224,10 +233,43 @@ const verifyOTP = async ({ email, otp, type }) => {
   }
 };
 
+
+
+async function verifyGoogleToken(token) {
+  const ticket = await client.verifyIdToken({
+    idToken: token,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+
+  const payload = ticket.getPayload();
+  
+  let user = await prisma.user.findUnique({ where: { email: payload.email } });
+
+  if (!user) {
+    user = await prisma.user.create({
+      data: {
+        name: payload.name,
+        email: payload.email,
+        password: null, // No password for Google accounts
+      },
+    });
+  }
+
+  const jwtToken = generateToken(user);
+
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    token: jwtToken,
+  };
+}
+
 export default {
   register,
   login,
   verifyOTP,
   loginWithOTP,
-  resetPassword
+  resetPassword,
+  verifyGoogleToken
 };

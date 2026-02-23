@@ -12,6 +12,7 @@ export const API_RESET_PASSWORD = `${API_AUTH}/reset-password`;
 export const API_LOGIN = `${API_AUTH}/login`;
 export const API_LOGIN_WITH_OTP = `${API_AUTH}/login-with-otp`;
 export const API_VERIFY_OTP = `${API_AUTH}/verifyOTP`;
+export const API_VERIFY_GOOGLE_TOKEN = `${API_AUTH}/verifyGoogleToken`;
 export const API_USERS = '/users';
 export const API_USER_INFO = '/users/getUserInfo';
 export const API_USER_UPDATE_PROFILE = '/users/updateProfile';

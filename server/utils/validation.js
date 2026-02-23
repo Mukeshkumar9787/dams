@@ -95,6 +95,10 @@ export const verifyOTPSchema = Joi.object({
   otp: Joi.string().min(6).required(),
 });
 
+export const verifyGoogleTokenSchema = Joi.object({
+  token: Joi.string()
+});
+
 export const loginWithOTPSchema = Joi.object({
   email: Joi.string().min(1).max(100).required(),
 });

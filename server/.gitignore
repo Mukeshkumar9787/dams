@@ -6,3 +6,5 @@
 /prisma/generated
 
 /uploads
+
+google.auth.json

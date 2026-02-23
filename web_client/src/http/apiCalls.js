@@ -1,5 +1,5 @@
 
-import { API_ADDRESS, API_ADMIN_ORDERS, API_CATEGORIES, API_COLOR, API_CONFIG, API_FILES, API_HSN, API_LOGIN, API_LOGIN_WITH_OTP, API_ORDERS, API_PAYMENT_VERIFY, API_PRODUCTS, API_REGISTER, API_RESET_PASSWORD, API_SIZE, API_USER_INFO, API_USER_UPDATE_PROFILE, API_VERIFY_OTP, GET_ACTIVE_API } from './apiUrls';
+import { API_ADDRESS, API_ADMIN_ORDERS, API_CATEGORIES, API_COLOR, API_CONFIG, API_FILES, API_HSN, API_LOGIN, API_LOGIN_WITH_OTP, API_ORDERS, API_PAYMENT_VERIFY, API_PRODUCTS, API_REGISTER, API_RESET_PASSWORD, API_SIZE, API_USER_INFO, API_USER_UPDATE_PROFILE, API_VERIFY_GOOGLE_TOKEN, API_VERIFY_OTP, GET_ACTIVE_API } from './apiUrls';
 import axiosInstance from './axiosInstance';
 
 export async function getCategories(params) {
@@ -224,4 +224,9 @@ export async function getConfig(values) {
 export async function updateConfig(data) {
   const res = await axiosInstance.put(API_CONFIG, data);
   return res?.data || [];
+}
+
+export async function verifyGoogleToken(data) {
+  const res = await axiosInstance.post(API_VERIFY_GOOGLE_TOKEN, data);
+  return res.data;
 }

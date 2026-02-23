@@ -1,7 +1,7 @@
 import express from "express";
 import authController from "../controllers/auth.js"; // use .js extension
 import validateInput from "../middlewares/requestValidationMiddleware.js";
-import { loginSchema, loginWithOTPSchema, registerSchema, resetPasswordSchema, verifyOTPSchema } from "../utils/validation.js";
+import { loginSchema, loginWithOTPSchema, registerSchema, resetPasswordSchema, verifyGoogleTokenSchema, verifyOTPSchema } from "../utils/validation.js";
 
 const router = express.Router();
 
@@ -19,5 +19,8 @@ router.post("/login-with-otp", validateInput(loginWithOTPSchema),  authControlle
 
 // Verify OTP
 router.post("/verifyOTP", validateInput(verifyOTPSchema), authController.verifyOTP);
+
+
+router.post("/verifyGoogleToken", validateInput(verifyGoogleTokenSchema), authController.verifyGoogleToken);
 
 export default router;
