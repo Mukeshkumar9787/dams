@@ -176,6 +176,13 @@ export const updateOrderStatusSchema = Joi.object({
   meta: Joi.optional()
 });
 
+export const updateOrderSchema = Joi.object({
+  additionalInfo: Joi.object({
+    courier: Joi.string().allow("").required(),
+    trackingId: Joi.string().allow("").optional(),
+  }).required()
+});
+
 export const configBodySchema = Joi.object({
   config: Joi.object({
     COMP_INFO: Joi.object({
@@ -207,7 +214,14 @@ export const configBodySchema = Joi.object({
           ).optional()
         })
       ).optional()
-    }).required()
+    }).required(),
+
+    COURIER: Joi.array().items(
+      Joi.object({
+        name: Joi.string().required(),
+        link: Joi.string().allow("").optional()
+      })
+    ).required(),
 
   }).required()
 });

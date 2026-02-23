@@ -87,6 +87,19 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
+const updateOrder = async (req, res) => {
+  try {
+    const orderNo = req.params.slug;
+    const data = await orderService.updateOrder({ orderNo, userId: req.user.id, ...req.body });
+    return res.status(200).json({
+      success: true,
+      data
+    });
+  } catch (err) {
+    return errorHandler(err, res);
+  }
+};
+
 const verifyPayment = async (req, res) => {
   const {
     razorpay_order_id,
@@ -125,5 +138,6 @@ export default {
   getOrderBySlugAdmin,
   getOrderBySlugUser,
   updateOrderStatus,
-  verifyPayment
+  verifyPayment,
+  updateOrder
 };

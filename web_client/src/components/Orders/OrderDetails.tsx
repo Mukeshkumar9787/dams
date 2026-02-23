@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Breadcrumb from "../Common/Breadcrumb";
 import { getCurrencyDetails, getLoggedInUserData, getShippingDisplay, isPrintEnable } from "@/utils/helper";
-import { getConfig, getOrderDetailsBySlug, getOrderDetailsBySlugAdmin, updateOrderStatusBySlugAdmin } from "@/http/apiCalls";
+import { getConfig, getOrderDetailsBySlug, getOrderDetailsBySlugAdmin, updateOrderBySlugAdmin, updateOrderStatusBySlugAdmin } from "@/http/apiCalls";
 import { CONFIG_KEYS, getNextOrderStatuses, ORDER_STATUS, ORDER_STATUS_COLOR, ROLE_TYPES } from "@/utils/constants";
 import Link from "next/link";
 import { SHOP_DETAILS } from "@/utils/appUrls";
@@ -11,12 +11,15 @@ import ModalInfo from "../Common/ModalInfo";
 import OrderStatusTimeline from "./OrderStatusHistory";
 import OrderInvoice from "./Invoice";
 import { useReactToPrint } from "react-to-print";
+import CourierDetails from "./CourierDetails";
 
 const OrderDetails = ({params}) => {
   const [data, setData] = useState(null);
   const [statusInfo, setStatusInfo] = useState(null);
   const componentRef = useRef(null);
   const [compInfo, setCompInfo] = React.useState({});
+  const [couriers, setCouriers] = useState([]);
+
 
   const handlePrint = useReactToPrint({contentRef: componentRef});
 
@@ -29,7 +32,8 @@ const OrderDetails = ({params}) => {
         response = await getOrderDetailsBySlugAdmin(params);
 
         const modifiedData = {
-          ...response?.data
+          ...response?.data,
+          isAdmin: true
         };
 
         setStatusInfo({ status: modifiedData?.status });
@@ -55,6 +59,27 @@ const OrderDetails = ({params}) => {
     }
   }
 
+  const handleUpdateOrder = async() => {
+    try {
+      const response = await updateOrderBySlugAdmin({slug: params.slug, additionalInfo: (data?.additionalInfo || {})});
+      if(response.success){
+        window.alert("Courier Details changed successfully");
+        fetchOrder();
+      }
+    } catch (error) {
+      
+    }
+  }
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setData(prev => {
+      let additionalInfo = prev.additionalInfo || {};
+      additionalInfo[name] = value;
+      return {...prev, additionalInfo};
+    });
+  }
+
   useEffect(() => {
     fetchOrder();
   }, [fetchOrder]);
@@ -62,11 +87,12 @@ const OrderDetails = ({params}) => {
   
     const fetchConfig = React.useCallback(async () => {
       try {
-        const { success, data } = await getConfig({ configs: [CONFIG_KEYS.COMP_INFO]});
+        const { success, data } = await getConfig({ configs: [CONFIG_KEYS.COMP_INFO, CONFIG_KEYS.COURIER] });
   
         if (!success) return;
   
         setCompInfo(data?.[CONFIG_KEYS.COMP_INFO] ?? {});
+        setCouriers(data?.[CONFIG_KEYS.COURIER] || []);
       } catch (error) {
         console.error(error);
       }
@@ -109,6 +135,11 @@ const OrderDetails = ({params}) => {
                       }
                     </span>
                   </div>
+                  {(data?.isAdmin || data?.additionalInfo?.courier) &&
+                    <div className="border-b border-gray-3 py-5 px-4 sm:px-8.5">
+                      <CourierDetails couriers={couriers} handleChange={handleChange} additionalInfo={data?.additionalInfo} isAdmin={data?.isAdmin} onSubmit={handleUpdateOrder} />
+                    </div>
+                  }
                   <div className="border-b border-gray-3 py-5 px-4 sm:px-8.5">
                     <h2 className="font-medium text-dark">
                       Shipping&nbsp;Address:
@@ -237,7 +268,7 @@ const OrderDetails = ({params}) => {
                               Are you proceed to <span style={ORDER_STATUS_COLOR[statusInfo.status]}> {statusInfo.status} </span> this order ?
                             </div>
                             {
-                              [ORDER_STATUS.SHIPPED, ORDER_STATUS.REJECTED].includes(statusInfo.status)
+                              [ORDER_STATUS.REJECTED].includes(statusInfo.status)
                               &&
                               <Input className="mt-3" type="text" placeholder="Enter comments" value={statusInfo?.meta?.comments || ''} 
                                 onChange={(e) => setStatusInfo(prev => ({...prev, meta: {comments: e.target.value}}))} 

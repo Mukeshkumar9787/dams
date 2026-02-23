@@ -206,6 +206,11 @@ export async function updateOrderStatusBySlugAdmin(values) {
   return res?.data || [];
 }
 
+export async function updateOrderBySlugAdmin(values) {
+  const res = await axiosInstance.patch(`${API_ORDERS}/${values.slug}/admin`, values);
+  return res?.data || [];
+}
+
 export async function verifyPayment(data) {
   const res = await axiosInstance.post(API_PAYMENT_VERIFY, data );
   return res.data;

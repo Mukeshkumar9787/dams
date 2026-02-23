@@ -208,7 +208,8 @@ const getOrder = async ({ userId=null, orderNo }) => {
       img: files.filter(f => f.featureId === i.productId).map( i => ({path: i.path}))?.[0]?.path || null
     })),
     user: order.user,
-    orderStatusHistory
+    orderStatusHistory,
+    additionalInfo: order.additionalInfo
   };
 }
 
@@ -251,6 +252,23 @@ const updateOrderStatus = async ({ orderNo, status, userId, meta = null }) => {
   })
 }
 
+const updateOrder = async ({ orderNo, additionalInfo }) => {
+  const order = await prisma.order.update({
+    where: {
+      orderNo
+    },
+    data: {
+      additionalInfo
+    },
+  });
+  if(!order){
+    let err =  new Error("Order Not found");
+    err.statusCode = 404;
+    throw err;
+  }
+  return order;
+}
+
 const updateOrderProductStockStatus = async ({ tx, orderId, status }) => {
   return await tx.$queryRaw`
     update "Stock" s set "type" = ${status}
@@ -290,5 +308,6 @@ export default {
   getOrder,
   updateOrderStatus,
   updateOrderProductStockStatus,
-  updateOrderStatusByPaymentId
+  updateOrderStatusByPaymentId,
+  updateOrder
 };

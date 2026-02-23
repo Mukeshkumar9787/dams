@@ -164,6 +164,7 @@ model Order {
   billingInfo          Json?
   notes                String?
   discount             Int                  @default(0)
+  additionalInfo       Json?
   createdAt            DateTime             @default(now())
   updatedAt            DateTime             @updatedAt
   orderProducts        OrderProducts[]
