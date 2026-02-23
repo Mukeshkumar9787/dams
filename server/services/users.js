@@ -16,6 +16,21 @@ const getUserInfo = async ({ id }) => {
   return user;
 };
 
+const getUsers = async ({ role }) => {
+  const users = await prisma.user.findMany({ 
+    where: { role  },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      createdAt: true,
+      mobile: true,
+    }
+  });
+
+  return users;
+};
+
 
 const updateProfile = async (id, { name, mobile }) => {
   const user = await prisma.user.update({ 
@@ -32,5 +47,6 @@ const updateProfile = async (id, { name, mobile }) => {
 
 export default {
   getUserInfo,
-  updateProfile
+  updateProfile,
+  getUsers
 };

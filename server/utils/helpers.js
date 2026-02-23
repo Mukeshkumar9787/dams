@@ -1,9 +1,10 @@
 import fs from "fs";
 import path from "path";
 import { generateRandom } from "./cryptoUtils.js";
-import { CONFIG_KEYS, ORDER_STATUS } from './constants.js';
+import { CONFIG_KEYS, ORDER_STATUS, ROLE_TYPES } from './constants.js';
 import { sendMail } from "./mailUtils.js";
 import configService from "../services/config.js";
+import userService from "../services/users.js";
 
 export const toCamelCase = (row) => {
   const obj = {};
@@ -174,6 +175,15 @@ export const getOrderStatusEmailTemplate = async({
           "Your order is awaiting payment confirmation."
         ),
       };
+    
+    case "RECEIVED":
+      return {
+        subject: `New Order Received - ${orderNo}`,
+        html: baseTemplate(
+          "Order Received",
+          "New Order Received"
+        ),
+      };
 
     default:
       return null;
@@ -201,6 +211,15 @@ export const sendOrderStatusMail = async ({
     subject: `${appName} - ${template.subject}`,
     html: template.html,
   });
+
+  //notify admins
+  if(status === ORDER_STATUS.PLACED) {
+    const adminUsers = await userService.getUsers({role: ROLE_TYPES.ADMIN});
+    adminUsers.forEach(async (admin) => {
+      const template = await getOrderStatusEmailTemplate({ status: "RECEIVED", orderNo, userName: admin.name })
+      sendMail({ to: admin.email, subject: template.subject, html: template.html})
+    });
+  }
 };
 
 export const getAppName = async() => {
