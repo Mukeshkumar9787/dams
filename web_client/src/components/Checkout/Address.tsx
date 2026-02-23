@@ -40,11 +40,21 @@ const Address = ({ type = ADDRESS_TYPES.SHIP, isDiffBillAddress = false, setIsDi
     }
   }
 
+  const getShippingHeading = () => {
+    if(!isDiffBillAddress) return "Shipping & Billing";
+    return "Shipping";
+  }
+
+  const isGSTShow = () => {
+    if(isDiffBillAddress && isShip) return false;
+    return true;
+  }
+
   return (
     <div id="addressForm" className="mt-3">
       <div className="bg-white shadow-1 rounded-[10px] p-4 sm:p-8.5">
         <h2 className="font-medium text-xl text-dark mb-3">
-          {isShip ? "Shipping" : "Billing"} Address
+          {isShip ? getShippingHeading() : "Billing"} Address
         </h2>
 
         <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5">
@@ -157,13 +167,28 @@ const Address = ({ type = ADDRESS_TYPES.SHIP, isDiffBillAddress = false, setIsDi
             </select>
           </div>
         </div>
-        {isShip 
-          &&
-            <Button type="link" onClick={()=> {setIsDiffBillAddress(prev => !prev)}}>
-              Is Different Billing Address ?
-              <input className="ml-3" type="checkbox" checked={isDiffBillAddress} />
-            </Button>
+        <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5 justify-between">
+          {isShip 
+            &&
+              <Button type="link" onClick={()=> {setIsDiffBillAddress(prev => !prev)}}>
+                Is Different Billing Address ?
+                <input className="ml-3" type="checkbox" checked={isDiffBillAddress} />
+              </Button>
+            }
+          {isGSTShow() &&
+            <div className="w-1/2">
+                {/* <label className="block mb-2.5">
+                  GST no.
+                </label> */}
+                <input
+                  type="text"
+                  name={'gstNo'}
+                  placeholder="Enter GST no."
+                  className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                />
+            </div>
           }
+        </div>
       </div>
     </div>
   );

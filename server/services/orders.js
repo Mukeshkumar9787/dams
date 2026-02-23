@@ -4,7 +4,7 @@ import { calculateInvoice, generateOrderNo, getFullAddress, getShippingAmount } 
 import { fileService, productService } from "./index.js";
 import { createPayment, razorpayInstance } from "./payment.js";
 
-const createOrder = async ({ name, mobile, address, city, pincode, country, state, isDiffBillAdd, billingName, billingMobile, billingAddress, billingCity, billingPincode, billingCountry, billingState, notes, orderProducts = [], userId, shippingAmount=0 }) => {
+const createOrder = async ({ name, mobile, address, city, pincode, country, state, isDiffBillAdd, billingName, billingMobile, billingAddress, billingCity, billingPincode, billingCountry, billingState, gstNo, notes, orderProducts = [], userId, shippingAmount=0 }) => {
   const totalAmount = orderProducts.reduce((a,c) => a + (c.price * c.quantity), 0) + shippingAmount;
   const payment = await createPayment({ amount: totalAmount });
   const order = await prisma.$transaction(async (tx) => {
@@ -14,7 +14,7 @@ const createOrder = async ({ name, mobile, address, city, pincode, country, stat
         orderNo: generateOrderNo(userId),
         name, mobile, address, city, pincode, country, state, 
         isDiffBillAdd,
-        billingInfo: isDiffBillAdd ? { billingName, billingMobile, billingAddress, billingCity, billingPincode, billingCountry, billingState } : null, 
+        billingInfo: isDiffBillAdd ? { billingName, billingMobile, billingAddress, billingCity, billingPincode, billingCountry, billingState, gstNo } : (gstNo ? { gstNo } : null), 
         notes: notes || null,
         userId,
         paymentType: PAYMENT_TYPES.ONLINE,
@@ -197,7 +197,8 @@ const getOrder = async ({ userId=null, orderNo }) => {
     address: getFullAddress(order),
     paymentType: order.paymentType,
     get billingAddress(){ 
-      return order.isDiffBillAdd ? getFullAddress(order.billingInfo, true) : this.address 
+      const gstNo = order.billingInfo?.gstNo;
+      return (order.isDiffBillAdd ? getFullAddress(order.billingInfo, true) : this.address) + `${gstNo ? `, GST No: ${gstNo}` : ''}`;
     },
     products: order.orderProducts.map(i => ({
       slug: i.product.slug,

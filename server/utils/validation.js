@@ -154,6 +154,8 @@ export const createOrderSchema = Joi.object({
     otherwise: Joi.string().min(1).max(100).optional().allow(null, '')
   }),
 
+  gstNo: Joi.string().min(1).max(100).optional().empty(''),
+
   notes: Joi.string().max(100).optional().empty(''),
 
   orderProducts: Joi.array()
