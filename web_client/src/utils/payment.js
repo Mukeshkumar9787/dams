@@ -27,12 +27,11 @@ export const handlePayment = async (payment, callBack) => {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: payment.amount,
         currency: payment.currency,
-        name: "DAMS",
-        description: "3D printing",
+        name: payment?.compInfo?.name || '',
+        description: payment?.compInfo?.name || '',
         order_id: payment.id,
         timeout: PAYMENT_TIMEOUT_SECONDS,
         handler: callBack,
-
         prefill: {
           name: payment.name,
           email: payment.email,

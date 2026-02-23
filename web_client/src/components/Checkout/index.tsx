@@ -22,6 +22,7 @@ const Checkout = () => {
   const [productItems, setProductItems] = useState([]);
   const [shippingInfo, setShippingInfo] = useState({country: '', state: ''});
   const [shipData, setShipData] = React.useState({});
+  const [compInfo, setCompInfo] = React.useState({});
   const [shippingAmount, setShippingAmount] = React.useState("");
 
   const cartItems = useAppSelector((state) => state.cartReducer.items);
@@ -31,11 +32,12 @@ const Checkout = () => {
       dispatch(removeItemFromCart(id));
     };
 
-    const fetchConfig = React.useCallback(async () => {
+  const fetchConfig = React.useCallback(async () => {
     try {
-        const { success, data } = await getConfig({ configs: [CONFIG_KEYS.SHIPPING]});
+        const { success, data } = await getConfig({ configs: [CONFIG_KEYS.SHIPPING, CONFIG_KEYS.COMP_INFO] });
         if (!success) return;
         setShipData(data?.[CONFIG_KEYS.SHIPPING] ?? {});
+        setCompInfo(data?.[CONFIG_KEYS.COMP_INFO] ?? {});
     } catch (error) {
         console.error(error);
     }
@@ -116,7 +118,7 @@ const Checkout = () => {
               }
             }
           }
-          await handlePayment(orderResponse.data.payment, onPaymentSuccess);
+          await handlePayment({...orderResponse.data.payment, compInfo }, onPaymentSuccess);
         }else{
           window.alert("Payment Failed");
         }
