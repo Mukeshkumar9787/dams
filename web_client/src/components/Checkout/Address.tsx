@@ -4,7 +4,7 @@ import { getLoggedInUserData } from "@/utils/helper";
 import { ADDRESS_TYPES } from "@/utils/constants";
 import { Button } from "antd";
 
-const Address = ({ type = ADDRESS_TYPES.SHIP, isDiffBillAddress = false, setIsDiffBillAddress = null, setShippingInfo=null }) => {
+const Address = ({ type = ADDRESS_TYPES.SHIP, isDiffBillAddress = false, setIsDiffBillAddress = null, setShippingInfo = null }) => {
   const [userData, setUserData] = useState(null);
   const [selectedCountry, setSelectedCountry] = useState(null);
 
@@ -29,25 +29,20 @@ const Address = ({ type = ADDRESS_TYPES.SHIP, isDiffBillAddress = false, setIsDi
 
   const handleCountryChange = (e) => {
     setSelectedCountry(e.target.value);
-    if(isShip){
-      setShippingInfo({country: e.target.value, state: ''});
+    if (isShip) {
+      setShippingInfo({ country: e.target.value, state: '' });
     };
   }
 
   const handleStateChange = (e) => {
-    if(isShip){
+    if (isShip) {
       setShippingInfo(prev => ({ ...prev, state: e.target.value }));
     }
   }
 
   const getShippingHeading = () => {
-    if(!isDiffBillAddress) return "Shipping & Billing";
+    if (!isDiffBillAddress) return "Shipping & Billing";
     return "Shipping";
-  }
-
-  const isGSTShow = () => {
-    if(isDiffBillAddress && isShip) return false;
-    return true;
   }
 
   return (
@@ -64,7 +59,7 @@ const Address = ({ type = ADDRESS_TYPES.SHIP, isDiffBillAddress = false, setIsDi
             </label>
             <input
               type="text"
-              name={isShip ? "name": "billingName"}
+              name={isShip ? "name" : "billingName"}
               defaultValue={userData?.name || ""}
               placeholder="Enter name"
               required
@@ -78,7 +73,7 @@ const Address = ({ type = ADDRESS_TYPES.SHIP, isDiffBillAddress = false, setIsDi
             </label>
             <input
               type="number"
-              name={isShip ? "mobile": "billingMobile"}
+              name={isShip ? "mobile" : "billingMobile"}
               defaultValue={userData?.mobile || ""}
               placeholder="Enter mobile"
               required
@@ -92,7 +87,7 @@ const Address = ({ type = ADDRESS_TYPES.SHIP, isDiffBillAddress = false, setIsDi
             Address <span className="text-red">*</span>
           </label>
           <textarea
-            name={isShip ? "address": "billingAddress"}
+            name={isShip ? "address" : "billingAddress"}
             rows={2}
             placeholder="Enter Address"
             required
@@ -107,7 +102,7 @@ const Address = ({ type = ADDRESS_TYPES.SHIP, isDiffBillAddress = false, setIsDi
             </label>
             <input
               type="text"
-              name={isShip ? "city": "billingCity"}
+              name={isShip ? "city" : "billingCity"}
               placeholder="Enter city"
               required
               className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5 outline-none focus:ring-2 focus:ring-blue/20"
@@ -120,7 +115,7 @@ const Address = ({ type = ADDRESS_TYPES.SHIP, isDiffBillAddress = false, setIsDi
             </label>
             <input
               type="text"
-              name={isShip ? "pincode": "billingPincode"}
+              name={isShip ? "pincode" : "billingPincode"}
               placeholder="Enter pincode"
               required
               className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5 outline-none focus:ring-2 focus:ring-blue/20"
@@ -134,7 +129,7 @@ const Address = ({ type = ADDRESS_TYPES.SHIP, isDiffBillAddress = false, setIsDi
               Country <span className="text-red">*</span>
             </label>
             <select
-              name={isShip ? "country": "billingCountry"}
+              name={isShip ? "country" : "billingCountry"}
               onChange={handleCountryChange}
               required
               className="w-full bg-gray-1 rounded-md border border-gray-3 py-3 pl-5 pr-9 outline-none focus:ring-2 focus:ring-blue/20"
@@ -154,7 +149,7 @@ const Address = ({ type = ADDRESS_TYPES.SHIP, isDiffBillAddress = false, setIsDi
             </label>
             <select
               onChange={handleStateChange}
-              name={isShip ? "state": "billingState"}
+              name={isShip ? "state" : "billingState"}
               required
               className="w-full bg-gray-1 rounded-md border border-gray-3 py-3 pl-5 pr-9 outline-none focus:ring-2 focus:ring-blue/20"
             >
@@ -167,28 +162,32 @@ const Address = ({ type = ADDRESS_TYPES.SHIP, isDiffBillAddress = false, setIsDi
             </select>
           </div>
         </div>
-        <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5 justify-between">
-          {isShip 
-            &&
-              <Button type="link" onClick={()=> {setIsDiffBillAddress(prev => !prev)}}>
+
+        {isShip
+          &&
+          <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5 items-center">
+            <div className="w-full">
+              <Button type="link" onClick={() => { setIsDiffBillAddress(prev => !prev) }}>
                 Is Different Billing Address ?
                 <input className="ml-3" type="checkbox" checked={isDiffBillAddress} />
               </Button>
-            }
-          {isGSTShow() &&
-            <div className="w-1/2">
-                {/* <label className="block mb-2.5">
-                  GST no.
-                </label> */}
+            </div>
+
+            <div className="w-full">
+              <div className="w-full">
+                <label className="block mb-2.5">
+                  Billing GST no. ( Optional )
+                </label>
                 <input
                   type="text"
                   name={'gstNo'}
                   placeholder="Enter GST no."
                   className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5 outline-none focus:ring-2 focus:ring-blue/20"
                 />
+              </div>
             </div>
-          }
-        </div>
+          </div>
+        }
       </div>
     </div>
   );

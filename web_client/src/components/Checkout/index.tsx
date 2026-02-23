@@ -155,7 +155,7 @@ const Checkout = () => {
                 {/* <Coupon /> */}
 
                 {/* <!-- payment box --> */}
-                <PaymentMethod />
+                {/* <PaymentMethod /> */}
                 <Policy />
                 {/* <!-- checkout button --> */}
                 <button
@@ -165,6 +165,9 @@ const Checkout = () => {
                 >
                   Pay Now
                 </button>
+                <div className="flex justify-end mt-2">
+                  <img referrerPolicy="origin" src = "https://badges.razorpay.com/badge-light.png " width={130}  ></img>
+                </div>
               </div>
             </div>
           </form>
