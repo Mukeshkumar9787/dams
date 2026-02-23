@@ -12,7 +12,7 @@ const CourierDetails = ({ couriers, handleChange, additionalInfo, isAdmin, onSub
                         name="courier"
                         value={additionalInfo?.courier || ''}
                         onChange={handleChange}
-                        className="w-full p-2 border text-sm rounded-md"
+                        className="w-full p-2 text-sm rounded-md"
                     >
                         <option value="">Select Courier</option>
                         {couriers.map(courier => (

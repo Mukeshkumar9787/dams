@@ -59,8 +59,17 @@ const OrderDetails = ({params}) => {
     }
   }
 
-  const handleUpdateOrder = async() => {
+  const handleUpdateOrder = async(e) => {
     try {
+      e.preventDefault();
+      if(!data?.additionalInfo?.courier){
+        window.alert("Please select courier");
+        return;
+      }
+      if(!data?.additionalInfo?.trackingId){
+        window.alert("Please enter tracking ID");
+        return;
+      }
       const response = await updateOrderBySlugAdmin({slug: params.slug, additionalInfo: (data?.additionalInfo || {})});
       if(response.success){
         window.alert("Courier Details changed successfully");
