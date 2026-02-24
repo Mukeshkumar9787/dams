@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { CONFIG_KEYS, ORDER_STATUS, OTP_TYPES, STATUS_TYPES } from "./constants.js";
+import { CONFIG_KEYS, ORDER_STATUS, OTP_TYPES, ROLE_TYPES, STATUS_TYPES } from "./constants.js";
 
 export const categoryBodySchema = Joi.object({
   title: Joi.string().min(1).max(100).required(),
@@ -230,4 +230,9 @@ export const configBodySchema = Joi.object({
     ).required(),
 
   }).required()
+});
+
+export const changeRoleSchema = Joi.object({
+  userId: Joi.number().required(),
+  role: Joi.string().valid(...Object.values(ROLE_TYPES)).required()
 });

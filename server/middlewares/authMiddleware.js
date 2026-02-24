@@ -1,12 +1,8 @@
 import jwt from "jsonwebtoken";
 import userService from "../services/users.js";
 
-export const getAuthMiddleware = (allowedRoles=[], isPassThrough = null) => {
+export const getAuthMiddleware = (allowedRoles=[]) => {
   return async(req, res, next) => {
-    if(isPassThrough && isPassThrough(req)){
-      next();
-      return;
-    }
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {

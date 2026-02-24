@@ -165,7 +165,18 @@ const Address = ({ type = ADDRESS_TYPES.SHIP, isDiffBillAddress = false, setIsDi
 
         {isShip
           &&
-          <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5 items-center">
+          <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5 items-center justify-center">
+            <div className="w-full">
+              <label className="block mb-2.5">
+                Billing GST no. ( Optional )
+              </label>
+              <input
+                type="text"
+                name={'gstNo'}
+                placeholder="Enter GST no."
+                className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+              />
+            </div>
             <div className="w-full">
               <Button type="link" onClick={() => { setIsDiffBillAddress(prev => !prev) }}>
                 Is Different Billing Address ?
@@ -173,19 +184,6 @@ const Address = ({ type = ADDRESS_TYPES.SHIP, isDiffBillAddress = false, setIsDi
               </Button>
             </div>
 
-            <div className="w-full">
-              <div className="w-full">
-                <label className="block mb-2.5">
-                  Billing GST no. ( Optional )
-                </label>
-                <input
-                  type="text"
-                  name={'gstNo'}
-                  placeholder="Enter GST no."
-                  className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5 outline-none focus:ring-2 focus:ring-blue/20"
-                />
-              </div>
-            </div>
           </div>
         }
       </div>

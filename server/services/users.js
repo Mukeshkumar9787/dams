@@ -44,9 +44,48 @@ const updateProfile = async (id, { name, mobile }) => {
   return user;
 };
 
+const getAll = async ({ skip=0, take=10, search, role }) => {
+  const where = { role: role || undefined };
+  if(search) {
+    where.OR = [
+      { email: { contains: search, mode: 'insensitive' } },
+      { mobile: { contains: search, mode: 'insensitive' } },
+      { name: { contains: search, mode: 'insensitive' } },
+    ];
+  }
+
+  const [users, totalCount] = await Promise.all([
+      prisma.user.findMany({
+        where,
+        orderBy: {
+          createdAt: 'desc'
+        },
+        skip,
+        take
+      }),
+      prisma.user.count({
+        where
+      })
+  ]);
+  return { users, totalCount };
+}
+
+const changeRole = async ({ id, role }) => {
+  const user = await prisma.user.update({ 
+    where: { id  },
+    data: {
+      role
+    }
+  });
+
+  return user;
+};
+
 
 export default {
   getUserInfo,
   updateProfile,
-  getUsers
+  getUsers,
+  getAll,
+  changeRole
 };

@@ -15,6 +15,8 @@ export const COLOR_NEW_URL = `${COLOR_URL}/new`;
 
 export const ORDER_URL = '/orders';
 
+export const USER_URL = '/users';
+
 export const SHOP_DETAILS = '/shop-details'
 
 export const CONFIG_URL = '/config'
