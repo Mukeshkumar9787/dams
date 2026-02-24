@@ -7,6 +7,7 @@ import Link from "next/link";
 import VerifyOTP from "../VerifyOTP";
 import ModalInfo from "@/components/Common/ModalInfo";
 import PasswordInput from "@/components/Common/PasswordInput";
+import GoogleLoginButton from "../GoogleLoginButton";
 
 const Signup = () => {
   const [alert, setAlert] = useState(null);
@@ -153,6 +154,10 @@ const Signup = () => {
                 >
                   Create Account
                 </button>
+
+                <div className="p-3 mt-5">
+                  <GoogleLoginButton />
+                </div>
 
                 <p className="text-center mt-6">
                   Already have an account?

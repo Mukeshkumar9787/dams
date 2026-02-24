@@ -7,7 +7,7 @@ import { afterSucessfullLogin } from "@/utils/helper";
 import { login } from "@/http/apiCalls";
 import PasswordInput from "@/components/Common/PasswordInput";
 import { getAlertContent, PASSWORD_REGEX } from "@/utils/constants";
-import GoogleLoginButton from "./GoogleLoginButton";
+import GoogleLoginButton from "../GoogleLoginButton";
 
 const Signin = () => {
   const [alert, setAlert] = useState(null);

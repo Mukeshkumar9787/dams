@@ -6,6 +6,7 @@ import { getAlertContent, VERIFY_OTP_TYPES } from "@/utils/constants";
 import Link from "next/link";
 import VerifyOTP from "../VerifyOTP";
 import ModalInfo from "@/components/Common/ModalInfo";
+import GoogleLoginButton from "../GoogleLoginButton";
 
 const SigninOtp = () => {
   const [alert, setAlert] = useState(null);
@@ -76,6 +77,10 @@ const SigninOtp = () => {
                 >
                   Send OTP
                 </button>
+
+                <div className="p-3 mt-5">
+                  <GoogleLoginButton />
+                </div>
 
                 <Link
                   href="/signin"
