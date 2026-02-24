@@ -77,14 +77,17 @@ const createOrder = async ({ name, mobile, address, city, pincode, country, stat
   return {...order, payment }
 };
 
-const getOrders = async ({ userId=null, skip=0, take=10, search }) => {
+const getOrders = async ({ userId=null, skip=0, take=10, search=null, status=null }) => {
   const where = { 
       userId: userId ? userId : undefined,
-      orderNo: search ? {
-        contains: search,
-        mode: 'insensitive'
-      } : undefined
+      status: status || undefined
   };
+  if(search) {
+    where.OR = [
+      { orderNo: { contains: search, mode: 'insensitive' } },
+      { user : { name: { contains: search, mode: 'insensitive' } } },
+    ];
+  }
 
   const [orders, totalCount] = await Promise.all([
       prisma.order.findMany({

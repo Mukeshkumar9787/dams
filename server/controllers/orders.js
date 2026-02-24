@@ -38,7 +38,7 @@ const getAdminOrders = async (req, res) => {
     const pageSize = parseInt(req.query.pageSize || 10);
     const skip = (page - 1) * pageSize;
 
-    const { data, totalCount} = await orderService.getOrders({ skip, take: pageSize, search: req.query.search});
+    const { data, totalCount} = await orderService.getOrders({ skip, take: pageSize, search: req.query.search, status: req.query.status });
     return res.status(200).json({
       success: true,
       data,

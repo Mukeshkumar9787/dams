@@ -7,6 +7,7 @@ import { Input, Table } from "antd"
 import { ORDER_STATUS_COLOR } from "../../utils/constants.js"
 import { ORDER_URL } from "@/utils/appUrls";
 import { ExportOutlined } from "@ant-design/icons";
+import StatusTags from "./StatusTags";
 
 
 const AdminOrders = () => {
@@ -14,11 +15,12 @@ const AdminOrders = () => {
   const [totalCount, setTotalCount] = React.useState(0);
   const [pagination, setPagination] = React.useState({ pageNumber: 1, pageSize: 10});
   const [search, setSearch] = React.useState('');
+  const [status, setStatus] = React.useState('');
 
   React.useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const data = await getOrdersForAdmin({...pagination, search});
+        const data = await getOrdersForAdmin({...pagination, search, status});
         setOrderItems(data?.data || []);
         setTotalCount(data?.totalCount || 0);
       } catch (err) {
@@ -27,7 +29,7 @@ const AdminOrders = () => {
     };
 
     fetchOrders();
-  }, [pagination, search]);
+  }, [pagination, search, status]);
 
   const columns = [
     {
@@ -96,10 +98,11 @@ const AdminOrders = () => {
       {/* <!-- ===== Breadcrumb Section End ===== --> */}
         <section className="overflow-hidden py-10 bg-gray-2">
           <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
-            <div className="flex flex-wrap items-center justify-between gap-5 mb-7.5">
+            <div className="flex items-center justify-between gap-5 mb-7.5">
               <div>
                 <Input placeholder="Search" type="text" value={search} onChange={(e) => setSearch(e.target.value)} />
               </div>
+              < StatusTags status={status} setStatus={setStatus} />
             </div>
             <Table dataSource={orderItems} columns={columns} rowKey="id"
              pagination={{
