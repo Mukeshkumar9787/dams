@@ -129,7 +129,9 @@ const getOrders = async ({ userId=null, skip=0, take=10, search=null, status=nul
           return i.isDiffBillAdd ? getFullAddress(i.billingInfo) : this.address 
         },
         filePath: files.find(f => i.orderProducts?.[0]?.productId === f.featureId)?.path || null,
-        user: i.user
+        user: i.user,
+        totalAmount: i.totalAmount,
+        shippingAmount: i.shippingAmount,
       }
     )),
     totalCount

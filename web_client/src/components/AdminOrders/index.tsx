@@ -9,6 +9,7 @@ import { ORDER_URL } from "@/utils/appUrls";
 import { ExportOutlined } from "@ant-design/icons";
 import StatusTags from "./StatusTags";
 import OrderStats from "./OrderStatsCard"
+import { getCurrencyDetails, getShippingDisplay } from "@/utils/helper";
 
 const AdminOrders = () => {
   const [orderItems, setOrderItems] = React.useState([]);
@@ -30,6 +31,7 @@ const AdminOrders = () => {
 
     fetchOrders();
   }, [pagination, search, status]);
+  const currency = getCurrencyDetails().currencySymbol;
 
   const columns = [
     {
@@ -57,6 +59,28 @@ const AdminOrders = () => {
       title: 'Products',
       dataIndex: 'title',
       key: 'title',
+    },
+    {
+      title: 'Total Amount',
+      dataIndex: 'totalAmount',
+      key: 'totalAmount',
+      render: (text) => {
+        return (
+          <div className="text-center">
+            {currency}{text}
+          </div> )
+      },
+    },
+    {
+      title: 'Shipping Amount',
+      dataIndex: 'shippingAmount',
+      key: 'shippingAmount',
+      render: (text) => {
+        return (
+          <div className="text-center">
+            {getShippingDisplay(text)}
+          </div> )
+      },
     },
     {
       title: 'Status',
