@@ -26,9 +26,9 @@ const Policy = (props: Props) => {
   return (
     <div className='flex bg-white mt-5 p-5 gap-2'>
         <span className=''>
-            <Input type="checkbox" required name="" id="" size='large' className='text-xl w-full' /> 
+            <Input id='policy' type="checkbox" required name="" size='large' className='text-xl w-full' /> 
         </span>
-        <label htmlFor=""> 
+        <label htmlFor="policy"> 
             <span>Agree&nbsp;to&nbsp;</span>
             <a href={compInfo.privacy} target='_' className='underline text-blue' >Privacy Policy</a>,&nbsp;&nbsp;
             <a href={compInfo.refund} target='_' className='underline text-blue'>Refund Policy</a>&nbsp;and&nbsp;
