@@ -240,3 +240,8 @@ export async function updateRole(data) {
   const res = await axiosInstance.patch(API_USERS_ROLE, data );
   return res.data;
 }
+
+export async function getOrderStats(data) {
+  const res = await axiosInstance.get(`${API_ORDERS}/stats`, {params: data} );
+  return res.data; 
+};

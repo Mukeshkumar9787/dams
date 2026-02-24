@@ -15,6 +15,8 @@ router.get("/",getAuthMiddleware(), orderController.getOrdersByUserId);
 
 router.get("/admin", getAuthMiddleware([ROLE_TYPES.ADMIN]), orderController.getAdminOrders);
 
+router.get("/stats", getAuthMiddleware([ROLE_TYPES.ADMIN]), orderController.getOrderStatsAdmin);
+
 router.get("/:slug",getAuthMiddleware(), orderController.getOrderBySlugUser);
 
 router.get("/:slug/admin", getAuthMiddleware([ROLE_TYPES.ADMIN]), orderController.getOrderBySlugAdmin);

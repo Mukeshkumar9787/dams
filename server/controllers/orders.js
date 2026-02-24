@@ -129,6 +129,18 @@ const verifyPayment = async (req, res) => {
   }
 };
 
+const getOrderStatsAdmin = async (req, res) => {
+  try {
+    const data = await orderService.getOrderStats();
+    return res.status(200).json({
+      success: true,
+      data
+    });
+  } catch (err) {
+    return errorHandler(err, res);
+  }
+};
+
 
 
 export default {
@@ -139,5 +151,6 @@ export default {
   getOrderBySlugUser,
   updateOrderStatus,
   verifyPayment,
-  updateOrder
+  updateOrder,
+  getOrderStatsAdmin
 };
