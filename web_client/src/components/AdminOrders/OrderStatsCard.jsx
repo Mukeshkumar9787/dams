@@ -21,11 +21,12 @@ const OrderStats = () => {
         fetchStats();
     }, []);
 
+    const statusStats = statsData?.orderStatus || {};
     
-    const stats = Object.values(ORDER_STATUS).map(i => {
+    const stats = [ORDER_STATUS.PLACED, ORDER_STATUS.REJECTED, ORDER_STATUS.CONFIRMED, ORDER_STATUS.SHIPPED, ORDER_STATUS.DELIVERED].map(i => {
         return {
             label: i,
-            value: statsData[i] || 0
+            value: statusStats[i] || 0
         }
     })
 
@@ -39,7 +40,7 @@ const OrderStats = () => {
                     Total&nbsp;Orders
                 </p>
                 <p className="text-6xl font-extrabold text-blue mt-2">
-                    {statsData['ALL'] || 0}
+                    {statusStats['ALL'] || 0}
                 </p>
             </div>
 

@@ -309,15 +309,16 @@ const fetchOrderStatusAndUpdateDB = async (paymentOrderId) => {
 }
 
 const getOrderStats = async () => {
-  const stats = await prisma.order.groupBy({
+  const statusStats = await prisma.order.groupBy({
     by: ['status'],
     _count: { status: true }
   });
-  const totalCount = stats.reduce((a,c) => a + c._count.status, 0);
-  return stats.map(i => ({ label: i.status, value: i._count.status })).concat({ label: 'ALL', value: totalCount }).reduce((acc, curr) => {
+  const totalCount = statusStats.reduce((a,c) => a + c._count.status, 0);
+  const orderStatus = statusStats.map(i => ({ label: i.status, value: i._count.status })).concat({ label: 'ALL', value: totalCount }).reduce((acc, curr) => {
     acc[curr.label] = curr.value;
     return acc;
-  }, {})
+  }, {});
+  return { orderStatus }
 }
 
 export default {
