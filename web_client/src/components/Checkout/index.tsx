@@ -15,11 +15,31 @@ import { handlePayment } from "@/utils/payment";
 import { ORDER_URL } from "@/utils/appUrls";
 import Policy from "./Policy";
 
+const initialCheckoutValues = {
+  name: "",
+  mobile: "",
+  address: "",
+  city: "",
+  pincode: "",
+  country: "",
+  state: "",
+  billingName: "",
+  billingMobile: "",
+  billingAddress: "",
+  billingCity: "",
+  billingPincode: "",
+  billingCountry: "",
+  billingState: "",
+  gstNo: "",
+  notes: "",
+};
+
 const Checkout = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   const [isDiffBillAdd, setIsDiffBillAddress] = React.useState(false);
   const [productItems, setProductItems] = useState([]);
+  const [checkoutValues, setCheckoutValues] = useState(initialCheckoutValues);
   const [shippingInfo, setShippingInfo] = useState({country: '', state: ''});
   const [shipData, setShipData] = React.useState({});
   const [compInfo, setCompInfo] = React.useState({});
@@ -46,6 +66,13 @@ const Checkout = () => {
   React.useEffect(() => {
       fetchConfig();
   }, [fetchConfig]);
+
+  useEffect(() => {
+    setShippingInfo({
+      country: checkoutValues.country,
+      state: checkoutValues.state,
+    });
+  }, [checkoutValues.country, checkoutValues.state]);
 
   useEffect(()=> {
     setShippingAmount(getShippingAmount(shipData, shippingInfo))
@@ -93,10 +120,8 @@ const Checkout = () => {
   const handleSubmit = async (e) => {
     try {
       e.preventDefault()
-      const formData = new FormData(e.target);
-      const values = Object.fromEntries(formData.entries());
       const orderResponse = await createOrder({
-        ...values, 
+        ...checkoutValues,
         shippingAmount,
         isDiffBillAdd,
         orderProducts: productItems.map(i => ({
@@ -141,9 +166,21 @@ const Checkout = () => {
               {/* <!-- checkout left --> */}
               <div className="lg:max-w-[670px] w-full">
                 {/* <!-- billing details --> */}
-                <Address type={ADDRESS_TYPES.SHIP} isDiffBillAddress={isDiffBillAdd} setIsDiffBillAddress={setIsDiffBillAddress} setShippingInfo={setShippingInfo} />
-                {isDiffBillAdd && <Address type={ADDRESS_TYPES.BILL} />}
-                <Notes />
+                <Address
+                  type={ADDRESS_TYPES.SHIP}
+                  isDiffBillAddress={isDiffBillAdd}
+                  setIsDiffBillAddress={setIsDiffBillAddress}
+                  checkoutValues={checkoutValues}
+                  setCheckoutValues={setCheckoutValues}
+                />
+                {isDiffBillAdd && (
+                  <Address
+                    type={ADDRESS_TYPES.BILL}
+                    checkoutValues={checkoutValues}
+                    setCheckoutValues={setCheckoutValues}
+                  />
+                )}
+                <Notes checkoutValues={checkoutValues} setCheckoutValues={setCheckoutValues} />
               </div>
 
               {/* // <!-- checkout right --> */}

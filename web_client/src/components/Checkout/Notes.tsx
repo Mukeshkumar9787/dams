@@ -1,6 +1,6 @@
 import React from "react";
 
-const Notes = () => {
+const Notes = ({ checkoutValues, setCheckoutValues }) => {
 
   return (
     <div id="addressForm" className="mt-3">
@@ -12,6 +12,8 @@ const Notes = () => {
           <textarea
             name="notes"
             rows={2}
+            value={checkoutValues?.notes || ""}
+            onChange={(e) => setCheckoutValues((prev) => ({ ...prev, notes: e.target.value }))}
             placeholder="Enter Notes"
             className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5 outline-none focus:ring-2 focus:ring-blue/20"
           />
