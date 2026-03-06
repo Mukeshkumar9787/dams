@@ -70,14 +70,14 @@ const Header = () => {
 
   return (
     <header
-      className={`fixed left-0 top-0 w-full z-9999 bg-white transition-all ease-in-out duration-300 ${
+      className={`sticky left-0 top-0 w-full z-50 bg-white transition-all ease-in-out duration-300 ${
         stickyMenu && "shadow"
       }`}
     >
       <div className="max-w-[1170px] mx-auto px-4 sm:px-7.5 xl:px-0">
         {/* <!-- header top start --> */}
         <div
-          className={`flex flex-col lg:flex-row gap-5 items-end lg:items-center xl:justify-between ease-out duration-200 ${
+          className={`relative flex flex-col lg:flex-row gap-5 items-end lg:items-center xl:justify-between ease-out duration-200 ${
             stickyMenu ? "py-4" : "py-6"
           }`}
         >
@@ -96,6 +96,45 @@ const Header = () => {
 
           {/* <!-- header top right --> */}
           <div className="flex w-full lg:w-auto items-center gap-7.5">
+            {/* <!--=== Main Nav Start ===--> */}
+            <div
+              className={`w-[288px] absolute right-4 top-full xl:static xl:w-auto h-0 xl:h-auto invisible xl:visible xl:flex items-center justify-between ${
+                navigationOpen &&
+                `!visible bg-white shadow-lg border border-gray-3 !h-auto max-h-[400px] overflow-y-scroll rounded-md p-5`
+              }`}
+            >
+              {/* <!-- Main Nav Start --> */}
+              <nav>
+                <ul className="flex xl:items-center flex-col xl:flex-row gap-5 xl:gap-6">
+                  {menuItems.map((menuItem, i) =>
+                    menuItem.submenu ? (
+                      <Dropdown
+                        key={i}
+                        menuItem={menuItem}
+                        stickyMenu={stickyMenu}
+                      />
+                    ) : (
+                      <li
+                        key={i}
+                        className="group relative before:w-0 before:h-[3px] before:bg-blue before:absolute before:left-0 before:top-0 before:rounded-b-[3px] before:ease-out before:duration-200 hover:before:w-full "
+                      >
+                        <Link
+                          href={menuItem.path}
+                          className={`hover:text-blue text-custom-sm font-medium text-dark flex ${
+                            stickyMenu ? "xl:py-4" : "xl:py-6"
+                          }`}
+                        >
+                          {menuItem.title}
+                        </Link>
+                      </li>
+                    )
+                  )}
+                </ul>
+              </nav>
+              {/* //   <!-- Main Nav End --> */}
+            </div>
+            {/* // <!--=== Main Nav End ===--> */}
+
             {/* <!-- divider --> */}
             <span className="hidden xl:block w-px h-7.5 bg-gray-4"></span>
 
@@ -252,52 +291,6 @@ const Header = () => {
           </div>
         </div>
         {/* <!-- header top end --> */}
-      </div>
-
-      <div className="border-t border-gray-3">
-        <div className="max-w-[1170px] mx-auto px-4 sm:px-7.5 xl:px-0">
-          <div className="flex items-center justify-between">
-            {/* <!--=== Main Nav Start ===--> */}
-            <div
-              className={`w-[288px] absolute right-4 top-full xl:static xl:w-auto h-0 xl:h-auto invisible xl:visible xl:flex items-center justify-between ${
-                navigationOpen &&
-                `!visible bg-white shadow-lg border border-gray-3 !h-auto max-h-[400px] overflow-y-scroll rounded-md p-5`
-              }`}
-            >
-              {/* <!-- Main Nav Start --> */}
-              <nav>
-                <ul className="flex xl:items-center flex-col xl:flex-row gap-5 xl:gap-6">
-                  {menuItems.map((menuItem, i) =>
-                    menuItem.submenu ? (
-                      <Dropdown
-                        key={i}
-                        menuItem={menuItem}
-                        stickyMenu={stickyMenu}
-                      />
-                    ) : (
-                      <li
-                        key={i}
-                        className="group relative before:w-0 before:h-[3px] before:bg-blue before:absolute before:left-0 before:top-0 before:rounded-b-[3px] before:ease-out before:duration-200 hover:before:w-full "
-                      >
-                        <Link
-                          href={menuItem.path}
-                          className={`hover:text-blue text-custom-sm font-medium text-dark flex ${
-                            stickyMenu ? "xl:py-4" : "xl:py-6"
-                          }`}
-                        >
-                          {menuItem.title}
-                        </Link>
-                      </li>
-                    )
-                  )}
-                </ul>
-              </nav>
-              {/* //   <!-- Main Nav End --> */}
-            </div>
-            {/* // <!--=== Main Nav End ===--> */}
-
-          </div>
-        </div>
       </div>
     </header>
   );
