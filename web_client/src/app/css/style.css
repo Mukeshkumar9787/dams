@@ -2,21 +2,131 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --app-bg: #f4f6fb;
+  --surface: #ffffff;
+  --surface-muted: #f8f9fc;
+  --text-primary: #1c274c;
+  --text-secondary: #606882;
+  --border-soft: #e4e8f0;
+}
+
 @layer base {
   html {
     @apply scroll-smooth;
   }
 
   body {
-    @apply font-euclid-circular-a font-normal text-base text-dark-3 relative z-1;
+    @apply font-euclid-circular-a font-normal text-base text-dark-3 relative z-1 antialiased;
+    background: radial-gradient(1200px 600px at -10% -10%, #eef2ff 0%, rgba(238, 242, 255, 0) 60%),
+      radial-gradient(1000px 480px at 110% -20%, #eaf7ff 0%, rgba(234, 247, 255, 0) 55%),
+      var(--app-bg);
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--text-primary);
+    letter-spacing: -0.015em;
+  }
+
+  section {
+    scroll-margin-top: 108px;
+  }
+
+  input,
+  textarea,
+  select {
+    transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: #94a3ff !important;
+    box-shadow: 0 0 0 3px rgba(60, 80, 224, 0.12);
+  }
+
+  .ant-input,
+  .ant-input-affix-wrapper,
+  .ant-select-selector {
+    border-radius: 10px !important;
+    border-color: var(--border-soft) !important;
+    box-shadow: none !important;
+  }
+
+  .ant-input,
+  .ant-input-affix-wrapper {
+    min-height: 44px;
+    background-color: #f8f9fc !important;
+  }
+
+  .ant-select-selector {
+    min-height: 44px !important;
+    background-color: #f8f9fc !important;
+    align-items: center !important;
+    padding-inline: 14px !important;
+  }
+
+  button {
+    transition: transform 120ms ease, box-shadow 160ms ease, background-color 160ms ease, color 160ms ease;
+  }
+
+  button:active {
+    transform: translateY(1px);
+  }
+
+  a {
+    transition: color 140ms ease, opacity 140ms ease;
+  }
+
+  ::selection {
+    background: rgba(60, 80, 224, 0.18);
+    color: #1c274c;
   }
 }
 
 @layer components {
+  .surface-card {
+    @apply rounded-xl border border-gray-3 bg-white;
+    box-shadow: 0px 12px 32px rgba(28, 39, 76, 0.06);
+  }
+
+  .form-card {
+    @apply surface-card p-5 sm:p-8 xl:p-10;
+    background: linear-gradient(180deg, #ffffff 0%, #fcfdff 100%);
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-lg bg-blue px-6 py-3 font-medium text-white transition hover:bg-blue-dark;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center rounded-lg bg-red px-6 py-3 font-medium text-white transition hover:opacity-90;
+  }
+
+  .form-label {
+    @apply mb-2.5 block text-sm font-medium text-dark;
+  }
+
+  .form-input {
+    @apply w-full rounded-lg border border-gray-3 bg-gray-1 px-5 py-3 text-dark placeholder:text-dark-5 outline-none;
+  }
+
   .dropdown {
     @apply flex-col gap-0 min-w-max xl:w-[193px] mt-2 lg:mt-0 bg-white shadow-2 ease-in duration-200 py-2.5 rounded-md border border-gray-3 left-0 hidden
     xl:translate-y-10 xl:opacity-0 xl:invisible xl:absolute xl:flex
     xl:group-hover:opacity-100 xl:group-hover:visible;
+  }
+
+  .page-section {
+    @apply overflow-hidden py-10 sm:py-12 lg:py-14;
   }
 }
 
@@ -198,4 +308,18 @@ input[type='search']::-webkit-search-results-decoration {
 
 .range-slider__range {
   @apply !bg-blue;
+}
+
+.shadow-1 {
+  border: 1px solid var(--border-soft);
+  box-shadow: 0px 8px 22px rgba(28, 39, 76, 0.06);
+}
+
+.shadow-2 {
+  border: 1px solid var(--border-soft);
+  box-shadow: 0px 14px 34px rgba(28, 39, 76, 0.08);
+}
+
+.rounded-\[10px\] {
+  border-radius: 14px !important;
 }

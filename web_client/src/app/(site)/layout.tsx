@@ -42,7 +42,9 @@ export default function RootLayout({
                   <ModalProvider>
                     <PreviewSliderProvider>
                       <Header />
-                      {children}
+                      <main className="relative z-10 min-h-[70vh]">
+                        {children}
+                      </main>
 
                       <QuickViewModal />
                       <CartSidebarModal />

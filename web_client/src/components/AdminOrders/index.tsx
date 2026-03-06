@@ -39,13 +39,14 @@ const AdminOrders = () => {
       dataIndex: 'filePath',
       key: 'filePath',
       render: (text) => {
-        return <img className="w-20 h-20" src={text}/>
+        return <img className="h-14 w-14 rounded-lg border border-gray-3 object-cover" src={text}/>
       },
     },
     {
       title: 'Order No',
       dataIndex: 'orderNo',
       key: 'orderNo',
+      render: (orderNo) => <span className="font-medium text-dark">#{orderNo}</span>,
     },
     {
       title: 'Placed by',
@@ -88,9 +89,10 @@ const AdminOrders = () => {
       key: 'status',
       render: (text) => {
         return (
-          <div className="w-full flex flex-row">
-            <div className={`text-white px-4 py-2 rounded`} style={ORDER_STATUS_COLOR[text]}>{text}</div>
-          </div> )
+          <span className="inline-flex rounded-full px-3 py-1 text-xs font-semibold" style={ORDER_STATUS_COLOR[text]}>
+            {text}
+          </span>
+        )
       },
     },
     {
@@ -99,14 +101,12 @@ const AdminOrders = () => {
       key: 'action',
       render: (orderNo) => {
         return(
-          <>
-            <Link
-                  href={ORDER_URL + `/${orderNo}`}
-                  className="inline-flex items-center gap-2 text-dark hover:text-green transition"
-                  >
-                  <ExportOutlined  size={20}/>
-            </Link>
-          </>
+          <Link
+            href={ORDER_URL + `/${orderNo}`}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-3 text-dark hover:border-blue hover:text-blue transition"
+          >
+            <ExportOutlined size={20}/>
+          </Link>
         )
       },
     }
@@ -120,27 +120,36 @@ const AdminOrders = () => {
         <Breadcrumb title={"Order"} pages={["Order"]} />
       </section>
       {/* <!-- ===== Breadcrumb Section End ===== --> */}
-        <section className="overflow-hidden py-10 bg-gray-2">
+        <section className="page-section bg-gray-2/60">
           <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
             <OrderStats />
-            <div className="flex items-center justify-between gap-5 mb-7.5">
-              <div>
-                <Input placeholder="Search" type="text" value={search} onChange={(e) => {setSearch(e.target.value);setPagination((prev) => ({...prev, pageNumber: 1}))}} />
+            <div className="surface-card p-5 sm:p-7">
+              <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-xl font-semibold text-dark">Order List</h2>
+                  <p className="text-sm text-dark-4">Track and manage all customer orders.</p>
+                </div>
               </div>
-              < StatusTags status={status} setStatus={(value)=> {setStatus(value); setPagination((prev) => ({...prev, pageNumber: 1}))}} />
+              <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+                <div className="w-full max-w-[320px]">
+                  <Input placeholder="Search orders" type="text" value={search} onChange={(e) => {setSearch(e.target.value);setPagination((prev) => ({...prev, pageNumber: 1}))}} />
+                </div>
+                <StatusTags status={status} setStatus={(value)=> {setStatus(value); setPagination((prev) => ({...prev, pageNumber: 1}))}} />
+              </div>
+              <Table dataSource={orderItems} columns={columns} rowKey="id"
+                pagination={{
+                  current: pagination.pageNumber,
+                  pageSize: pagination.pageSize,
+                  total: totalCount,
+                  showSizeChanger: true,
+                  pageSizeOptions: ['10', '20'],
+                  onChange(page, pageSize) {
+                    setPagination({pageNumber: page, pageSize});
+                  },
+                }}
+                locale={{ emptyText: "No orders found." }}
+              />
             </div>
-            <Table dataSource={orderItems} columns={columns} rowKey="id"
-             pagination={{
-                current: pagination.pageNumber,
-                pageSize: pagination.pageSize,
-                total: totalCount,
-                showSizeChanger: true,
-                pageSizeOptions: ['10', '20'],
-                onChange(page, pageSize) {
-                  setPagination({pageNumber: page, pageSize});
-                },
-              }}
-            />
           </div>
         </section>
       

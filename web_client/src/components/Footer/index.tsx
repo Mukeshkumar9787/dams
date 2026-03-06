@@ -25,10 +25,10 @@ const Footer = () => {
     fetchConfig();
   }, [fetchConfig]);
   return (
-    <footer className="overflow-hidden">
+    <footer className="overflow-hidden border-t border-gray-3/70 bg-white/80 backdrop-blur">
       <div className="max-w-[1170px] mx-auto px-4 sm:px-8 xl:px-0">
         {/* <!-- footer menu start --> */}
-        <div className="flex flex-wrap xl:flex-nowrap gap-10 xl:gap-19 xl:justify-between pt-17.5 xl:pt-22.5 pb-10 xl:pb-15">
+        <div className="flex flex-wrap xl:flex-nowrap gap-10 xl:gap-19 xl:justify-between pt-14 xl:pt-18 pb-10 xl:pb-14">
           <div className="max-w-[330px] w-full">
             <h2 className="mb-7.5 text-custom-1 font-medium text-dark">
               Help & Support
@@ -225,7 +225,7 @@ const Footer = () => {
       </div>
 
       {/* <!-- footer bottom start --> */}
-      <div className="py-5 xl:py-7.5 bg-gray-1">
+      <div className="py-5 xl:py-6 border-t border-gray-3 bg-gray-1/70">
         <div className="max-w-[1170px] mx-auto px-4 sm:px-8 xl:px-0">
           <div className="flex gap-5 flex-wrap items-center justify-between">
             <p className="text-dark font-medium">

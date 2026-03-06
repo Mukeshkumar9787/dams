@@ -2,6 +2,7 @@ import prisma, { PrismaConfig } from "../prisma/client.js";
 
 import { ERR_CODES, FEATURE_TYPES, STOCK_TYPES } from "../utils/constants.js";
 import { convertToFullFilePath, deleteFiles, slugText } from "../utils/helpers.js";
+import { sendMail } from "../utils/mailUtils.js";
 import { fileService } from "./index.js";
 
 /**
@@ -177,6 +178,8 @@ const getProductBySlug = async (slug) => {
 const updateProduct = async (id, { title, fileIds, deletedFileIds, categoryId, hsnId, mrp, price, stock, status, sizeId, colorId, variant, oldStockQty }) => {
   let updated = null;
   let deletedFiles = [];
+  let shouldSendRestockNotification = false;
+  let restockProductInfo = null;
   
   
   await prisma.$transaction(async (tx) => {
@@ -213,9 +216,14 @@ const updateProduct = async (id, { title, fileIds, deletedFileIds, categoryId, h
       err.data = {stockQty: dbStockQty}
       throw err;
     }
+    shouldSendRestockNotification = dbStockQty <= 0 && Number(stock) > 0;
+    restockProductInfo = shouldSendRestockNotification ? { id: updated.id, title: updated.title, slug: updated.slug } : null;
     deletedFiles = deletedRecords;
   })
   deleteFiles(deletedFiles.map(i => i.path));
+  if (shouldSendRestockNotification && restockProductInfo) {
+    sendRestockNotifications(restockProductInfo);
+  }
   return updated;
 };
 
@@ -266,6 +274,106 @@ const getProductById = async({ id, tx = prisma, include= null }) => {
   return { ...product, stock }
 }
 
+const subscribeProductRestockNotification = async ({ productId, user }) => {
+  const product = await getProductById({ id: productId });
+  if (!product) {
+    const err = new Error("Product not found");
+    err.statusCode = 404;
+    throw err;
+  }
+
+  if (product.stock > 0) {
+    return { alreadyAvailable: true, message: "Product is already in stock." };
+  }
+
+  await prisma.productNotification.upsert({
+    where: {
+      userId_productId: {
+        userId: user.id,
+        productId,
+      },
+    },
+    update: {
+      email: user.email,
+      notified: false,
+      notifiedAt: null,
+    },
+    create: {
+      userId: user.id,
+      productId,
+      email: user.email,
+      notified: false,
+    },
+  });
+
+  return { message: "You will be notified when this product is back in stock." };
+};
+
+const sendRestockNotifications = async ({ id, title, slug }) => {
+  const subscriptions = await prisma.productNotification.findMany({
+    where: {
+      productId: id,
+      notified: false,
+    },
+    include: {
+      user: {
+        select: {
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+
+  const image = await prisma.file.findFirst({
+    where: {
+      feature: FEATURE_TYPES.PRODUCT,
+      featureId: id,
+    },
+    orderBy: [{ createdAt: "asc" }],
+  });
+  const imageUrl = image?.path ? convertToFullFilePath(image.path) : "";
+  if (!subscriptions.length) return;
+
+  const baseUrl = process.env.FRONTEND_URL || "";
+  const productPath = `/shop-details/${slug}`;
+  const productUrl = baseUrl ? `${baseUrl}${productPath}` : "";
+
+
+  await Promise.all(
+    subscriptions.map(async (subscription) => {
+      const to = subscription.email || subscription.user?.email;
+      if (!to) return;
+
+      const userName = subscription.user?.name || "Customer";
+      const result = await sendMail({
+        to,
+        subject: `${title} is back in stock`,
+        html: `
+          <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+            <p>Hi ${userName},</p>
+            <p><strong>${title}</strong> is now back in stock.</p>
+            ${productUrl
+              ? `<p>You can place your order here:</p><p><a href="${productUrl}" target="_blank" rel="noreferrer">${productUrl}</a></p>`
+              : `<p>Please open the store and search for "${title}" to place your order.</p>`}
+            <p>Thanks,<br/>DAMS Team</p>
+          </div>
+        `,
+      });
+
+      if (result?.success) {
+        await prisma.productNotification.update({
+          where: { id: subscription.id },
+          data: {
+            notified: true,
+            notifiedAt: new Date(),
+          },
+        });
+      }
+    })
+  );
+};
+
 export default {
   createProduct,
   getProducts,
@@ -273,5 +381,6 @@ export default {
   updateProduct,
   deleteProduct,
   getProductStockById,
-  getProductById
+  getProductById,
+  subscribeProductRestockNotification,
 };

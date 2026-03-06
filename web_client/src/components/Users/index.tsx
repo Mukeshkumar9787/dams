@@ -5,9 +5,10 @@ import { getUsers, updateRole } from "../../http/apiCalls.js";
 import { Button, Input, Table } from "antd"
 import ModalInfo from "../Common/ModalInfo";
 import { ROLE_TYPES } from "@/utils/constants";
+import { notifySuccess } from "@/utils/notify";
 
 
-const Orders = () => {
+const Users = () => {
   const [items, setItems] = React.useState([]);
   const [totalCount, setTotalCount] = React.useState(0);
   const [pagination, setPagination] = React.useState({ pageNumber: 1, pageSize: 10 });
@@ -33,6 +34,7 @@ const Orders = () => {
       title: 'Username',
       dataIndex: 'name',
       key: 'name',
+      render: (name) => <span className="font-medium text-dark">{name}</span>,
     },
     {
       title: 'Email',
@@ -54,8 +56,10 @@ const Orders = () => {
       render: ((role, record) => {
         return ( 
         <span className="flex gap-3 items-center justify-between">
-          <span>{role}</span>
-          <Button className="text-white bg-blue p-2" onClick={() => setEditUser(record)}> Change </Button>
+          <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+            role === ROLE_TYPES.ADMIN ? "bg-blue/15 text-blue-dark" : "bg-orange/15 text-orange-dark"
+          }`}>{role}</span>
+          <Button className="text-white bg-blue p-2" onClick={() => setEditUser(record)}>Change</Button>
         </span>
         )
       })
@@ -70,7 +74,7 @@ const Orders = () => {
     try {
       const response = await updateRole({userId: editUser.id, role: getOtherRole(editUser.role) });
       if(response?.success){
-        window.alert("Role updated successfully");
+        notifySuccess("Role updated successfully.");
         setEditUser(null); 
         fetchUsers();
       }
@@ -86,25 +90,32 @@ const Orders = () => {
         <Breadcrumb title={"Users"} pages={["Users"]} />
       </section>
       {/* <!-- ===== Breadcrumb Section End ===== --> */}
-        <section className="overflow-hidden py-10 bg-gray-2">
+        <section className="page-section bg-gray-2/60">
           <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
-            <div className="flex flex-wrap items-center justify-between gap-5 mb-7.5">
-              <div>
-                <Input placeholder="Search" type="text" value={search} onChange={(e) => setSearch(e.target.value)} />
+            <div className="surface-card p-5 sm:p-7">
+              <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-xl font-semibold text-dark">User List</h2>
+                  <p className="text-sm text-dark-4">View members and update account roles.</p>
+                </div>
               </div>
+              <div className="mb-5 w-full max-w-[320px]">
+                <Input placeholder="Search users" type="text" value={search} onChange={(e) => setSearch(e.target.value)} />
+              </div>
+              <Table dataSource={items} columns={columns} rowKey="id"
+                pagination={{
+                  current: pagination.pageNumber,
+                  pageSize: pagination.pageSize,
+                  total: totalCount,
+                  showSizeChanger: true,
+                  pageSizeOptions: ['10', '20'],
+                  onChange(page, pageSize) {
+                    setPagination({pageNumber: page, pageSize});
+                  },
+                }}
+                locale={{ emptyText: "No users found." }}
+              />
             </div>
-            <Table dataSource={items} columns={columns} rowKey="id"
-             pagination={{
-                current: pagination.pageNumber,
-                pageSize: pagination.pageSize,
-                total: totalCount,
-                showSizeChanger: true,
-                pageSizeOptions: ['10', '20'],
-                onChange(page, pageSize) {
-                  setPagination({pageNumber: page, pageSize});
-                },
-              }}
-            />
           </div>
         </section>
         <ModalInfo content={
@@ -118,4 +129,4 @@ const Orders = () => {
   );
 };
 
-export default Orders;
+export default Users;

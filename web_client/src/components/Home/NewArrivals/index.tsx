@@ -7,7 +7,7 @@ const NewArrival = async () => {
   const data = await getProducts({pageSize: 8, status: STATUS_TYPES.ACTIVE});
   const shopData = data.data || [];
   return (
-    <section className="overflow-hidden pt-15">
+    <section className="overflow-hidden pt-15 pb-16">
       <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
         {/* <!-- section title --> */}
         <div className="mb-7 flex items-center justify-between">

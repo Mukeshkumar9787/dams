@@ -7,6 +7,7 @@ import React, { useState } from "react";
 import Ship from "./Ship";
 import CompanyInfo from "./CompanyInfo";
 import CourierList from "./Courier";
+import { notifySuccess } from "@/utils/notify";
 
 const ConfigForm = () => {
   const [compInfo, setCompInfo] = useState({});
@@ -17,7 +18,7 @@ const ConfigForm = () => {
     e.preventDefault();
     const response = await updateConfig({config: { [CONFIG_KEYS.COMP_INFO]: compInfo, [CONFIG_KEYS.SHIPPING]: shipInfo, [CONFIG_KEYS.COURIER]: couriers }});
     if (response.success) {
-      window.alert("Updated Successfully");
+      notifySuccess("Updated successfully.");
       fetchConfig();
     }
   };
@@ -45,9 +46,9 @@ const ConfigForm = () => {
     <>
       <Breadcrumb title={"Config"} pages={["Config"]} />
 
-      <section className="overflow-hidden py-20 bg-gray-2">
+      <section className="page-section bg-gray-2/60">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
-          <div className="max-w-[1000px] w-full mx-auto rounded-xl bg-white shadow-1 p-4 sm:p-7.5 xl:p-11">
+          <div className="form-card max-w-[1000px] w-full mx-auto">
             <form onSubmit={handleSubmit}>
               <CompanyInfo compInfo={compInfo} setCompInfo={setCompInfo} />
               <Ship shipInfo={shipInfo} setShipInfo={setShipInfo} />
@@ -55,7 +56,7 @@ const ConfigForm = () => {
               <div className="w-full flex justify-end mt-4">
                 <button
                   type="submit"
-                  className="w-1/2 flex justify-center font-medium text-white bg-dark py-3 px-6 rounded-lg transition"
+                  className="btn-primary w-1/2"
                 >
                   Save
                 </button>

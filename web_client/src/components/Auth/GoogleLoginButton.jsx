@@ -2,6 +2,7 @@ import React from 'react'
 import { GoogleLogin } from "@react-oauth/google";
 import { verifyGoogleToken } from '@/http/apiCalls';
 import { afterSucessfullLogin } from '@/utils/helper';
+import { notifyError } from '@/utils/notify';
 
 const GoogleLoginButton = () => {
     const onSuccess = async (credentialResponse) => {
@@ -10,12 +11,12 @@ const GoogleLoginButton = () => {
         if (response.success) {
             afterSucessfullLogin(response.data.token);
         } else {
-            window.alert("Login failed: " + response.message);
+            notifyError("Login failed: " + response.message);
         }       
     };
 
     const onError = (error) => {
-        window.alert("Login Failed error: " + error);
+        notifyError("Login failed.");
     };
     return (
         <GoogleLogin

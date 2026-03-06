@@ -8,6 +8,7 @@ import { PRODUCT_URL } from "@/utils/appUrls";
 import React from "react";
 import { useRouter } from "next/navigation";
 import { Select } from "antd";
+import { confirmAction, notifyError } from "@/utils/notify";
 
 const ProductForm = ({ params }) => {
   const router = useRouter();
@@ -90,7 +91,7 @@ const ProductForm = ({ params }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if(images.length === 0){
-      window.alert("Select a file ...!");
+      notifyError("Select at least one file.");
       return;
     }
     let data = { title, status, categoryId, hsnId, sizeId, colorId, mrp, price, stock,variant, fileIds: [...fileIdsRef.current], deletedFileIds: [...deletedFileIdsRef.current] }
@@ -112,7 +113,12 @@ const ProductForm = ({ params }) => {
   
   const handleDelete = async (e) => {
     e.preventDefault();
-    if(!window.confirm(`Do you want to delete: ${title} Product ?`)) return
+    const isConfirmed = await confirmAction({
+      title: "Delete product?",
+      content: `This will delete "${title}" product.`,
+      okText: "Delete",
+    });
+    if(!isConfirmed) return;
     if(!isNew){
       let response = await deleteProduct({id: editDataRef.current.id})
       if(response.success){
@@ -153,9 +159,9 @@ const ProductForm = ({ params }) => {
     <>
       <Breadcrumb title={"Product"} pages={["Product /", params.slug]} />
 
-      <section className="overflow-hidden py-20 bg-gray-2">
+      <section className="page-section bg-gray-2/60">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
-          <div className="max-w-[570px] w-full mx-auto rounded-xl bg-white shadow-1 p-4 sm:p-7.5 xl:p-11">
+          <div className="form-card max-w-[570px] w-full mx-auto">
 
             <div className="text-center mb-8">
               <h2 className="font-semibold text-xl sm:text-2xl text-dark">
@@ -166,38 +172,38 @@ const ProductForm = ({ params }) => {
             <form onSubmit={handleSubmit}>
               {/* Product Variant */}
               <div className="mb-5">
-                <label className="block mb-2.5">Product Variant</label>
+                <label className="form-label">Product Variant</label>
                 <input
                   type="text"
                   placeholder="Enter Variant"
                   value={variant}
                   onChange={(e) => setVariant(e.target.value)}
                   required
-                  className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                  className="form-input"
                 />
               </div>
 
               {/* Product Name */}
               <div className="mb-5">
-                <label className="block mb-2.5">Product Name</label>
+                <label className="form-label">Product Name</label>
                 <input
                   type="text"
                   placeholder="Enter Product name"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   required
-                  className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                  className="form-input"
                 />
               </div>
 
               {/* Category */}
               <div className="mb-7">
-                <label className="block mb-2.5">Category</label>
+                <label className="form-label">Category</label>
                 <select
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
                   required
-                  className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                  className="form-input"
                 >
                   <option value={null}>Select</option>
                   {categoryItems.map(value => 
@@ -209,7 +215,7 @@ const ProductForm = ({ params }) => {
               {/* Color / Size */}
               <div className="mb-7 flex w-full gap-5">
                 <div className="w-1/2">
-                  <label className="block mb-2.5">Color</label>
+                  <label className="form-label">Color</label>
                   <Select value={colorId} onChange={(value) => setColorId(value)} style={{ width: 200 }} className="h-13 bg-gray">
                     {colorItems.map(item => (
                       <Select.Option key={item.id} value={item.id}>
@@ -231,14 +237,14 @@ const ProductForm = ({ params }) => {
                   </Select>
                 </div>
                 <div className="w-1/2">
-                  <label className="block mb-2.5">Size</label>
+                  <label className="form-label">Size</label>
                   <select
                     itemType="number"
                     value={sizeId}
                     onChange={(e) => {
                       setSizeId(e.target.value); 
                     }}
-                    className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                    className="form-input"
                     >
                     <option value={null}>Select</option>
                     {sizeItems.map(value => 
@@ -251,14 +257,14 @@ const ProductForm = ({ params }) => {
               {/* Hsn */}
               <div className="mb-7 flex w-full gap-5">
                 <div className="w-1/2">
-                  <label className="block mb-2.5">Hsn</label>
+                  <label className="form-label">Hsn</label>
                   <select
                     itemType="number"
                     value={hsnId}
                     onChange={(e) => {
                       setHsnId(e.target.value); 
                     }}
-                    className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                    className="form-input"
                     >
                     <option value={null}>Select</option>
                     {hsnItems.map(value => 
@@ -267,20 +273,20 @@ const ProductForm = ({ params }) => {
                   </select>
                 </div>
                 <div className="w-1/2">
-                <label className="block mb-2.5">Tax</label>
+                <label className="form-label">Tax</label>
                 <input
                   type="text"
                   placeholder="Enter Tax"
                   value={tax}
                   disabled
-                  className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                  className="form-input"
                 />
               </div>
               </div>
 
               <div className="mb-7 flex w-full gap-5">
                 <div className="w-1/2">
-                  <label className="block mb-2.5">Mrp</label>
+                  <label className="form-label">Mrp</label>
                   <input
                   type="number"
                   placeholder="Enter MRP"
@@ -288,11 +294,11 @@ const ProductForm = ({ params }) => {
                   onChange={(e) => setMrp(e.target.value)}
                   required
                   min={1}
-                  className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                  className="form-input"
                   />
                 </div>
                 <div className="w-1/2">
-                  <label className="block mb-2.5">Price</label>
+                  <label className="form-label">Price</label>
                   <input
                   type="number"
                   placeholder="Enter Price"
@@ -300,13 +306,13 @@ const ProductForm = ({ params }) => {
                   onChange={(e) => setPrice(e.target.value)}
                   required
                   min={1}
-                  className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                  className="form-input"
                   />
                 </div>
               </div>
 
               <div className="mb-7">
-                  <label className="block mb-2.5">Stock</label>
+                  <label className="form-label">Stock</label>
                   <input
                   type="number"
                   placeholder="Enter stock"
@@ -314,7 +320,7 @@ const ProductForm = ({ params }) => {
                   onChange={(e) => setStock(e.target.value)}
                   required
                   min={1}
-                  className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                  className="form-input"
                   />
               </div>
 
@@ -322,17 +328,17 @@ const ProductForm = ({ params }) => {
 
               {/* Product Image */}
               <div className="mb-5">
-                <label className="block mb-2.5">Product Image</label>
+                <label className="form-label">Product Image</label>
                 <FileUploader files={images} setFiles={setImages} multiSelect fileIdsRef={fileIdsRef} deletedFileIdsRef={deletedFileIdsRef} />
               </div>
 
               {/* Status */}
               <div className="mb-7">
-                <label className="block mb-2.5">Status</label>
+                <label className="form-label">Status</label>
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
-                  className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                  className="form-input"
                 >
                   {Object.values(STATUS_TYPES).map(value => 
                     <option key={value} value={value}>{value}</option>
@@ -344,7 +350,7 @@ const ProductForm = ({ params }) => {
               <div className="w-full flex">
               <button
                 type="submit"
-                className="w-3/4 flex justify-center font-medium text-white bg-dark py-3 px-6 rounded-lg transition"
+                className="btn-primary w-3/4"
               >
                 Save Product
               </button>
@@ -352,7 +358,7 @@ const ProductForm = ({ params }) => {
                   <button
                   type="button"
                   onClick={handleDelete}
-                  className="ml-3 w-1/4 font-medium text-white bg-red py-3 px-6 rounded-lg transition"
+                  className="btn-danger ml-3 w-1/4"
                   >
                   Delete
                   </button>

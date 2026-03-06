@@ -10,6 +10,8 @@ const router = express.Router();
 // Get all categories
 router.get("/active", productController.getActiveProducts);
 
+router.post("/:id/notify-me", getAuthMiddleware(), productController.subscribeProductRestockNotification);
+
 router.use(getAuthMiddleware([ROLE_TYPES.ADMIN]));
 
 router.get("/", productController.getProducts);

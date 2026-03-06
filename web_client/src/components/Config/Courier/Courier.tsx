@@ -1,5 +1,6 @@
 import React from 'react'
 import { Button } from 'antd';
+import { confirmAction } from '@/utils/notify';
 
 
 function Courier({ setCouriers, rowIndex, courier }) {
@@ -13,10 +14,17 @@ function Courier({ setCouriers, rowIndex, courier }) {
             return updatedCouriers
         })
     }
-    const handleRemove = () => {
-        if(courier?.name && !window.confirm(`Do you want to remove courier - ${courier?.name}`)) return;
+    const handleRemove = async () => {
+        if(courier?.name){
+            const isConfirmed = await confirmAction({
+                title: "Remove courier?",
+                content: `Do you want to remove courier "${courier?.name}"?`,
+                okText: "Remove",
+            });
+            if(!isConfirmed) return;
+        }
         setCouriers(prev => {
-            const updatedCouriers = prev.countries.filter((c, index) => index !== rowIndex);
+            const updatedCouriers = prev.filter((c, index) => index !== rowIndex);
             return updatedCouriers;
         })
     }
@@ -31,7 +39,7 @@ function Courier({ setCouriers, rowIndex, courier }) {
                     name="name"
                     onChange={handleChange}
                     required
-                    className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                    className="form-input"
                 />
                 <input
                     type="text"
@@ -40,10 +48,10 @@ function Courier({ setCouriers, rowIndex, courier }) {
                     name="link"
                     onChange={handleChange}
                     required
-                    className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                    className="form-input"
                 />
                 <div className="flex justify-end gap-1">
-                    <Button className="bg-red text-white p-5" onClick={handleRemove}>Remove</Button>
+                    <Button className="bg-red text-white p-5 rounded-md" onClick={handleRemove}>Remove</Button>
                 </div>
             </div>
         </div>

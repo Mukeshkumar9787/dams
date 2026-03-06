@@ -95,12 +95,10 @@ const Addresses = () => {
   };
 
   return (
-    <div className="w-full bg-white rounded-xl shadow-1 p-4 sm:p-7.5">
+    <div className="w-full form-card p-4 sm:p-7.5">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-medium text-lg text-dark">Saved Addresses</h3>
-        <Button type="primary" className="bg-blue" onClick={openAddModal}>
-          Add New Address
-        </Button>
+        <button type="button" className="btn-primary py-2.5 text-sm" onClick={openAddModal}>Add New Address</button>
       </div>
 
       {loading ? (
@@ -149,7 +147,7 @@ const Addresses = () => {
               value={formValues.name}
               onChange={handleInputChange("name")}
               placeholder="Name"
-              className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+              className="form-input"
             />
             <input
               type="text"
@@ -157,7 +155,7 @@ const Addresses = () => {
               value={formValues.mobile}
               onChange={handleInputChange("mobile")}
               placeholder="Mobile"
-              className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+              className="form-input"
             />
           </div>
           <div className="mb-4">
@@ -167,7 +165,7 @@ const Addresses = () => {
               value={formValues.address}
               onChange={handleInputChange("address")}
               placeholder="Address"
-              className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+              className="form-input"
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -177,7 +175,7 @@ const Addresses = () => {
               value={formValues.city}
               onChange={handleInputChange("city")}
               placeholder="City"
-              className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+              className="form-input"
             />
             <input
               type="text"
@@ -185,7 +183,7 @@ const Addresses = () => {
               value={formValues.pincode}
               onChange={handleInputChange("pincode")}
               placeholder="Pincode"
-              className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+              className="form-input"
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -195,7 +193,7 @@ const Addresses = () => {
               value={formValues.country}
               onChange={handleInputChange("country")}
               placeholder="Country"
-              className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+              className="form-input"
             />
             <input
               type="text"
@@ -203,7 +201,7 @@ const Addresses = () => {
               value={formValues.state}
               onChange={handleInputChange("state")}
               placeholder="State"
-              className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+              className="form-input"
             />
           </div>
           <div className="flex justify-end gap-3">
@@ -213,7 +211,7 @@ const Addresses = () => {
             <button
               type="submit"
               disabled={saving}
-              className={`px-5 py-2 rounded-md text-white ${saving ? "bg-gray-4" : "bg-blue"}`}
+              className={`px-5 py-2 rounded-lg text-white ${saving ? "bg-gray-4" : "bg-blue hover:bg-blue-dark"}`}
             >
               {saving ? "Saving..." : isEditing ? "Update Address" : "Save Address"}
             </button>

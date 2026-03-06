@@ -34,7 +34,7 @@ const Ship = ({ shipInfo, setShipInfo }) => {
             </div>
 
             <div className="mb-5 ">
-                <label className="block mb-2.5">Default Amount</label>
+                <label className="form-label">Default Amount</label>
                 <span className="flex justify-center items-center gap-5">
                     <input
                         type="number"
@@ -44,9 +44,9 @@ const Ship = ({ shipInfo, setShipInfo }) => {
                         min={0}
                         onChange={(e) => handleChange(e)}
                         required
-                        className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                        className="form-input"
                     />
-                    <Button className="bg-blue text-white p-5" onClick={handleAddCountry}>Add Country</Button>
+                    <Button className="bg-blue text-white p-5 rounded-md" onClick={handleAddCountry}>Add Country</Button>
                 </span>
             </div>
             {(countries.length > 0) && 

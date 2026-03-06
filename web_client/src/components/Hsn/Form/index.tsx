@@ -6,6 +6,7 @@ import { STATUS_TYPES } from "@/utils/constants";
 import { HSN_URL } from "@/utils/appUrls";
 import React from "react";
 import { useRouter } from "next/navigation";
+import { confirmAction } from "@/utils/notify";
 
 const HsnForm = ({ params }) => {
   const router = useRouter();
@@ -32,7 +33,12 @@ const HsnForm = ({ params }) => {
   
   const handleDelete = async (e) => {
     e.preventDefault();
-    if(!window.confirm(`Do you want to delete: ${code} Hsn ?`)) return
+    const isConfirmed = await confirmAction({
+      title: "Delete HSN?",
+      content: `This will delete HSN "${code}".`,
+      okText: "Delete",
+    });
+    if(!isConfirmed) return;
     if(!isNew){
       let response = await deleteHsn({id: editDataRef.current.id})
       if(response.success){
@@ -65,9 +71,9 @@ const HsnForm = ({ params }) => {
     <>
       <Breadcrumb title={"Hsn"} pages={["Hsn /", params.slug]} />
 
-      <section className="overflow-hidden py-20 bg-gray-2">
+      <section className="page-section bg-gray-2/60">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
-          <div className="max-w-[570px] w-full mx-auto rounded-xl bg-white shadow-1 p-4 sm:p-7.5 xl:p-11">
+          <div className="form-card max-w-[570px] w-full mx-auto">
 
             <div className="text-center mb-8">
               <h2 className="font-semibold text-xl sm:text-2xl text-dark">
@@ -78,36 +84,36 @@ const HsnForm = ({ params }) => {
             <form onSubmit={handleSubmit}>
               {/* Hsn Name */}
               <div className="mb-5">
-                <label className="block mb-2.5">Hsn Code</label>
+                <label className="form-label">Hsn Code</label>
                 <input
                   type="text"
                   placeholder="Enter Hsn"
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
                   required
-                  className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                  className="form-input"
                 />
               </div>
 
               <div className="mb-5">
-                <label className="block mb-2.5">Tax</label>
+                <label className="form-label">Tax</label>
                 <input
                   type="number"
                   placeholder="Enter Tax"
                   value={tax}
                   onChange={(e) => setTax(e.target.value)}
                   required
-                  className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                  className="form-input"
                 />
               </div>
 
               {/* Status */}
               <div className="mb-7">
-                <label className="block mb-2.5">Status</label>
+                <label className="form-label">Status</label>
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
-                  className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                  className="form-input"
                 >
                   {Object.values(STATUS_TYPES).map(value => 
                     <option key={value} value={value}>{value}</option>
@@ -119,7 +125,7 @@ const HsnForm = ({ params }) => {
               <div className="w-full flex">
               <button
                 type="submit"
-                className="w-3/4 flex justify-center font-medium text-white bg-dark py-3 px-6 rounded-lg transition"
+                className="btn-primary w-3/4"
               >
                 Save Hsn
               </button>
@@ -127,7 +133,7 @@ const HsnForm = ({ params }) => {
                   <button
                   type="button"
                   onClick={handleDelete}
-                  className="ml-3 w-1/4 font-medium text-white bg-red py-3 px-6 rounded-lg transition"
+                  className="btn-danger ml-3 w-1/4"
                   >
                   Delete
                   </button>

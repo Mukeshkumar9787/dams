@@ -8,6 +8,7 @@ import { updateProfile } from "@/http/apiCalls";
 import { Button, Popconfirm } from "antd";
 import ResetPassword from "../Auth/ResetPassword";
 import Addresses from "./Addresses";
+import { notifySuccess } from "@/utils/notify";
 
 const MyAccount = () => {
   const [activeTab, setActiveTab] = useState("orders");
@@ -38,7 +39,7 @@ const MyAccount = () => {
       const formData = new FormData(e.target);
       const values = Object.fromEntries(formData.entries());
       const response = await updateProfile(values);
-      window.alert(response.message);
+      notifySuccess(response.message || "Profile updated.");
       window.location.reload();
     } catch (error) {
       
@@ -49,7 +50,7 @@ const MyAccount = () => {
     <>
       <Breadcrumb title={"My Account"} pages={["my account"]} />
 
-      <section className="overflow-hidden py-20 bg-gray-2">
+      <section className="page-section bg-gray-2/60">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
           <div className="flex flex-col gap-7.5">
             {/* <!--== user dashboard menu start ==--> */}
@@ -105,10 +106,10 @@ const MyAccount = () => {
                   
                 </div>
 
-                <div className="p-4 sm:p-7.5 xl:p-9">
+                <div className="p-4 sm:p-7.5 xl:p-8">
                   
                   <div className="w-full overflow-x-auto">
-                    <div className="inline-flex min-w-full rounded-lg bg-gray-1 p-1.5 gap-1.5">
+                    <div className="inline-flex min-w-full rounded-lg bg-gray-1/80 p-1.5 gap-1.5">
                       {tabs.map((tab) => (
                         <button
                           key={tab.key}
@@ -158,10 +159,10 @@ const MyAccount = () => {
               } flex justify-center`}
             >
               <form onSubmit={handleProfileUpdate} className="w-full md:w-1/2">
-                <div className="bg-white shadow-1 rounded-xl p-4 sm:p-8.5">
+                <div className="form-card p-4 sm:p-8.5">
                   <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5">
                     <div className="w-full">
-                      <label htmlFor="email" className="block mb-2.5">
+                      <label htmlFor="email" className="form-label">
                         Email
                       </label>
 
@@ -172,14 +173,14 @@ const MyAccount = () => {
                         value={user?.email || ""}
                         disabled
                         readOnly
-                        className="rounded-md border border-gray-3 bg-gray-2 text-dark-4 placeholder:text-dark-5 w-full py-2.5 px-5 outline-none cursor-not-allowed"
+                        className="form-input bg-gray-2 text-dark-4 cursor-not-allowed"
                       />
                     </div>
                   </div>
 
                   <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5">
                     <div className="w-full">
-                      <label htmlFor="firstName" className="block mb-2.5">
+                      <label htmlFor="firstName" className="form-label">
                         Name <span className="text-red">*</span>
                       </label>
 
@@ -189,14 +190,14 @@ const MyAccount = () => {
                         id="name"
                         placeholder="Enter Name"
                         defaultValue={user?.name}
-                        className="rounded-md border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-2.5 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
+                        className="form-input"
                       />
                     </div>
                   </div>
 
                   <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5">
                     <div className="w-full">
-                      <label htmlFor="firstName" className="block mb-2.5">
+                      <label htmlFor="firstName" className="form-label">
                         Mobile <span className="text-red">*</span>
                       </label>
 
@@ -206,14 +207,14 @@ const MyAccount = () => {
                         id="name"
                         placeholder="Enter Mobile"
                         defaultValue={user?.mobile}
-                        className="rounded-md border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-2.5 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
+                        className="form-input"
                       />
                     </div>
                   </div>
 
                   <button
                     type="submit"
-                    className="inline-flex font-medium text-white bg-blue py-3 px-7 rounded-md ease-out duration-200 hover:bg-blue-dark"
+                    className="btn-primary"
                   >
                     Save Changes
                   </button>

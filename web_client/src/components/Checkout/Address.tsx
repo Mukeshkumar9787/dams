@@ -243,7 +243,7 @@ const Address = ({
 
   return (
     <div id="addressForm" className="mt-3">
-      <div className="bg-white shadow-1 rounded-[10px] p-4 sm:p-8.5">
+      <div className="form-card p-4 sm:p-8.5">
         <h2 className="font-medium text-xl text-dark mb-3">
           {isShip ? getShippingHeading() : "Billing"} Address
         </h2>
@@ -326,7 +326,7 @@ const Address = ({
             <button
               type="button"
               onClick={openAddModal}
-              className="inline-flex items-center rounded-md border border-blue px-4 py-2 text-sm font-medium text-blue hover:bg-blue/5"
+              className="btn-primary py-2.5 text-sm"
             >
               Add New Address
             </button>
@@ -344,7 +344,7 @@ const Address = ({
                   value={modalValues.name}
                   onChange={handleModalInputChange("name")}
                   placeholder="Name"
-                  className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+                  className="form-input"
                 />
                 {renderFieldError("name")}
               </div>
@@ -355,7 +355,7 @@ const Address = ({
                   value={modalValues.mobile}
                   onChange={handleModalInputChange("mobile")}
                   placeholder="Mobile"
-                  className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+                  className="form-input"
                 />
                 {renderFieldError("mobile")}
               </div>
@@ -367,7 +367,7 @@ const Address = ({
                 value={modalValues.address}
                 onChange={handleModalInputChange("address")}
                 placeholder="Address"
-                className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+                className="form-input"
               />
               {renderFieldError("address")}
             </div>
@@ -379,7 +379,7 @@ const Address = ({
                   value={modalValues.city}
                   onChange={handleModalInputChange("city")}
                   placeholder="City"
-                  className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+                  className="form-input"
                 />
                 {renderFieldError("city")}
               </div>
@@ -390,7 +390,7 @@ const Address = ({
                   value={modalValues.pincode}
                   onChange={handleModalInputChange("pincode")}
                   placeholder="Pincode"
-                  className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+                  className="form-input"
                 />
                 {renderFieldError("pincode")}
               </div>
@@ -401,7 +401,7 @@ const Address = ({
                   required
                   value={modalValues.country}
                   onChange={handleModalCountryChange}
-                  className="w-full bg-gray-1 rounded-md border border-gray-3 py-3 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+                  className="form-input"
                 >
                   <option value="">Select Country</option>
                   {countryList.map((country) => (
@@ -417,7 +417,7 @@ const Address = ({
                   required
                   value={modalValues.state}
                   onChange={handleModalInputChange("state")}
-                  className="w-full bg-gray-1 rounded-md border border-gray-3 py-3 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+                  className="form-input"
                 >
                   <option value="">Select State</option>
                   {modalStateList.map((state) => (
@@ -434,8 +434,8 @@ const Address = ({
                 type="button"
                 onClick={handleSaveAddress}
                 disabled={savingAddress}
-                className={`inline-flex items-center rounded-md px-4 py-2 text-sm font-medium text-white ${
-                  savingAddress ? "bg-gray-4" : "bg-blue"
+                className={`inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium text-white ${
+                  savingAddress ? "bg-gray-4" : "bg-blue hover:bg-blue-dark"
                 }`}
               >
                 {savingAddress ? "Saving..." : "Save Address"}
@@ -473,7 +473,7 @@ const Address = ({
                 value={modalValues.name}
                 onChange={handleModalInputChange("name")}
                 placeholder="Name"
-                className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+                className="form-input"
               />
               {renderFieldError("name")}
             </div>
@@ -484,7 +484,7 @@ const Address = ({
                 value={modalValues.mobile}
                 onChange={handleModalInputChange("mobile")}
                 placeholder="Mobile"
-                className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+                className="form-input"
               />
               {renderFieldError("mobile")}
             </div>
@@ -496,7 +496,7 @@ const Address = ({
               value={modalValues.address}
               onChange={handleModalInputChange("address")}
               placeholder="Address"
-              className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+              className="form-input"
             />
             {renderFieldError("address")}
           </div>
@@ -508,7 +508,7 @@ const Address = ({
                 value={modalValues.city}
                 onChange={handleModalInputChange("city")}
                 placeholder="City"
-                className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+                className="form-input"
               />
               {renderFieldError("city")}
             </div>
@@ -519,7 +519,7 @@ const Address = ({
                 value={modalValues.pincode}
                 onChange={handleModalInputChange("pincode")}
                 placeholder="Pincode"
-                className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+                className="form-input"
               />
               {renderFieldError("pincode")}
             </div>
@@ -530,7 +530,7 @@ const Address = ({
                 required
                 value={modalValues.country}
                 onChange={handleModalCountryChange}
-                className="w-full bg-gray-1 rounded-md border border-gray-3 py-3 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+                className="form-input"
               >
                 <option value="">Select Country</option>
                 {countryList.map((country) => (
@@ -546,7 +546,7 @@ const Address = ({
                 required
                 value={modalValues.state}
                 onChange={handleModalInputChange("state")}
-                className="w-full bg-gray-1 rounded-md border border-gray-3 py-3 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+                className="form-input"
               >
                 <option value="">Select State</option>
                 {modalStateList.map((state) => (
@@ -566,7 +566,7 @@ const Address = ({
               type="button"
               onClick={handleSaveAddress}
               disabled={savingAddress}
-              className={`px-5 py-2 rounded-md text-white ${savingAddress ? "bg-gray-4" : "bg-blue"}`}
+              className={`px-5 py-2 rounded-lg text-white ${savingAddress ? "bg-gray-4" : "bg-blue hover:bg-blue-dark"}`}
             >
               {savingAddress ? "Saving..." : isEditMode ? "Update Address" : "Save Address"}
             </button>

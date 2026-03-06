@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import ResendButton from "../../Common/ResendButton";
 import { afterSucessfullLogin } from "@/utils/helper";
 import { VERIFY_OTP_TYPES } from "@/utils/constants";
+import { notifySuccess } from "@/utils/notify";
 
 const VerifyOTP = ({ type, sentTo=null, isOpen, onClose, resendOtp=null, nestedForm=false }) => {
   const router = useRouter();
@@ -17,7 +18,7 @@ const VerifyOTP = ({ type, sentTo=null, isOpen, onClose, resendOtp=null, nestedF
         const response = await verifyOTP({...values, type});
         if(response.success){
           if(type === VERIFY_OTP_TYPES.RESET_PASSWORD){
-            window.alert("Password Changed Successfully");
+            notifySuccess("Password changed successfully.");
             if(nestedForm){
               onClose(true);
             }else{
@@ -49,7 +50,7 @@ const VerifyOTP = ({ type, sentTo=null, isOpen, onClose, resendOtp=null, nestedF
       <div>
           <form id="otpForm" onSubmit={handleSubmit}>
             <div className="mb-5">
-              <label htmlFor="email" className="block mb-2.5">
+              <label htmlFor="email" className="form-label">
                 Email sent to <span className="font-bold">{sentTo}</span>
               </label>
               <input
@@ -60,12 +61,12 @@ const VerifyOTP = ({ type, sentTo=null, isOpen, onClose, resendOtp=null, nestedF
                 readOnly
                 value={sentTo}
                 placeholder="Enter your email"
-                className="rounded-lg border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-3 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
+                className="form-input"
               />
             </div>
 
             <div className="mb-5">
-              <label htmlFor="otp" className="block mb-2.5">
+              <label htmlFor="otp" className="form-label">
                 OTP
               </label>
               
@@ -77,7 +78,7 @@ const VerifyOTP = ({ type, sentTo=null, isOpen, onClose, resendOtp=null, nestedF
                 autoComplete="on"
                 minLength={6}
                 maxLength={6}
-                className="rounded-lg border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-3 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
+                className="form-input"
               />
             </div>
           </form>

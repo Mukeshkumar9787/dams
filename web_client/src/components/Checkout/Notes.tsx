@@ -4,9 +4,9 @@ const Notes = ({ checkoutValues, setCheckoutValues }) => {
 
   return (
     <div id="addressForm" className="mt-3">
-      <div className="bg-white shadow-1 rounded-[10px] p-4 sm:p-8.5">
+      <div className="form-card p-4 sm:p-8.5">
         <div className="mb-5">
-          <label className="block mb-2.5">
+          <label className="form-label">
             GST no.
           </label>
           <input
@@ -15,11 +15,11 @@ const Notes = ({ checkoutValues, setCheckoutValues }) => {
             value={checkoutValues?.gstNo || ""}
             onChange={(e) => setCheckoutValues((prev) => ({ ...prev, gstNo: e.target.value }))}
             placeholder="Enter GST no."
-            className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+            className="form-input"
           />
         </div>
         <div className="mb-5">
-          <label className="block mb-2.5">
+          <label className="form-label">
             Other Additional Notes
           </label>
           <textarea
@@ -28,7 +28,7 @@ const Notes = ({ checkoutValues, setCheckoutValues }) => {
             value={checkoutValues?.notes || ""}
             onChange={(e) => setCheckoutValues((prev) => ({ ...prev, notes: e.target.value }))}
             placeholder="Enter Notes"
-            className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+            className="form-input"
           />
         </div>
       </div>

@@ -17,7 +17,7 @@ const CourierList = ({ couriers, setCouriers }) => {
             </div>
 
             <span className="flex justify-end items-center gap-5">
-                <Button className="bg-blue text-white p-5" onClick={handleAddCourier}>Add Courier</Button>
+                <Button className="bg-blue text-white p-5 rounded-md" onClick={handleAddCourier}>Add Courier</Button>
             </span>
             {(couriers.length > 0) &&
                 <div className="rounded-md">

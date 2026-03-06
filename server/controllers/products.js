@@ -88,6 +88,27 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+const subscribeProductRestockNotification = async (req, res) => {
+  try {
+    const productId = Number(req.params.id);
+    if (Number.isNaN(productId)) {
+      return res.status(400).json({ success: false, message: "Invalid product id" });
+    }
+    const result = await productService.subscribeProductRestockNotification({
+      productId,
+      user: req.user,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result,
+    });
+  } catch (err) {
+    return errorHandler(err, res);
+  }
+};
+
 export default {
   createProduct,
   getProducts,
@@ -95,4 +116,5 @@ export default {
   getProductBySlug,
   updateProduct,
   deleteProduct,
+  subscribeProductRestockNotification,
 };

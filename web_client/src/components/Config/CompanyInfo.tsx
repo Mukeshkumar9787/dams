@@ -89,7 +89,7 @@ const CompanyInfo = ({ compInfo, setCompInfo }) => {
       <div className="grid md:grid-cols-2 gap-2">
       {fields.map((field) => (
         <div className={`mb-5 col-span-${field.col || 1}`} key={field.key}>
-          <label className="block mb-2.5">{field.label}</label>
+          <label className="form-label">{field.label}</label>
 
           {field.type === "textarea" ? (
             <textarea
@@ -100,7 +100,7 @@ const CompanyInfo = ({ compInfo, setCompInfo }) => {
                 handleOnChange(field.key, e.target.value)
               }
               required={field.required}
-              className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+              className="form-input"
             />
           ) : (
             <input
@@ -111,7 +111,7 @@ const CompanyInfo = ({ compInfo, setCompInfo }) => {
                 handleOnChange(field.key, e.target.value)
               }
               required={field.required}
-              className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+              className="form-input"
             />
           )}
         </div>

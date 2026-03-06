@@ -1,16 +1,24 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { addItemToCart, removeItemFromCart } from "@/redux/features/cart-slice";
 import { AppDispatch, useAppSelector } from "@/redux/store";
-import { getProductCountFromCart } from "@/utils/helper";
+import { getProductCountFromCart, redirectToSignIn } from "@/utils/helper";
 import { useDispatch } from "react-redux";
 import { DeleteFilled, MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import { useRouter } from "next/navigation";
 import { Button } from "antd";
+import { notifyError, notifySuccess } from "@/utils/notify";
+import { notifyProductWhenInStock } from "@/http/apiCalls";
 
 const AddToCart = ({ id, align='center', stack = true, purchase = true, stock=0, isDelete=false }) => {
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
     const cartItems = useAppSelector((state) => state.cartReducer.items);
+    const baseWrapClass = `flex ${stack ? "flex-col" : ""} gap-2 items-center justify-${align} w-full min-h-[96px]`;
+    const actionBtnClass = "inline-flex h-10 w-full max-w-[220px] items-center justify-center rounded-lg font-medium text-custom-sm";
+    const stockLevel = Number(stock);
+    const isOutOfStock = !Number.isFinite(stockLevel) || stockLevel <= 0;
+    const [isNotifyLoading, setIsNotifyLoading] = useState(false);
+    const [isNotifyDone, setIsNotifyDone] = useState(false);
 
     const quantity = useMemo(()=>getProductCountFromCart(id, cartItems),[cartItems]);
 
@@ -28,25 +36,50 @@ const AddToCart = ({ id, align='center', stack = true, purchase = true, stock=0,
         dispatch(removeItemFromCart(id));
     };
 
+    const handleNotifyMe = async () => {
+        if (!localStorage.getItem("token")) {
+            redirectToSignIn();
+            return;
+        }
+
+        try {
+            setIsNotifyLoading(true);
+            const response = await notifyProductWhenInStock(id);
+            if (!response?.success) {
+                notifyError(response?.message || "Unable to subscribe for notification.");
+                return;
+            }
+            setIsNotifyDone(true);
+            notifySuccess(response?.message || "Notification request saved.");
+        } finally {
+            setIsNotifyLoading(false);
+        }
+    };
+
     const PurchaseNow = () => (
         <button
             type="button"
             onClick={() => handleAddToCart(true)}
-            className="inline-flex font-medium text-custom-sm py-[7px] px-7 rounded-[7px] bg-dark text-white"
+            className={`${actionBtnClass} bg-dark text-white hover:bg-[#121826]`}
         >
             Purchase&nbsp;Now
         </button>
     )
 
-    if(stock === 0) {
+    if(isOutOfStock) {
         return (
-            <div className={`flex ${stack ? "flex-col" : ""} gap-2 items-center justify-${align} w-full`}>
+            <div className={baseWrapClass}>
                 <button
                     type="button"
-                    disabled
-                    className="inline-flex font-medium text-custom-sm py-[7px] px-7 rounded-[7px] bg-red text-white"
+                    onClick={handleNotifyMe}
+                    disabled={isNotifyLoading || isNotifyDone}
+                    className={`${actionBtnClass} ${isNotifyLoading ? "opacity-70" : ""}`}
+                    style={{
+                        backgroundColor: isNotifyDone ? "#22c55e" : "#000",
+                        color: "#fff",
+                    }}
                 >
-                    Out&nbsp;of&nbsp;Stock 
+                    {isNotifyDone ? "Notification Set" : isNotifyLoading ? "Saving..." : "Notify Me"}
                 </button>
                 {isDelete && 
                 <Button onClick={handleRemoveFromCart}>
@@ -59,11 +92,11 @@ const AddToCart = ({ id, align='center', stack = true, purchase = true, stock=0,
 
     if(quantity === 0) {
         return (
-            <div className={`flex ${stack ? "flex-col" : ""} gap-2 items-center justify-${align} w-full`}>
+            <div className={baseWrapClass}>
                 <button
                     type="button"
                     onClick={() => handleAddToCart()}
-                    className="inline-flex font-medium text-custom-sm py-[7px] px-7 rounded-[7px] bg-blue text-white hover:bg-blue-dark"
+                    className={`${actionBtnClass} bg-blue text-white hover:bg-blue-dark`}
                 >
                     Add&nbsp;to&nbsp;cart
                 </button>
@@ -74,8 +107,8 @@ const AddToCart = ({ id, align='center', stack = true, purchase = true, stock=0,
         )
     }
   return (
-    <div className={`flex items-center ${stack ? "flex-col" : ""} gap-2 justify-${align} w-full`}>
-        <div className="flex items-center rounded-md border border-gray-3 bg-white w-1/2 h-9 text-custom-sm">
+    <div className={baseWrapClass}>
+        <div className="flex h-10 w-full max-w-[220px] items-center rounded-lg border border-gray-3 bg-white text-custom-sm">
             <button
                 type="button"
                 aria-label="button for remove product"

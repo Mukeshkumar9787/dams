@@ -12,6 +12,7 @@ import OrderStatusTimeline from "./OrderStatusHistory";
 import OrderInvoice from "./Invoice";
 import { useReactToPrint } from "react-to-print";
 import CourierDetails from "./CourierDetails";
+import { notifyError, notifySuccess } from "@/utils/notify";
 
 const OrderDetails = ({params}) => {
   const [data, setData] = useState(null);
@@ -51,7 +52,7 @@ const OrderDetails = ({params}) => {
     try {
       const response = await updateOrderStatusBySlugAdmin({slug: params.slug, ...statusInfo});
       if(response.success){
-        window.alert("Order status changed successfully");
+        notifySuccess("Order status changed successfully.");
         fetchOrder();
       }
     } catch (error) {
@@ -63,16 +64,16 @@ const OrderDetails = ({params}) => {
     try {
       e.preventDefault();
       if(!data?.additionalInfo?.courier){
-        window.alert("Please select courier");
+        notifyError("Please select courier.");
         return;
       }
       if(!data?.additionalInfo?.trackingId){
-        window.alert("Please enter tracking ID");
+        notifyError("Please enter tracking ID.");
         return;
       }
       const response = await updateOrderBySlugAdmin({slug: params.slug, additionalInfo: (data?.additionalInfo || {})});
       if(response.success){
-        window.alert("Courier Details changed successfully");
+        notifySuccess("Courier details changed successfully.");
         fetchOrder();
       }
     } catch (error) {

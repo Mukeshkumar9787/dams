@@ -2,6 +2,7 @@ import React from 'react'
 import countryList from "@/data/countries.json";
 import { Button } from 'antd';
 import State from './State';
+import { confirmAction } from '@/utils/notify';
 
 
 function Country({ country, setShipInfo, rowIndex }) {
@@ -15,8 +16,15 @@ function Country({ country, setShipInfo, rowIndex }) {
             return {...prev, countries: updatedCountries};
         })
     }
-    const handleRemove = () => {
-        if(country?.name && !window.confirm(`Do you want to remove country - ${country?.name}`)) return;
+    const handleRemove = async () => {
+        if(country?.name){
+            const isConfirmed = await confirmAction({
+                title: "Remove country?",
+                content: `Do you want to remove country "${country?.name}"?`,
+                okText: "Remove",
+            });
+            if(!isConfirmed) return;
+        }
         setShipInfo(prev => {
             const updatedCountries = prev.countries.filter((c, index) => index !== rowIndex);
             return {...prev, countries: updatedCountries};
@@ -42,7 +50,7 @@ function Country({ country, setShipInfo, rowIndex }) {
                     required
                     value={country?.name}
                     disabled={country?.states && (country?.states.length > 0)}
-                    className="w-full bg-gray-1 rounded-md border border-gray-3 py-3 pl-5 pr-9 outline-none focus:ring-2 focus:ring-blue/20"
+                    className="form-input"
                 >
                     <option value="">Select Country</option>
                     {countryList.map((country) => (
@@ -60,11 +68,11 @@ function Country({ country, setShipInfo, rowIndex }) {
                     min={0}
                     onChange={handleChange}
                     required
-                    className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                    className="form-input"
                 />
                 <div className="flex justify-end gap-1">
-                    <Button className="bg-red text-white p-5" onClick={handleRemove}>Remove</Button>
-                    <Button className="bg-blue text-white p-5" disabled={!country?.name} onClick={handleAddState}>Add State</Button>
+                    <Button className="bg-red text-white p-5 rounded-md" onClick={handleRemove}>Remove</Button>
+                    <Button className="bg-blue text-white p-5 rounded-md" disabled={!country?.name} onClick={handleAddState}>Add State</Button>
                 </div>
             </div>
             {stateList.length > 0 &&

@@ -1,5 +1,6 @@
 import { redirectToSignIn } from '@/utils/helper';
 import axios from 'axios';
+import { message } from 'antd';
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -34,7 +35,7 @@ axiosInstance.interceptors.response.use((response) => {
         redirectToSignIn();
       }
     }else{
-      window.alert(error?.response?.data?.errors || error?.response?.data?.message || 'Something went wrong');
+      message.error(error?.response?.data?.errors || error?.response?.data?.message || 'Something went wrong');
     }
   } catch (err) {}
   return  error?.response || { data: { success: false, message: "Something went wrong"}}

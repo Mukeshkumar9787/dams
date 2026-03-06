@@ -1,6 +1,7 @@
 import React from 'react'
 import countryList from "@/data/countries.json";
 import { Button } from 'antd';
+import { confirmAction } from '@/utils/notify';
 
 
 function State({ country, state, setShipInfo, countryIndex, rowIndex }) {
@@ -19,8 +20,15 @@ function State({ country, state, setShipInfo, countryIndex, rowIndex }) {
         })
     }
 
-    const handleRemove = () => {
-        if(state?.name && !window.confirm(`Do you want to remove state - ${state?.name} ?`)) return;
+    const handleRemove = async () => {
+        if(state?.name){
+            const isConfirmed = await confirmAction({
+                title: "Remove state?",
+                content: `Do you want to remove state "${state?.name}"?`,
+                okText: "Remove",
+            });
+            if(!isConfirmed) return;
+        }
         setShipInfo(prev => {
             const updatedCountries = prev.countries.map((prevCountry) => {
                 const prevStates = (prevCountry?.states || []);
@@ -37,7 +45,7 @@ function State({ country, state, setShipInfo, countryIndex, rowIndex }) {
                 value={state?.name}
                 onChange={handleChange}
                 required
-                className="w-full bg-gray-1 rounded-md border border-gray-3 py-3 pl-5 pr-9 outline-none focus:ring-2 focus:ring-blue/20"
+                className="form-input"
             >
                 <option value="">Select State</option>
                 {stateList.map((state) => (
@@ -54,9 +62,9 @@ function State({ country, state, setShipInfo, countryIndex, rowIndex }) {
                 min={0}
                 onChange={handleChange}
                 required
-                className="rounded-lg border border-gray-3 bg-gray-1 w-full py-3 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                className="form-input"
             />
-            <Button className="bg-red text-white p-5" onClick={handleRemove}>Remove</Button>
+            <Button className="bg-red text-white p-5 rounded-md" onClick={handleRemove}>Remove</Button>
         </div>
     )
 }

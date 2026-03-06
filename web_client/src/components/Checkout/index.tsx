@@ -14,6 +14,7 @@ import { removeAllItemsFromCart, removeItemFromCart } from "@/redux/features/car
 import { handlePayment } from "@/utils/payment";
 import { ORDER_URL } from "@/utils/appUrls";
 import Policy from "./Policy";
+import { notifyError } from "@/utils/notify";
 
 const initialCheckoutValues = {
   name: "",
@@ -215,7 +216,7 @@ const Checkout = () => {
           }
           await handlePayment({...orderResponse.data.payment, compInfo }, onPaymentSuccess);
         }else{
-          window.alert("Payment Failed");
+          notifyError("Payment failed.");
         }
       }else{
         fetchProducts();
@@ -229,7 +230,7 @@ const Checkout = () => {
   return (
     <>
       <Breadcrumb title={"Checkout"} pages={["checkout"]} />
-      <section className="overflow-hidden py-20 pt-5 bg-gray-2">
+      <section className="page-section bg-gray-2/60">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col lg:flex-row gap-7.5 xl:gap-11">
