@@ -354,7 +354,7 @@ const sendRestockNotifications = async ({ id, title, slug }) => {
             <p>Hi ${userName},</p>
             <p><strong>${title}</strong> is now back in stock.</p>
             ${productUrl
-              ? `<p>You can place your order here:</p><p><a href="${productUrl}" target="_blank" rel="noreferrer">${productUrl}</a></p>`
+              ? `<p>You can place your order here:</p><p><a href="${productUrl}" target="_blank" rel="noreferrer">${productUrl}</a></p><p style="margin-top:12px;"><a href="${productUrl}" target="_blank" rel="noreferrer" style="display:inline-flex;padding:10px 24px;border-radius:6px;background:#000;color:#fff;text-decoration:none;">View Product</a></p>`
               : `<p>Please open the store and search for "${title}" to place your order.</p>`}
             <p>Thanks,<br/>DAMS Team</p>
           </div>
