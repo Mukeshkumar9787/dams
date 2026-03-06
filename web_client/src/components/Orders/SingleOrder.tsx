@@ -46,7 +46,7 @@ const SingleOrder = ({ orderItem }: any) => {
           <div className="">
             <p className="text-custom-sm text-dark">
               <span className="font-bold pr-2">Total:</span>
-              {getCurrencyDetails().currencySymbol}{orderItem.price}
+              {getCurrencyDetails().currencySymbol}{orderItem.totalAmount}
             </p>
           </div>
           <div className="">

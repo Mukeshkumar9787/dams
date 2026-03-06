@@ -2,25 +2,16 @@
 import React, { useEffect, useState } from "react";
 import Breadcrumb from "../Common/Breadcrumb";
 import Image from "next/image";
-import AddressModal from "./AddressModal";
 import Orders from "../Orders";
 import { getLoggedInUserData, getMemberSince, logout } from "@/utils/helper";
 import { updateProfile } from "@/http/apiCalls";
 import { Button, Popconfirm } from "antd";
 import ResetPassword from "../Auth/ResetPassword";
+import Addresses from "./Addresses";
 
 const MyAccount = () => {
   const [activeTab, setActiveTab] = useState("orders");
-  const [addressModal, setAddressModal] = useState(false);
   const [user, setUser] = useState({});
-
-  const openAddressModal = () => {
-    setAddressModal(true);
-  };
-
-  const closeAddressModal = () => {
-    setAddressModal(false);
-  };
 
   
   useEffect(()=>{
@@ -149,6 +140,27 @@ const MyAccount = () => {
                       Orders
                     </button>
                     <button
+                      onClick={() => setActiveTab("addresses")}
+                      className={`flex items-center rounded-md gap-2.5 py-3 px-4.5 ease-out duration-200 hover:bg-blue hover:text-white ${
+                        activeTab === "addresses"
+                          ? "text-white bg-blue"
+                          : "text-dark-2 bg-gray-1"
+                      }`}
+                    >
+                      <svg
+                        className="fill-current"
+                        width="22"
+                        height="22"
+                        viewBox="0 0 22 22"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path d="M8.25065 15.8125C7.87096 15.8125 7.56315 16.1203 7.56315 16.5C7.56315 16.8797 7.87096 17.1875 8.25065 17.1875H13.7507C14.1303 17.1875 14.4382 16.8797 14.4382 16.5C14.4382 16.1203 14.1303 15.8125 13.7507 15.8125H8.25065Z" fill="" />
+                        <path fillRule="evenodd" clipRule="evenodd" d="M11.0007 1.14581C10.3515 1.14581 9.7618 1.33173 9.12199 1.64287C8.50351 1.94363 7.78904 2.38706 6.8966 2.94094L5.00225 4.11664C4.15781 4.6407 3.48164 5.06035 2.96048 5.45947C2.42079 5.87278 2.00627 6.29371 1.70685 6.84072C1.40806 7.38659 1.2735 7.96741 1.20899 8.65396C1.14647 9.31931 1.14648 10.1329 1.14648 11.1533V12.6315C1.14647 14.3767 1.14646 15.7543 1.28646 16.8315C1.43008 17.9364 1.73183 18.8284 2.41365 19.5336C3.0986 20.2421 3.97024 20.5587 5.04929 20.7087C6.0951 20.8542 7.43075 20.8542 9.11401 20.8541H12.8872C14.5705 20.8542 15.9062 20.8542 16.952 20.7087C18.0311 20.5587 18.9027 20.2421 19.5877 19.5336C20.2695 18.8284 20.5712 17.9364 20.7148 16.8315C20.8548 15.7543 20.8548 14.3768 20.8548 12.6315V11.1533C20.8548 10.1329 20.8548 9.31929 20.7923 8.65396C20.7278 7.96741 20.5932 7.38659 20.2944 6.84072C19.995 6.29371 19.5805 5.87278 19.0408 5.45947C18.5197 5.06035 17.8435 4.64071 16.9991 4.11665L15.1047 2.94093C14.2123 2.38706 13.4978 1.94363 12.8793 1.64287C12.2395 1.33173 11.6498 1.14581 11.0007 1.14581Z" fill="" />
+                      </svg>
+                      Addresses
+                    </button>
+                    <button
                       onClick={() => setActiveTab("account-details")}
                       className={`flex items-center rounded-md gap-2.5 py-3 px-4.5 ease-out duration-200 hover:bg-blue hover:text-white ${
                         activeTab === "account-details"
@@ -240,6 +252,13 @@ const MyAccount = () => {
           <!-- details tab content start --> */}
             <div
               className={`w-full ${
+                activeTab === "addresses" ? "block" : "hidden"
+              }`}
+            >
+              <Addresses />
+            </div>
+            <div
+              className={`w-full ${
                 activeTab === "account-details" ? "block" : "hidden"
               } flex justify-center`}
             >
@@ -306,8 +325,6 @@ const MyAccount = () => {
           </div>
         </div>
       </section>
-
-      <AddressModal isOpen={addressModal} closeModal={closeAddressModal} />
     </>
   );
 };

@@ -236,3 +236,13 @@ export const changeRoleSchema = Joi.object({
   userId: Joi.number().required(),
   role: Joi.string().valid(...Object.values(ROLE_TYPES)).required()
 });
+
+export const addressBodySchema = Joi.object({
+  name: Joi.string().min(1).max(100).required(),
+  mobile: Joi.string().min(1).max(12).required(),
+  address: Joi.string().min(1).max(100).required(),
+  city: Joi.string().min(1).max(100).required(),
+  pincode: Joi.string().min(1).max(100).required(),
+  country: Joi.string().min(1).max(100).required(),
+  state: Joi.string().min(1).max(100).required(),
+});

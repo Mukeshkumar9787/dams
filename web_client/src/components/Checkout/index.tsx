@@ -7,7 +7,7 @@ import Address from "./Address";
 import { ADDRESS_TYPES, CONFIG_KEYS, STATUS_TYPES } from "@/utils/constants";
 import Notes from "./Notes";
 import { AppDispatch, useAppSelector } from "@/redux/store";
-import { createOrder, getConfig, getProducts, verifyPayment } from "@/http/apiCalls";
+import { createAddress, createOrder, deleteAddress, getAddress, getConfig, getProducts, updateAddress, verifyPayment } from "@/http/apiCalls";
 import OrderList from "./OrderList";
 import { useDispatch } from "react-redux";
 import { removeAllItemsFromCart, removeItemFromCart } from "@/redux/features/cart-slice";
@@ -40,6 +40,7 @@ const Checkout = () => {
   const [isDiffBillAdd, setIsDiffBillAddress] = React.useState(false);
   const [productItems, setProductItems] = useState([]);
   const [checkoutValues, setCheckoutValues] = useState(initialCheckoutValues);
+  const [savedAddresses, setSavedAddresses] = useState([]);
   const [shippingInfo, setShippingInfo] = useState({country: '', state: ''});
   const [shipData, setShipData] = React.useState({});
   const [compInfo, setCompInfo] = React.useState({});
@@ -103,6 +104,16 @@ const Checkout = () => {
     }
   }, [cartItems]);
 
+  const fetchAddresses = useCallback(async () => {
+    try {
+      const response = await getAddress();
+      if (!response?.success) return;
+      setSavedAddresses(response?.data || []);
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
   useEffect(() => {
     fetchProducts();
   },[fetchProducts])
@@ -112,14 +123,73 @@ const Checkout = () => {
       let user = await getLoggedInUserData();
       if(!user) {
         redirectToSignIn("/checkout");
+        return;
       }
+      fetchAddresses();
     }
     navigateGuestUser();
-  },[]);
+  },[fetchAddresses]);
+
+  const isSameAddress = (current, existing) => {
+    const normalize = (value) => (value || "").toString().trim().toLowerCase();
+    return (
+      normalize(current.name) === normalize(existing.name) &&
+      normalize(current.mobile) === normalize(existing.mobile) &&
+      normalize(current.address) === normalize(existing.address) &&
+      normalize(current.city) === normalize(existing.city) &&
+      normalize(current.pincode) === normalize(existing.pincode) &&
+      normalize(current.country) === normalize(existing.country) &&
+      normalize(current.state) === normalize(existing.state)
+    );
+  };
+
+  const createShippingAddressIfNeeded = async () => {
+    const shippingAddress = {
+      name: checkoutValues.name,
+      mobile: checkoutValues.mobile,
+      address: checkoutValues.address,
+      city: checkoutValues.city,
+      pincode: checkoutValues.pincode,
+      country: checkoutValues.country,
+      state: checkoutValues.state,
+    };
+    const alreadyExists = savedAddresses.some((item) => isSameAddress(shippingAddress, item));
+    if (alreadyExists) return;
+
+    const response = await createAddress(shippingAddress);
+    if (!response?.success) {
+      throw new Error(response?.message || "Failed to save shipping address");
+    }
+    fetchAddresses();
+  };
+
+  const createBillingAddressIfNeeded = async () => {
+    if (!isDiffBillAdd) return;
+
+    const billingAddress = {
+      name: checkoutValues.billingName,
+      mobile: checkoutValues.billingMobile,
+      address: checkoutValues.billingAddress,
+      city: checkoutValues.billingCity,
+      pincode: checkoutValues.billingPincode,
+      country: checkoutValues.billingCountry,
+      state: checkoutValues.billingState,
+    };
+    const alreadyExists = savedAddresses.some((item) => isSameAddress(billingAddress, item));
+    if (alreadyExists) return;
+
+    const response = await createAddress(billingAddress);
+    if (!response?.success) {
+      throw new Error(response?.message || "Failed to save billing address");
+    }
+    fetchAddresses();
+  };
   
   const handleSubmit = async (e) => {
     try {
       e.preventDefault()
+      await createShippingAddressIfNeeded();
+      await createBillingAddressIfNeeded();
       const orderResponse = await createOrder({
         ...checkoutValues,
         shippingAmount,
@@ -172,12 +242,22 @@ const Checkout = () => {
                   setIsDiffBillAddress={setIsDiffBillAddress}
                   checkoutValues={checkoutValues}
                   setCheckoutValues={setCheckoutValues}
+                  savedAddresses={savedAddresses}
+                  onAddAddress={createAddress}
+                  onUpdateAddress={updateAddress}
+                  onDeleteAddress={deleteAddress}
+                  onRefreshAddresses={fetchAddresses}
                 />
                 {isDiffBillAdd && (
                   <Address
                     type={ADDRESS_TYPES.BILL}
                     checkoutValues={checkoutValues}
                     setCheckoutValues={setCheckoutValues}
+                    savedAddresses={savedAddresses}
+                    onAddAddress={createAddress}
+                    onUpdateAddress={updateAddress}
+                    onDeleteAddress={deleteAddress}
+                    onRefreshAddresses={fetchAddresses}
                   />
                 )}
                 <Notes checkoutValues={checkoutValues} setCheckoutValues={setCheckoutValues} />

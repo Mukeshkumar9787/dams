@@ -172,7 +172,22 @@ export async function updateProfile(data) {
 }
 
 export async function getAddress(data) {
-  const res = await axiosInstance.get(API_ADDRESS, data );
+  const res = await axiosInstance.get(API_ADDRESS, { params: data });
+  return res.data;
+}
+
+export async function createAddress(data) {
+  const res = await axiosInstance.post(API_ADDRESS, data );
+  return res.data;
+}
+
+export async function deleteAddress(id) {
+  const res = await axiosInstance.delete(`${API_ADDRESS}/${id}`);
+  return res.data;
+}
+
+export async function updateAddress(id, data) {
+  const res = await axiosInstance.patch(`${API_ADDRESS}/${id}`, data);
   return res.data;
 }
 

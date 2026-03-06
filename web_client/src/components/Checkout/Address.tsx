@@ -2,7 +2,27 @@ import React, { useEffect, useState } from "react";
 import countryList from "../../data/countries.json";
 import { getLoggedInUserData } from "@/utils/helper";
 import { ADDRESS_TYPES } from "@/utils/constants";
-import { Button } from "antd";
+import { Button, Modal, message } from "antd";
+
+const initialAddressValues = {
+  name: "",
+  mobile: "",
+  address: "",
+  city: "",
+  pincode: "",
+  country: "",
+  state: "",
+};
+
+const addressFieldLabels = {
+  name: "Name",
+  mobile: "Mobile",
+  address: "Address",
+  city: "City",
+  pincode: "Pincode",
+  country: "Country",
+  state: "State",
+};
 
 const Address = ({
   type = ADDRESS_TYPES.SHIP,
@@ -10,33 +30,40 @@ const Address = ({
   setIsDiffBillAddress = null,
   checkoutValues,
   setCheckoutValues,
+  savedAddresses = [],
+  onAddAddress = null,
+  onUpdateAddress = null,
+  onDeleteAddress = null,
+  onRefreshAddresses = null,
 }) => {
   const [userData, setUserData] = useState(null);
-  const isShip = type === ADDRESS_TYPES.SHIP;
-  const countryField = isShip ? "country" : "billingCountry";
-  const stateField = isShip ? "state" : "billingState";
-  const selectedCountry = checkoutValues?.[countryField] || "";
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [selectedSavedAddressId, setSelectedSavedAddressId] = useState(null);
+  const [deletingAddressId, setDeletingAddressId] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [savingAddress, setSavingAddress] = useState(false);
+  const [editingAddressId, setEditingAddressId] = useState(null);
+  const [modalValues, setModalValues] = useState(initialAddressValues);
 
-  const stateList = selectedCountry
-    ? countryList.find((i) => i.name === selectedCountry)?.states || []
+  const isShip = type === ADDRESS_TYPES.SHIP;
+  const isEditMode = Boolean(editingAddressId);
+  const modalStateList = modalValues.country
+    ? countryList.find((i) => i.name === modalValues.country)?.states || []
     : [];
 
   useEffect(() => {
     if (!localStorage.getItem("token")) return;
-
     const fetchUser = async () => {
       const userDataDetails = await getLoggedInUserData();
       if (userDataDetails) {
         setUserData(userDataDetails);
       }
     };
-
     fetchUser();
   }, []);
 
   useEffect(() => {
     if (!userData) return;
-
     setCheckoutValues((prev) => {
       const next = { ...prev };
       if (isShip) {
@@ -50,22 +77,168 @@ const Address = ({
     });
   }, [userData, isShip, setCheckoutValues]);
 
-  const handleInputChange = (field) => (e) => {
-    setCheckoutValues((prev) => ({ ...prev, [field]: e.target.value }));
-  };
+  const applySavedAddress = (selectedAddressId) => {
+    const selectedAddress = savedAddresses.find((item) => item.id === selectedAddressId);
+    if (!selectedAddress) return;
 
-  const handleCountryChange = (e) => {
-    const countryValue = e.target.value;
     setCheckoutValues((prev) => ({
       ...prev,
-      [countryField]: countryValue,
-      [stateField]: "",
+      [isShip ? "name" : "billingName"]: selectedAddress.name || "",
+      [isShip ? "mobile" : "billingMobile"]: selectedAddress.mobile || "",
+      [isShip ? "address" : "billingAddress"]: selectedAddress.address || "",
+      [isShip ? "city" : "billingCity"]: selectedAddress.city || "",
+      [isShip ? "pincode" : "billingPincode"]: selectedAddress.pincode || "",
+      [isShip ? "country" : "billingCountry"]: selectedAddress.country || "",
+      [isShip ? "state" : "billingState"]: selectedAddress.state || "",
     }));
+    setFieldErrors({});
   };
+
+  useEffect(() => {
+    if (!savedAddresses.length) {
+      setSelectedSavedAddressId(null);
+      return;
+    }
+
+    const preferredId = selectedSavedAddressId && savedAddresses.some((i) => i.id === selectedSavedAddressId)
+      ? selectedSavedAddressId
+      : savedAddresses[0].id;
+
+    setSelectedSavedAddressId(preferredId);
+    applySavedAddress(preferredId);
+  }, [isShip, savedAddresses]);
+
+  useEffect(() => {
+    if (savedAddresses.length) return;
+    setModalValues((prev) => ({
+      ...prev,
+      name: prev.name || checkoutValues?.[isShip ? "name" : "billingName"] || userData?.name || "",
+      mobile: prev.mobile || checkoutValues?.[isShip ? "mobile" : "billingMobile"] || userData?.mobile || "",
+    }));
+  }, [savedAddresses.length, isShip, checkoutValues, userData]);
 
   const getShippingHeading = () => {
     if (!isDiffBillAddress) return "Shipping & Billing";
     return "Shipping";
+  };
+
+  const openAddModal = () => {
+    setEditingAddressId(null);
+    setModalValues({
+      name: checkoutValues?.[isShip ? "name" : "billingName"] || userData?.name || "",
+      mobile: checkoutValues?.[isShip ? "mobile" : "billingMobile"] || userData?.mobile || "",
+      address: "",
+      city: "",
+      pincode: "",
+      country: "",
+      state: "",
+    });
+    setFieldErrors({});
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (item) => {
+    setEditingAddressId(item.id);
+    setModalValues({
+      name: item.name || "",
+      mobile: item.mobile || "",
+      address: item.address || "",
+      city: item.city || "",
+      pincode: item.pincode || "",
+      country: item.country || "",
+      state: item.state || "",
+    });
+    setFieldErrors({});
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingAddressId(null);
+    setModalValues(initialAddressValues);
+    setFieldErrors({});
+  };
+
+  const handleModalInputChange = (field) => (e) => {
+    if (fieldErrors[field]) {
+      setFieldErrors((prev) => ({ ...prev, [field]: "" }));
+    }
+    setModalValues((prev) => ({ ...prev, [field]: e.target.value }));
+  };
+
+  const handleModalCountryChange = (e) => {
+    const country = e.target.value;
+    setFieldErrors((prev) => ({ ...prev, country: "", state: "" }));
+    setModalValues((prev) => ({ ...prev, country, state: "" }));
+  };
+
+  const validateAddressValues = (values) => {
+    const nextErrors = {};
+    Object.keys(addressFieldLabels).forEach((field) => {
+      if (!values?.[field]?.toString().trim()) {
+        nextErrors[field] = `Please enter ${addressFieldLabels[field]}.`;
+      }
+    });
+    return nextErrors;
+  };
+
+  const renderFieldError = (field) => (
+    fieldErrors[field] ? <p className="mt-1 text-xs text-red">{fieldErrors[field]}</p> : null
+  );
+
+  const handleSaveAddress = async (e) => {
+    e?.preventDefault?.();
+    e?.stopPropagation?.();
+
+    const nextErrors = validateAddressValues(modalValues);
+    setFieldErrors(nextErrors);
+    if (Object.keys(nextErrors).length) {
+      return;
+    }
+
+    try {
+      setSavingAddress(true);
+      const response = isEditMode
+        ? await onUpdateAddress?.(editingAddressId, modalValues)
+        : await onAddAddress?.(modalValues);
+
+      if (!response?.success) {
+        message.error(response?.message || "Failed to save address.");
+        return;
+      }
+
+      await onRefreshAddresses?.();
+
+      const savedId = response?.data?.id || editingAddressId;
+      if (savedId) {
+        setSelectedSavedAddressId(savedId);
+        applySavedAddress(savedId);
+      }
+
+      closeModal();
+      message.success(isEditMode ? "Address updated." : "Address saved.");
+    } finally {
+      setSavingAddress(false);
+    }
+  };
+
+  const handleDeleteAddress = async (addressId) => {
+    if (!onDeleteAddress) return;
+    try {
+      setDeletingAddressId(addressId);
+      const response = await onDeleteAddress(addressId);
+      if (!response?.success) {
+        message.error(response?.message || "Failed to delete address.");
+        return;
+      }
+      await onRefreshAddresses?.();
+      if (selectedSavedAddressId === addressId) {
+        setSelectedSavedAddressId(null);
+      }
+      message.success("Address deleted.");
+    } finally {
+      setDeletingAddressId(null);
+    }
   };
 
   return (
@@ -75,172 +248,331 @@ const Address = ({
           {isShip ? getShippingHeading() : "Billing"} Address
         </h2>
 
-        <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5">
-          <div className="w-full">
-            <label className="block mb-2.5">
-              Name <span className="text-red">*</span>
-            </label>
-            <input
-              type="text"
-              name={isShip ? "name" : "billingName"}
-              value={checkoutValues?.[isShip ? "name" : "billingName"] || ""}
-              onChange={handleInputChange(isShip ? "name" : "billingName")}
-              placeholder="Enter name"
-              required
-              className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5 outline-none focus:ring-2 focus:ring-blue/20"
-            />
+        {!!savedAddresses.length && (
+          <div className="mb-5">
+            <div className="grid grid-cols-1 gap-3">
+              {savedAddresses.map((item) => {
+                const isSelected = selectedSavedAddressId === item.id;
+                return (
+                  <div
+                    key={item.id}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => {
+                      setSelectedSavedAddressId(item.id);
+                      applySavedAddress(item.id);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setSelectedSavedAddressId(item.id);
+                        applySavedAddress(item.id);
+                      }
+                    }}
+                    className={`w-full text-left rounded-md border p-4 transition ${
+                      isSelected
+                        ? "border-blue bg-blue/5"
+                        : "border-gray-3 bg-gray-1 hover:border-blue/40"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="font-medium text-dark">{item.name}</p>
+                        <p className="text-sm text-dark-4">{item.mobile}</p>
+                        <p className="text-sm text-dark-4">
+                          {`${item.address}, ${item.city}, ${item.state}, ${item.country} - ${item.pincode}`}
+                        </p>
+                      </div>
+                      <span
+                        className={`mt-1 h-4 w-4 rounded-full border ${
+                          isSelected ? "border-blue bg-blue" : "border-gray-4 bg-white"
+                        }`}
+                      />
+                    </div>
+                    <div className="mt-3 flex justify-end gap-4">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openEditModal(item);
+                        }}
+                        className="text-xs font-medium text-blue hover:underline"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteAddress(item.id);
+                        }}
+                        disabled={deletingAddressId === item.id}
+                        className={`text-xs font-medium ${
+                          deletingAddressId === item.id ? "text-gray-4" : "text-red hover:underline"
+                        }`}
+                      >
+                        {deletingAddressId === item.id ? "Deleting..." : "Delete"}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
+        )}
 
-          <div className="w-full">
-            <label className="block mb-2.5">
-              Mobile <span className="text-red">*</span>
-            </label>
-            <input
-              type="number"
-              name={isShip ? "mobile" : "billingMobile"}
-              value={checkoutValues?.[isShip ? "mobile" : "billingMobile"] || ""}
-              onChange={handleInputChange(isShip ? "mobile" : "billingMobile")}
-              placeholder="Enter mobile"
-              required
-              className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5 outline-none focus:ring-2 focus:ring-blue/20"
-            />
-          </div>
-        </div>
-
-        <div className="mb-5">
-          <label className="block mb-2.5">
-            Address <span className="text-red">*</span>
-          </label>
-          <textarea
-            name={isShip ? "address" : "billingAddress"}
-            rows={2}
-            value={checkoutValues?.[isShip ? "address" : "billingAddress"] || ""}
-            onChange={handleInputChange(isShip ? "address" : "billingAddress")}
-            placeholder="Enter Address"
-            required
-            className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5 outline-none focus:ring-2 focus:ring-blue/20"
-          />
-        </div>
-
-        <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5">
-          <div className="w-full">
-            <label className="block mb-2.5">
-              City <span className="text-red">*</span>
-            </label>
-            <input
-              type="text"
-              name={isShip ? "city" : "billingCity"}
-              value={checkoutValues?.[isShip ? "city" : "billingCity"] || ""}
-              onChange={handleInputChange(isShip ? "city" : "billingCity")}
-              placeholder="Enter city"
-              required
-              className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5 outline-none focus:ring-2 focus:ring-blue/20"
-            />
-          </div>
-
-          <div className="w-full">
-            <label className="block mb-2.5">
-              Pincode <span className="text-red">*</span>
-            </label>
-            <input
-              type="text"
-              name={isShip ? "pincode" : "billingPincode"}
-              value={checkoutValues?.[isShip ? "pincode" : "billingPincode"] || ""}
-              onChange={handleInputChange(isShip ? "pincode" : "billingPincode")}
-              placeholder="Enter pincode"
-              required
-              className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5 outline-none focus:ring-2 focus:ring-blue/20"
-            />
-          </div>
-        </div>
-
-        <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5">
-          <div className="w-full">
-            <label className="block mb-2.5">
-              Country <span className="text-red">*</span>
-            </label>
-            <select
-              name={isShip ? "country" : "billingCountry"}
-              onChange={handleCountryChange}
-              value={checkoutValues?.[countryField] || ""}
-              required
-              className="w-full bg-gray-1 rounded-md border border-gray-3 py-3 pl-5 pr-9 outline-none focus:ring-2 focus:ring-blue/20"
+        <div className="flex justify-end mb-5">
+          {savedAddresses.length > 0 && (
+            <button
+              type="button"
+              onClick={openAddModal}
+              className="inline-flex items-center rounded-md border border-blue px-4 py-2 text-sm font-medium text-blue hover:bg-blue/5"
             >
-              <option value="">Select Country</option>
-              {countryList.map((country) => (
-                <option key={country.name} value={country.name}>
-                  {country.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="w-full">
-            <label className="block mb-2.5">
-              State <span className="text-red">*</span>
-            </label>
-            <select
-              onChange={handleInputChange(stateField)}
-              value={checkoutValues?.[stateField] || ""}
-              name={isShip ? "state" : "billingState"}
-              required
-              className="w-full bg-gray-1 rounded-md border border-gray-3 py-3 pl-5 pr-9 outline-none focus:ring-2 focus:ring-blue/20"
-            >
-              <option value="">Select State</option>
-              {stateList.map((state) => (
-                <option key={state.name} value={state.name}>
-                  {state.name}
-                </option>
-              ))}
-            </select>
-          </div>
+              Add New Address
+            </button>
+          )}
         </div>
 
-        {isShip
-          ?
-          (<div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5 items-center justify-center">
-            { (!isDiffBillAddress) && 
-              <div className="w-full">
-                <label className="block mb-2.5">
-                  GST no.
-                </label>
+        {!savedAddresses.length && (
+          <div>
+            <h3 className="font-medium text-lg text-dark mb-4">New Address</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
                 <input
                   type="text"
-                  name={'gstNo'}
-                  value={checkoutValues?.gstNo || ""}
-                  onChange={handleInputChange("gstNo")}
-                  placeholder="Enter GST no."
-                  className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                  required
+                  value={modalValues.name}
+                  onChange={handleModalInputChange("name")}
+                  placeholder="Name"
+                  className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
                 />
+                {renderFieldError("name")}
               </div>
-            }
+              <div>
+                <input
+                  type="text"
+                  required
+                  value={modalValues.mobile}
+                  onChange={handleModalInputChange("mobile")}
+                  placeholder="Mobile"
+                  className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+                />
+                {renderFieldError("mobile")}
+              </div>
+            </div>
+            <div className="mb-4">
+              <textarea
+                required
+                rows={2}
+                value={modalValues.address}
+                onChange={handleModalInputChange("address")}
+                placeholder="Address"
+                className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+              />
+              {renderFieldError("address")}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <input
+                  type="text"
+                  required
+                  value={modalValues.city}
+                  onChange={handleModalInputChange("city")}
+                  placeholder="City"
+                  className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+                />
+                {renderFieldError("city")}
+              </div>
+              <div>
+                <input
+                  type="text"
+                  required
+                  value={modalValues.pincode}
+                  onChange={handleModalInputChange("pincode")}
+                  placeholder="Pincode"
+                  className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+                />
+                {renderFieldError("pincode")}
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div>
+                <select
+                  required
+                  value={modalValues.country}
+                  onChange={handleModalCountryChange}
+                  className="w-full bg-gray-1 rounded-md border border-gray-3 py-3 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+                >
+                  <option value="">Select Country</option>
+                  {countryList.map((country) => (
+                    <option key={country.name} value={country.name}>
+                      {country.name}
+                    </option>
+                  ))}
+                </select>
+                {renderFieldError("country")}
+              </div>
+              <div>
+                <select
+                  required
+                  value={modalValues.state}
+                  onChange={handleModalInputChange("state")}
+                  className="w-full bg-gray-1 rounded-md border border-gray-3 py-3 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+                >
+                  <option value="">Select State</option>
+                  {modalStateList.map((state) => (
+                    <option key={state.name} value={state.name}>
+                      {state.name}
+                    </option>
+                  ))}
+                </select>
+                {renderFieldError("state")}
+              </div>
+            </div>
+            <div className="mb-5 flex justify-end">
+              <button
+                type="button"
+                onClick={handleSaveAddress}
+                disabled={savingAddress}
+                className={`inline-flex items-center rounded-md px-4 py-2 text-sm font-medium text-white ${
+                  savingAddress ? "bg-gray-4" : "bg-blue"
+                }`}
+              >
+                {savingAddress ? "Saving..." : "Save Address"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {isShip && (
+          <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-2 items-center justify-center">
             <div className="w-full">
-              <Button type="link" onClick={() => { setIsDiffBillAddress(prev => !prev) }}>
+              <Button type="link" onClick={() => { setIsDiffBillAddress((prev) => !prev); }}>
                 Is Different Billing Address ?
                 <input className="ml-3" type="checkbox" checked={isDiffBillAddress} readOnly />
               </Button>
             </div>
-          </div>)
-          :
-          (<div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5 items-center justify-center">
-            <div className="w-full">
-              <label className="block mb-2.5">
-                GST no.
-              </label>
+          </div>
+        )}
+      </div>
+
+      <Modal
+        title={isEditMode ? "Edit Address" : "Add New Address"}
+        open={isModalOpen && savedAddresses.length > 0}
+        centered
+        onCancel={closeModal}
+        footer={null}
+        destroyOnHidden
+      >
+        <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
               <input
                 type="text"
-                name={'gstNo'}
-                value={checkoutValues?.gstNo || ""}
-                onChange={handleInputChange("gstNo")}
-                placeholder="Enter GST no."
-                className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-5 outline-none focus:ring-2 focus:ring-blue/20"
+                required
+                value={modalValues.name}
+                onChange={handleModalInputChange("name")}
+                placeholder="Name"
+                className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
               />
+              {renderFieldError("name")}
             </div>
-            <div className="w-full"></div>
-          </div>)
-        }
-        
-      </div>
+            <div>
+              <input
+                type="text"
+                required
+                value={modalValues.mobile}
+                onChange={handleModalInputChange("mobile")}
+                placeholder="Mobile"
+                className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+              />
+              {renderFieldError("mobile")}
+            </div>
+          </div>
+          <div className="mb-4">
+            <textarea
+              required
+              rows={2}
+              value={modalValues.address}
+              onChange={handleModalInputChange("address")}
+              placeholder="Address"
+              className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+            />
+            {renderFieldError("address")}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <input
+                type="text"
+                required
+                value={modalValues.city}
+                onChange={handleModalInputChange("city")}
+                placeholder="City"
+                className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+              />
+              {renderFieldError("city")}
+            </div>
+            <div>
+              <input
+                type="text"
+                required
+                value={modalValues.pincode}
+                onChange={handleModalInputChange("pincode")}
+                placeholder="Pincode"
+                className="rounded-md border border-gray-3 bg-gray-1 w-full py-2.5 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+              />
+              {renderFieldError("pincode")}
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div>
+              <select
+                required
+                value={modalValues.country}
+                onChange={handleModalCountryChange}
+                className="w-full bg-gray-1 rounded-md border border-gray-3 py-3 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+              >
+                <option value="">Select Country</option>
+                {countryList.map((country) => (
+                  <option key={country.name} value={country.name}>
+                    {country.name}
+                  </option>
+                ))}
+              </select>
+              {renderFieldError("country")}
+            </div>
+            <div>
+              <select
+                required
+                value={modalValues.state}
+                onChange={handleModalInputChange("state")}
+                className="w-full bg-gray-1 rounded-md border border-gray-3 py-3 px-4 outline-none focus:ring-2 focus:ring-blue/20"
+              >
+                <option value="">Select State</option>
+                {modalStateList.map((state) => (
+                  <option key={state.name} value={state.name}>
+                    {state.name}
+                  </option>
+                ))}
+              </select>
+              {renderFieldError("state")}
+            </div>
+          </div>
+          <div className="flex justify-end gap-3">
+            <button type="button" onClick={closeModal} className="px-4 py-2 rounded-md border border-gray-3 text-dark-4">
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleSaveAddress}
+              disabled={savingAddress}
+              className={`px-5 py-2 rounded-md text-white ${savingAddress ? "bg-gray-4" : "bg-blue"}`}
+            >
+              {savingAddress ? "Saving..." : isEditMode ? "Update Address" : "Save Address"}
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };
