@@ -24,3 +24,4 @@ export const GET_ACTIVE_API = (API, params) => (params?.status === STATUS_TYPES.
 export const API_ADMIN_ORDERS = `${API_ORDERS}/admin`
 export const API_PAYMENT_VERIFY = `${API_ORDERS}/payment/verify`;
 export const API_CONFIG = '/config';
+export const API_CART = '/cart';

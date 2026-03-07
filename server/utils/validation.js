@@ -246,3 +246,14 @@ export const addressBodySchema = Joi.object({
   country: Joi.string().min(1).max(100).required(),
   state: Joi.string().min(1).max(100).required(),
 });
+
+export const replaceCartSchema = Joi.object({
+  items: Joi.array()
+    .items(
+      Joi.object({
+        productId: Joi.number().integer().positive().required(),
+        quantity: Joi.number().integer().min(0).required(),
+      })
+    )
+    .required(),
+});

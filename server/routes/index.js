@@ -10,6 +10,7 @@ import userRoutes from "./users.js"
 import orderRoutes from "./orders.js"
 import configRoutes from "./config.js"
 import addressRoutes from "./address.js"
+import cartRoutes from "./cart.js"
 import { getAuthMiddleware } from "../middlewares/authMiddleware.js";
 import { ROLE_TYPES } from "../utils/constants.js";
 import { paginationMiddleware } from "../middlewares/paginationValidationMiddleware.js";
@@ -43,6 +44,8 @@ router.use("/users",getAuthMiddleware(), userRoutes);
 router.use("/orders", orderRoutes);
 
 router.use("/address", getAuthMiddleware(), addressRoutes);
+
+router.use("/cart", cartRoutes);
 
 router.use("/config", configRoutes);
 

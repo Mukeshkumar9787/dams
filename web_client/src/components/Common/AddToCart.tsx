@@ -108,7 +108,7 @@ const AddToCart = ({ id, align='center', stack = true, purchase = true, stock=0,
     }
   return (
     <div className={baseWrapClass}>
-        <div className="flex h-10 w-full max-w-[220px] items-center rounded-lg border border-gray-3 bg-white text-custom-sm">
+        <div className="flex h-10 w-1/2 max-w-[220px] items-center rounded-lg border border-gray-3 bg-white text-custom-sm">
             <button
                 type="button"
                 aria-label="button for remove product"

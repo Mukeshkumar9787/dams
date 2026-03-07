@@ -77,7 +77,9 @@ export const logout = () => {
 }
 
 export const redirectToSignIn = (next=null) => {
-  localStorage.clear();
+  // Keep persisted cart/wishlist and only clear auth/session markers.
+  localStorage.removeItem('token');
+  localStorage.removeItem('loginToProceed');
   if(next){
     localStorage.setItem("next", next);
   }else{

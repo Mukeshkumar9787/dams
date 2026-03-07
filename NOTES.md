@@ -1,0 +1,1 @@
+- Do not generate `migration.sql` while changing Prisma schema files.

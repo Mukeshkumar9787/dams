@@ -16,6 +16,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 
 import ScrollToTop from "@/components/Common/ScrollToTop";
 import PreLoader from "@/components/Common/PreLoader";
+import CartSync from "@/components/Common/CartSync";
 
 export default function RootLayout({
   children,
@@ -38,6 +39,7 @@ export default function RootLayout({
           <>
             <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
               <ReduxProvider>
+                <CartSync />
                 <CartModalProvider>
                   <ModalProvider>
                     <PreviewSliderProvider>
