@@ -263,3 +263,12 @@ export const replaceWishlistSchema = Joi.object({
     .items(Joi.number().integer().positive())
     .required(),
 });
+
+export const productReviewSchema = Joi.object({
+  rating: Joi.number().integer().min(1).max(5).required(),
+  comment: Joi.string().max(1000).allow("").optional(),
+});
+
+export const reviewVisibilitySchema = Joi.object({
+  isHidden: Joi.boolean().required(),
+});

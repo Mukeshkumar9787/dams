@@ -2,13 +2,13 @@
 
 import Breadcrumb from "@/components/Common/Breadcrumb";
 import FileUploader from "@/components/Common/FileUploader";
-import { createProduct, deleteProduct, getCategories, getColors, getHsnCodes, getProductBySlug, getSizes, updateProduct } from "@/http/apiCalls";
+import { createProduct, deleteProduct, getCategories, getColors, getHsnCodes, getProductBySlug, getProductReviewsForAdmin, getSizes, updateProduct, updateProductReviewVisibility } from "@/http/apiCalls";
 import { STATUS_TYPES } from "@/utils/constants";
 import { PRODUCT_URL } from "@/utils/appUrls";
 import React from "react";
 import { useRouter } from "next/navigation";
 import { Select } from "antd";
-import { confirmAction, notifyError } from "@/utils/notify";
+import { confirmAction, notifyError, notifySuccess } from "@/utils/notify";
 
 const ProductForm = ({ params }) => {
   const router = useRouter();
@@ -28,6 +28,7 @@ const ProductForm = ({ params }) => {
   const [mrp, setMrp] = React.useState(1);
   const [price, setPrice] = React.useState(1);
   const [stock, setStock] = React.useState(1);
+  const [reviews, setReviews] = React.useState([]);
   const tax = hsnItems.find(i => i.id == hsnId)?.tax || 0;
   const fileIdsRef = React.useRef(new Set());
   const deletedFileIdsRef = React.useRef(new Set());
@@ -86,6 +87,15 @@ const ProductForm = ({ params }) => {
   }, []);
 
   let isNew = params.slug === 'new';
+
+  const fetchReviews = async (productId) => {
+    try {
+      const data = await getProductReviewsForAdmin(productId);
+      setReviews(data?.data || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
 
   const handleSubmit = async (e) => {
@@ -146,6 +156,7 @@ const ProductForm = ({ params }) => {
         setMrp(editDataRef.current.mrp);
         setPrice(editDataRef.current.price);
         setStock(editDataRef.current.stock);
+        fetchReviews(editDataRef.current.id);
       } catch (err) {
         console.error(err);
       }
@@ -153,6 +164,14 @@ const ProductForm = ({ params }) => {
 
     fetchProduct();
     }, []);
+
+  const handleToggleReviewVisibility = async (review) => {
+    const response = await updateProductReviewVisibility(review.id, !review.isHidden);
+    if (response?.success) {
+      notifySuccess(`Review ${review.isHidden ? "unhidden" : "hidden"} successfully.`);
+      fetchReviews(editDataRef.current.id);
+    }
+  };
   
 
   return (
@@ -365,6 +384,39 @@ const ProductForm = ({ params }) => {
               }
               </div>
             </form>
+
+            {!isNew && (
+              <div className="mt-10 border-t border-gray-3 pt-6">
+                <h3 className="text-lg font-semibold text-dark mb-4">Reviews</h3>
+                {reviews.length === 0 ? (
+                  <p className="text-sm text-dark-4">No reviews yet.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {reviews.map((review) => (
+                      <div key={review.id} className="rounded-lg border border-gray-3 p-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <p className="font-medium text-dark">{review?.user?.name || "User"}</p>
+                            <p className="text-sm text-dark-4">Rating: {review.rating}/5</p>
+                            {review.comment && <p className="text-sm text-dark mt-1">{review.comment}</p>}
+                            <p className={`text-xs mt-1 ${review.isHidden ? "text-red" : "text-green"}`}>
+                              {review.isHidden ? "Hidden" : "Visible"}
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleToggleReviewVisibility(review)}
+                            className={`rounded-md px-3 py-1.5 text-white ${review.isHidden ? "bg-blue hover:bg-blue-dark" : "bg-red hover:opacity-90"}`}
+                          >
+                            {review.isHidden ? "Unhide" : "Hide"}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
           </div>
         </div>

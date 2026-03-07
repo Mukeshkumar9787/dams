@@ -1,5 +1,5 @@
 
-import { API_ADDRESS, API_ADMIN_ORDERS, API_CART, API_CATEGORIES, API_COLOR, API_CONFIG, API_FILES, API_HSN, API_LOGIN, API_LOGIN_WITH_OTP, API_ORDERS, API_PAYMENT_VERIFY, API_PRODUCTS, API_PRODUCTS_NOTIFY, API_REGISTER, API_RESET_PASSWORD, API_SIZE, API_USER_INFO, API_USER_UPDATE_PROFILE, API_USERS, API_USERS_ROLE, API_VERIFY_GOOGLE_TOKEN, API_VERIFY_OTP, API_WISHLIST, GET_ACTIVE_API } from './apiUrls';
+import { API_ADDRESS, API_ADMIN_ORDERS, API_CART, API_CATEGORIES, API_COLOR, API_CONFIG, API_FILES, API_HSN, API_LOGIN, API_LOGIN_WITH_OTP, API_ORDERS, API_PAYMENT_VERIFY, API_PRODUCTS, API_PRODUCTS_NOTIFY, API_PRODUCT_REVIEWS, API_PRODUCT_REVIEWS_ADMIN, API_PRODUCT_REVIEW_ME, API_PRODUCT_REVIEW_SELF, API_PRODUCT_REVIEW_VISIBILITY, API_REGISTER, API_RESET_PASSWORD, API_SIZE, API_USER_INFO, API_USER_UPDATE_PROFILE, API_USERS, API_USERS_ROLE, API_VERIFY_GOOGLE_TOKEN, API_VERIFY_OTP, API_WISHLIST, GET_ACTIVE_API } from './apiUrls';
 import axiosInstance from './axiosInstance';
 
 export async function getCategories(params) {
@@ -63,6 +63,41 @@ export async function deleteProduct(data) {
 
 export async function notifyProductWhenInStock(productId) {
   const res = await axiosInstance.post(API_PRODUCTS_NOTIFY(productId));
+  return res?.data || {};
+}
+
+export async function getProductReviews(productId) {
+  const res = await axiosInstance.get(API_PRODUCT_REVIEWS(productId));
+  return res?.data || {};
+}
+
+export async function addProductReview(productId, data) {
+  const res = await axiosInstance.post(API_PRODUCT_REVIEWS(productId), data);
+  return res?.data || {};
+}
+
+export async function getMyProductReview(productId) {
+  const res = await axiosInstance.get(API_PRODUCT_REVIEW_ME(productId));
+  return res?.data || {};
+}
+
+export async function updateMyProductReview(reviewId, data) {
+  const res = await axiosInstance.patch(API_PRODUCT_REVIEW_SELF(reviewId), data);
+  return res?.data || {};
+}
+
+export async function deleteMyProductReview(reviewId) {
+  const res = await axiosInstance.delete(API_PRODUCT_REVIEW_SELF(reviewId));
+  return res?.data || {};
+}
+
+export async function getProductReviewsForAdmin(productId) {
+  const res = await axiosInstance.get(API_PRODUCT_REVIEWS_ADMIN(productId));
+  return res?.data || {};
+}
+
+export async function updateProductReviewVisibility(reviewId, isHidden) {
+  const res = await axiosInstance.patch(API_PRODUCT_REVIEW_VISIBILITY(reviewId), { isHidden });
   return res?.data || {};
 }
 

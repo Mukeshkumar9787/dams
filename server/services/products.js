@@ -144,7 +144,7 @@ const getProductBySlug = async (slug) => {
     err.statusCode = 404;
     throw err;
   }
-  const [stockQty, images] = await Promise.all([
+  const [stockQty, images, reviewAgg] = await Promise.all([
       getProductStockById({ productId: product.id}),
       prisma.file.findMany({
       select: {
@@ -156,7 +156,19 @@ const getProductBySlug = async (slug) => {
         featureId: product.id
       },
       orderBy: [{ createdAt: 'asc' }]
-    })
+    }),
+    prisma.productReview.aggregate({
+      where: {
+        productId: product.id,
+        isHidden: false,
+      },
+      _avg: {
+        rating: true,
+      },
+      _count: {
+        _all: true,
+      },
+    }),
   ]);
   product.images = images.map(i => {
     if(i.path){
@@ -167,6 +179,8 @@ const getProductBySlug = async (slug) => {
   product.colorCode = product.Color.code;
   product.sizeTitle = product.Size.title;
   product.stock = stockQty;
+  product.avgRating = Number(reviewAgg?._avg?.rating || 0);
+  product.reviewCount = Number(reviewAgg?._count?._all || 0);
   product.Color = undefined;
   product.Size = undefined;
   return product;
@@ -309,6 +323,141 @@ const subscribeProductRestockNotification = async ({ productId, user }) => {
   return { message: "You will be notified when this product is back in stock." };
 };
 
+const getProductReviews = async ({ productId, includeHidden = false }) => {
+  const product = await prisma.product.findUnique({ where: { id: productId } });
+  if (!product) {
+    const err = new Error("Product not found");
+    err.statusCode = 404;
+    throw err;
+  }
+
+  const reviews = await prisma.productReview.findMany({
+    where: {
+      productId,
+      isHidden: includeHidden ? undefined : false,
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+    orderBy: [{ createdAt: "desc" }],
+  });
+
+  return reviews;
+};
+
+const getProductReviewByUser = async ({ productId, userId }) => {
+  const product = await prisma.product.findUnique({ where: { id: productId } });
+  if (!product) {
+    const err = new Error("Product not found");
+    err.statusCode = 404;
+    throw err;
+  }
+
+  const reviews = await prisma.productReview.findMany({
+    where: { userId, productId },
+    orderBy: [{ createdAt: "desc" }],
+  });
+
+  return reviews;
+};
+
+const getProductReviewStats = async (productId) => {
+  const agg = await prisma.productReview.aggregate({
+    where: {
+      productId,
+      isHidden: false,
+    },
+    _avg: {
+      rating: true,
+    },
+    _count: {
+      _all: true,
+    },
+  });
+  return {
+    avgRating: Number(agg?._avg?.rating || 0),
+    reviewCount: Number(agg?._count?._all || 0),
+  };
+};
+
+const addOrUpdateProductReview = async ({ productId, userId, rating, comment = "" }) => {
+  const product = await prisma.product.findUnique({ where: { id: productId } });
+  if (!product) {
+    const err = new Error("Product not found");
+    err.statusCode = 404;
+    throw err;
+  }
+
+  const review = await prisma.productReview.create({
+    data: {
+      userId,
+      productId,
+      rating,
+      comment: comment || null,
+      isHidden: false,
+    },
+  });
+
+  const stats = await getProductReviewStats(productId);
+  return { review, ...stats };
+};
+
+const updateProductReviewByUser = async ({ reviewId, userId, rating, comment = "" }) => {
+  const review = await prisma.productReview.findUnique({
+    where: { id: reviewId },
+  });
+
+  if (!review || review.userId !== userId) {
+    const err = new Error("Review not found");
+    err.statusCode = 404;
+    throw err;
+  }
+
+  const updatedReview = await prisma.productReview.update({
+    where: { id: reviewId },
+    data: {
+      rating,
+      comment: comment || null,
+      isHidden: false,
+    },
+  });
+
+  const stats = await getProductReviewStats(review.productId);
+  return { review: updatedReview, ...stats };
+};
+
+const deleteProductReviewByUser = async ({ reviewId, userId }) => {
+  const review = await prisma.productReview.findUnique({
+    where: { id: reviewId },
+  });
+
+  if (!review || review.userId !== userId) {
+    const err = new Error("Review not found");
+    err.statusCode = 404;
+    throw err;
+  }
+
+  await prisma.productReview.delete({
+    where: { id: review.id },
+  });
+
+  const stats = await getProductReviewStats(review.productId);
+  return { reviewId: review.id, ...stats };
+};
+
+const updateProductReviewVisibility = async ({ reviewId, isHidden }) => {
+  const review = await prisma.productReview.update({
+    where: { id: reviewId },
+    data: { isHidden },
+  });
+  return review;
+};
+
 const sendRestockNotifications = async ({ id, title, slug }) => {
   const subscriptions = await prisma.productNotification.findMany({
     where: {
@@ -383,4 +532,10 @@ export default {
   getProductStockById,
   getProductById,
   subscribeProductRestockNotification,
+  getProductReviews,
+  getProductReviewByUser,
+  addOrUpdateProductReview,
+  updateProductReviewByUser,
+  deleteProductReviewByUser,
+  updateProductReviewVisibility,
 };

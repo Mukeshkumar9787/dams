@@ -37,9 +37,9 @@ const RecentlyViewdItems = ({ product }) => {
     fetchProducts();
   },[])
 
-  // if (shopData.length === 0) {
-  //   return null;
-  // }
+  if (shopData.length === 0) {
+    return null;
+  }
 
   return (
     <section className="overflow-hidden pt-17.5">
