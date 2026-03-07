@@ -37,6 +37,10 @@ const RecentlyViewdItems = ({ product }) => {
     fetchProducts();
   },[])
 
+  // if (shopData.length === 0) {
+  //   return null;
+  // }
+
   return (
     <section className="overflow-hidden pt-17.5">
       <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0 pb-15 border-b border-gray-3">
@@ -51,11 +55,8 @@ const RecentlyViewdItems = ({ product }) => {
                   height={17}
                   alt="icon"
                 />
-                Categories
+                Similar Products
               </span>
-              <h2 className="font-semibold text-xl xl:text-heading-5 text-dark">
-                 Similar Products
-              </h2>
             </div>
 
             <div className="flex items-center gap-3">

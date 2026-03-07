@@ -1,5 +1,5 @@
 
-import { API_ADDRESS, API_ADMIN_ORDERS, API_CART, API_CATEGORIES, API_COLOR, API_CONFIG, API_FILES, API_HSN, API_LOGIN, API_LOGIN_WITH_OTP, API_ORDERS, API_PAYMENT_VERIFY, API_PRODUCTS, API_PRODUCTS_NOTIFY, API_REGISTER, API_RESET_PASSWORD, API_SIZE, API_USER_INFO, API_USER_UPDATE_PROFILE, API_USERS, API_USERS_ROLE, API_VERIFY_GOOGLE_TOKEN, API_VERIFY_OTP, GET_ACTIVE_API } from './apiUrls';
+import { API_ADDRESS, API_ADMIN_ORDERS, API_CART, API_CATEGORIES, API_COLOR, API_CONFIG, API_FILES, API_HSN, API_LOGIN, API_LOGIN_WITH_OTP, API_ORDERS, API_PAYMENT_VERIFY, API_PRODUCTS, API_PRODUCTS_NOTIFY, API_REGISTER, API_RESET_PASSWORD, API_SIZE, API_USER_INFO, API_USER_UPDATE_PROFILE, API_USERS, API_USERS_ROLE, API_VERIFY_GOOGLE_TOKEN, API_VERIFY_OTP, API_WISHLIST, GET_ACTIVE_API } from './apiUrls';
 import axiosInstance from './axiosInstance';
 
 export async function getCategories(params) {
@@ -273,5 +273,15 @@ export async function getCart() {
 
 export async function replaceCart(items) {
   const res = await axiosInstance.put(API_CART, { items });
+  return res?.data || {};
+}
+
+export async function getWishlist() {
+  const res = await axiosInstance.get(API_WISHLIST);
+  return res?.data || {};
+}
+
+export async function replaceWishlist(items) {
+  const res = await axiosInstance.put(API_WISHLIST, { items });
   return res?.data || {};
 }

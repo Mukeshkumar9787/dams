@@ -257,3 +257,9 @@ export const replaceCartSchema = Joi.object({
     )
     .required(),
 });
+
+export const replaceWishlistSchema = Joi.object({
+  items: Joi.array()
+    .items(Joi.number().integer().positive())
+    .required(),
+});

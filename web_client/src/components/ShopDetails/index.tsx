@@ -7,6 +7,7 @@ import { getProductBySlug } from "@/http/apiCalls";
 import { getCurrencyDetails, getOfferPercent } from "@/utils/helper";
 import AddToCart from "../Common/AddToCart";
 import AvailableStock from "../Common/AvailableStock";
+import WishlistButton from "../Common/WishlistButton";
 
 const ShopDetails = ({params}) => {
   const [product, setProduct] = useState(null);
@@ -78,8 +79,11 @@ const ShopDetails = ({params}) => {
                       {product.title}
                     </h2>
 
-                    <div className="inline-flex font-medium text-custom-sm text-white bg-blue rounded py-0.5 px-2.5">
-                      {getOfferPercent(product.mrp, product.price)}% OFF
+                    <div className="flex items-center gap-2">
+                      <div className="inline-flex font-medium text-custom-sm text-white bg-blue rounded py-0.5 px-2.5">
+                        {getOfferPercent(product.mrp, product.price)}% OFF
+                      </div>
+                      <WishlistButton productId={product.id} compact />
                     </div>
                   </div>
 
@@ -308,7 +312,7 @@ const ShopDetails = ({params}) => {
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center w-full">
+                    <div className="flex flex-wrap items-center w-full gap-3">
                       <AddToCart align="right" id={product.id} stack={false} stock={product.stock} />
                     </div>
                 </div>

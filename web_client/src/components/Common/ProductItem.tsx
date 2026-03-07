@@ -5,6 +5,7 @@ import Link from "next/link";
 import { getCurrencyDetails } from "@/utils/helper";
 import AddToCart from "./AddToCart";
 import AvailableStock from "./AvailableStock";
+import WishlistButton from "./WishlistButton";
 
 
 const ProductItem = ({ item }: { item: Product }) => {
@@ -26,6 +27,9 @@ const ProductItem = ({ item }: { item: Product }) => {
                 {discount}% OFF
               </span>
             )}
+            <div className="absolute right-3 top-3 z-10">
+              <WishlistButton productId={item.id} compact />
+            </div>
           </div>
           <h3 className="line-clamp-2 text-base font-semibold text-dark ease-out duration-200 hover:text-blue mb-1.5 mt-3.5">
             {item.title}

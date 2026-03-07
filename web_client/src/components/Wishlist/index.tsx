@@ -1,11 +1,34 @@
 "use client";
 import React from "react";
 import Breadcrumb from "../Common/Breadcrumb";
-import { useAppSelector } from "@/redux/store";
+import { AppDispatch, useAppSelector } from "@/redux/store";
 import SingleItem from "./SingleItem";
+import { useDispatch } from "react-redux";
+import { removeAllItemsFromWishlist } from "@/redux/features/wishlist-slice";
+import { getProducts } from "@/http/apiCalls";
+import { STATUS_TYPES } from "@/utils/constants";
 
 export const Wishlist = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const wishlistItems = useAppSelector((state) => state.wishlistReducer.items);
+  const [productItems, setProductItems] = React.useState([]);
+
+  const fetchProducts = React.useCallback(async () => {
+    if (wishlistItems.length === 0) {
+      setProductItems([]);
+      return;
+    }
+    const data = await getProducts({
+      productIds: wishlistItems.map((i) => i.id),
+      pagination: false,
+      status: STATUS_TYPES.ACTIVE,
+    });
+    setProductItems(data?.data || []);
+  }, [wishlistItems]);
+
+  React.useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   return (
     <>
@@ -14,7 +37,9 @@ export const Wishlist = () => {
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
           <div className="flex flex-wrap items-center justify-between gap-5 mb-7.5">
             <h2 className="font-medium text-dark text-2xl">Your Wishlist</h2>
-            <button className="text-blue">Clear Wishlist Cart</button>
+            <button className="text-blue" onClick={() => dispatch(removeAllItemsFromWishlist())}>
+              Clear Wishlist
+            </button>
           </div>
 
           <div className="bg-white rounded-[10px] shadow-1">
@@ -41,7 +66,7 @@ export const Wishlist = () => {
                 </div>
 
                 {/* <!-- wish item --> */}
-                {wishlistItems.map((item, key) => (
+                {productItems.map((item, key) => (
                   <SingleItem item={item} key={key} />
                 ))}
               </div>
