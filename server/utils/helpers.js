@@ -226,26 +226,37 @@ export const sendOrderDisputeMail = async ({
   orderNo,
   customerName,
   message,
+  isEditing = false,
+  updatedAt = null,
 }) => {
   const adminUsers = await userService.getUsers({ role: ROLE_TYPES.ADMIN });
   if (!adminUsers?.length) return;
 
   const appName = await getAppName();
   const orderLink = `${process.env.FRONTEND_URL}/orders/${orderNo}`;
+  const actionLabel = isEditing ? "updated" : "raised";
+  const headingLabel = isEditing ? "Order Dispute Updated" : "New Order Dispute";
+  const actionText = isEditing
+    ? "A customer has updated an existing dispute for an order."
+    : "A customer has raised a dispute for an order.";
+  const updatedAtMarkup = isEditing && updatedAt
+    ? `<p><strong>Updated At:</strong> ${new Date(updatedAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}</p>`
+    : "";
 
   await Promise.all(
     adminUsers.map((admin) =>
       sendMail({
         to: admin.email,
-        subject: `${appName} - Order dispute raised - ${orderNo}`,
+        subject: `${appName} - Order dispute ${actionLabel} - ${orderNo}`,
         html: `
           <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; font-size: 16px;">
-            <h2 style="color:#333;">New Order Dispute</h2>
+            <h2 style="color:#333;">${headingLabel}</h2>
             <p>Hi ${admin.name},</p>
-            <p>A customer has raised a dispute for an order.</p>
+            <p>${actionText}</p>
             <p><strong>Order No:</strong> ${orderNo}</p>
             <p><strong>Customer:</strong> ${customerName}</p>
             <p><strong>Dispute:</strong><br/>${message}</p>
+            ${updatedAtMarkup}
             <div style="margin: 25px 0;">
               <a href="${orderLink}"
                 style="

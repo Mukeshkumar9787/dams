@@ -113,6 +113,8 @@ const raiseDispute = async (req, res) => {
       orderNo: data.orderNo,
       customerName: data.user?.name || req.user.name,
       message: data.dispute.message,
+      isEditing: data.isEditing,
+      updatedAt: data.dispute.updatedAt || null,
     });
     return res.status(200).json({
       success: true,
