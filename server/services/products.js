@@ -262,15 +262,16 @@ const deleteProduct = async (id) => {
 
 const getProductStockById = async({ productId, tx = prisma }) => {
   const productStock = await tx.$queryRaw`
-      SELECT COALESCE(SUM(COALESCE(quantity, 0)), 0) as stock
+      SELECT GREATEST(COALESCE(SUM(COALESCE(quantity, 0)), 0), 0) as stock
       FROM "Stock"
       WHERE
         "productId" = ${productId}
-        AND 
-        type NOT IN (${STOCK_TYPES.PAYMENT_PENDING}, ${STOCK_TYPES.WITHDRAW})
-        OR (
-          type = ${STOCK_TYPES.PAYMENT_PENDING}
-          AND "createdAt" > NOW() - INTERVAL '5 minutes'
+        AND (
+          type NOT IN (${STOCK_TYPES.PAYMENT_PENDING}, ${STOCK_TYPES.WITHDRAW})
+          OR (
+            type = ${STOCK_TYPES.PAYMENT_PENDING}
+            AND "createdAt" > NOW() - INTERVAL '5 minutes'
+          )
         )
     `;
   return parseInt(productStock[0].stock)

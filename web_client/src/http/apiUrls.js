@@ -31,3 +31,4 @@ export const API_PAYMENT_VERIFY = `${API_ORDERS}/payment/verify`;
 export const API_CONFIG = '/config';
 export const API_CART = '/cart';
 export const API_WISHLIST = '/wishlist';
+export const API_DASHBOARD = '/dashboard';

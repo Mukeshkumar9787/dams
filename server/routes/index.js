@@ -12,6 +12,7 @@ import configRoutes from "./config.js"
 import addressRoutes from "./address.js"
 import cartRoutes from "./cart.js"
 import wishlistRoutes from "./wishlist.js"
+import dashboardRoutes from "./dashboard.js"
 import { getAuthMiddleware } from "../middlewares/authMiddleware.js";
 import { ROLE_TYPES } from "../utils/constants.js";
 import { paginationMiddleware } from "../middlewares/paginationValidationMiddleware.js";
@@ -52,6 +53,8 @@ router.use("/wishlist", wishlistRoutes);
 router.use("/config", configRoutes);
 
 router.use(getAuthMiddleware([ROLE_TYPES.ADMIN]));
+
+router.use("/dashboard", dashboardRoutes);
 
 router.use("/files", fileRoutes);
 

@@ -118,6 +118,7 @@ const getOrders = async ({ userId=null, skip=0, take=10, search=null, status=nul
   const files = await fileService.getFilesByFeatureIds({ feature: FEATURE_TYPES.PRODUCT, featureIds: orders.filter(i => i.orderProducts.length > 0).map(i => i.orderProducts?.[0]?.productId)});
   return {
     data: orders.map(i => ({
+        id: i.id,
         name: i.name,
         orderNo: i.orderNo,
         createdAt: i.createdAt,

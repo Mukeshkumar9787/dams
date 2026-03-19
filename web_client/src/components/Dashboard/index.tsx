@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import Breadcrumb from "../Common/Breadcrumb";
-import { getOrderStats, getOrdersForAdmin, getProducts } from "@/http/apiCalls";
+import { getAdminDashboard } from "@/http/apiCalls";
 import { getCurrencyDetails, getLoggedInUserData, getShippingDisplay, getStoredToken, redirectToSignIn } from "@/utils/helper";
 import { ORDER_STATUS, ORDER_STATUS_COLOR, ROLE_TYPES, STATUS_TYPES } from "@/utils/constants";
 import { ORDER_URL } from "@/utils/appUrls";
@@ -50,9 +50,7 @@ const formatAmount = (value = 0) => {
 
 const Dashboard = () => {
   const [isLoading, setIsLoading] = React.useState(true);
-  const [products, setProducts] = React.useState([]);
-  const [orders, setOrders] = React.useState([]);
-  const [statusStats, setStatusStats] = React.useState({});
+  const [dashboardData, setDashboardData] = React.useState(null);
 
   React.useEffect(() => {
     const loadDashboard = async () => {
@@ -74,15 +72,8 @@ const Dashboard = () => {
           return;
         }
 
-        const [orderStatsResponse, ordersResponse, productsResponse] = await Promise.all([
-          getOrderStats(),
-          getOrdersForAdmin({ pageNumber: 1, pageSize: 500 }),
-          getProducts({ pagination: false }),
-        ]);
-
-        setStatusStats(orderStatsResponse?.data?.orderStatus || {});
-        setOrders(ordersResponse?.data || []);
-        setProducts(productsResponse?.data || []);
+        const response = await getAdminDashboard();
+        setDashboardData(response?.data || null);
       } catch (error) {
         console.error(error);
       } finally {
@@ -93,82 +84,15 @@ const Dashboard = () => {
     loadDashboard();
   }, []);
 
-  const salesOrders = React.useMemo(
-    () => orders.filter((order) => SALES_STATUSES.has(order.status)),
-    [orders]
-  );
-
-  const totalSales = React.useMemo(
-    () => salesOrders.reduce((sum, order) => sum + Number(order.totalAmount || 0), 0),
-    [salesOrders]
-  );
-
-  const totalStockUnits = React.useMemo(
-    () => products.reduce((sum, product) => sum + Number(product.stock || 0), 0),
-    [products]
-  );
-
-  const outOfStockCount = React.useMemo(
-    () => products.filter((product) => Number(product.stock || 0) <= 0).length,
-    [products]
-  );
-
-  const lowStockProducts = React.useMemo(
-    () =>
-      products
-        .filter((product) => Number(product.stock || 0) > 0 && Number(product.stock || 0) <= 5)
-        .sort((first, second) => Number(first.stock || 0) - Number(second.stock || 0))
-        .slice(0, 5),
-    [products]
-  );
-
-  const lowStockCount = React.useMemo(
-    () => products.filter((product) => Number(product.stock || 0) > 0 && Number(product.stock || 0) <= 5).length,
-    [products]
-  );
-
-  const recentOrders = React.useMemo(() => orders.slice(0, 8), [orders]);
-
-  const salesTrend = React.useMemo(() => {
-    const months = getLastSixMonths();
-
-    salesOrders.forEach((order) => {
-      const date = new Date(order.createdAt);
-      const key = `${date.getFullYear()}-${date.getMonth()}`;
-      const month = months.find((item) => item.key === key);
-
-      if (month) {
-        month.amount += Number(order.totalAmount || 0);
-      }
-    });
-
-    return months;
-  }, [salesOrders]);
-
-  const stockBuckets = React.useMemo(() => {
-    const buckets = [
-      { label: "Out of Stock", value: 0, color: "#d92d20" },
-      { label: "Low Stock", value: 0, color: "#f79009" },
-      { label: "Healthy", value: 0, color: "#1570ef" },
-      { label: "High Stock", value: 0, color: "#039855" },
-    ];
-
-    products.forEach((product) => {
-      const stock = Number(product.stock || 0);
-
-      if (stock <= 0) {
-        buckets[0].value += 1;
-      } else if (stock <= 5) {
-        buckets[1].value += 1;
-      } else if (stock <= 20) {
-        buckets[2].value += 1;
-      } else {
-        buckets[3].value += 1;
-      }
-    });
-
-    return buckets;
-  }, [products]);
+  const overview = React.useMemo(() => dashboardData?.overview || {}, [dashboardData]);
+  const salesTrend = React.useMemo(() => dashboardData?.salesTrend || getLastSixMonths(), [dashboardData]);
+  const statusStats = React.useMemo(() => dashboardData?.orderStatus || {}, [dashboardData]);
+  const stockBuckets = React.useMemo(() => dashboardData?.stockBuckets || [], [dashboardData]);
+  const recentOrders = React.useMemo(() => dashboardData?.recentOrders || [], [dashboardData]);
+  const lowStockProducts = React.useMemo(() => dashboardData?.lowStockProducts || [], [dashboardData]);
+  const topProducts = React.useMemo(() => dashboardData?.topProducts || [], [dashboardData]);
+  const recentCustomers = React.useMemo(() => dashboardData?.recentCustomers || [], [dashboardData]);
+  const categoryPerformance = React.useMemo(() => dashboardData?.categoryPerformance || [], [dashboardData]);
 
   const statusChartData = React.useMemo(
     () =>
@@ -182,27 +106,34 @@ const Dashboard = () => {
   const summaryCards = [
     {
       label: "Sales",
-      value: formatAmount(totalSales),
-      detail: `${salesOrders.length} paid or fulfilled orders`,
+      value: formatAmount(overview.totalSales),
+      detail: `${overview.salesOrderCount || 0} paid or fulfilled orders`,
       accent: "from-[#0f766e] via-[#14b8a6] to-[#99f6e4]",
     },
     {
       label: "Products",
-      value: products.length.toLocaleString("en-IN"),
-      detail: `${products.filter((item) => item.status === STATUS_TYPES.ACTIVE).length} active listings`,
+      value: Number(overview.totalProducts || 0).toLocaleString("en-IN"),
+      detail: `${overview.activeProducts || 0} active listings`,
       accent: "from-[#1d4ed8] via-[#3b82f6] to-[#bfdbfe]",
     },
     {
       label: "Stock Units",
-      value: totalStockUnits.toLocaleString("en-IN"),
-      detail: `${outOfStockCount} products out of stock`,
+      value: Number(overview.stockUnits || 0).toLocaleString("en-IN"),
+      detail: `${overview.outOfStockCount || 0} products out of stock`,
+      accent: "from-[#9f1239] via-[#f43f5e] to-[#fecdd3]",
+    },
+    {
+      label: "Customers",
+      value: Number(overview.totalUsers || 0).toLocaleString("en-IN"),
+      detail: `${formatAmount(overview.averageOrderValue)} average order value`,
       accent: "from-[#9f1239] via-[#f43f5e] to-[#fecdd3]",
     },
   ];
 
-  const maxSalesValue = Math.max(...salesTrend.map((item) => item.amount), 1);
+  const maxSalesValue = Math.max(...salesTrend.map((item) => Number(item.revenue || item.amount || 0)), 1);
   const maxStatusValue = Math.max(...statusChartData.map((item) => item.value), 1);
   const maxStockBucketValue = Math.max(...stockBuckets.map((item) => item.value), 1);
+  const maxCategoryRevenue = Math.max(...categoryPerformance.map((item) => Number(item.revenue || 0)), 1);
 
   return (
     <>
@@ -229,15 +160,15 @@ const Dashboard = () => {
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 <div className="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur">
                   <p className="text-xs uppercase tracking-[0.2em] text-sky-100">Orders</p>
-                  <p className="mt-2 text-2xl font-semibold">{Number(statusStats?.ALL || orders.length).toLocaleString("en-IN")}</p>
+                  <p className="mt-2 text-2xl font-semibold">{Number(statusStats?.ALL || overview.totalOrders || 0).toLocaleString("en-IN")}</p>
                 </div>
                 <div className="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur">
                   <p className="text-xs uppercase tracking-[0.2em] text-sky-100">Low Stock</p>
-                  <p className="mt-2 text-2xl font-semibold">{lowStockCount.toLocaleString("en-IN")}</p>
+                  <p className="mt-2 text-2xl font-semibold">{Number(overview.lowStockCount || 0).toLocaleString("en-IN")}</p>
                 </div>
                 <div className="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur">
-                  <p className="text-xs uppercase tracking-[0.2em] text-sky-100">Out Of Stock</p>
-                  <p className="mt-2 text-2xl font-semibold">{outOfStockCount.toLocaleString("en-IN")}</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-sky-100">Restock Requests</p>
+                  <p className="mt-2 text-2xl font-semibold">{Number(overview.restockRequestCount || 0).toLocaleString("en-IN")}</p>
                 </div>
               </div>
             </div>
@@ -247,7 +178,7 @@ const Dashboard = () => {
             <div className="surface-card p-8 text-center text-dark-4">Loading dashboard...</div>
           ) : (
             <div className="space-y-6">
-              <div className="grid gap-4 md:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 {summaryCards.map((card) => (
                   <div
                     key={card.label}
@@ -272,7 +203,7 @@ const Dashboard = () => {
                       <p className="text-sm text-dark-4">Last 6 months based on placed, confirmed, shipped, and delivered orders.</p>
                     </div>
                     <div className="rounded-full bg-teal-50 px-4 py-2 text-sm font-medium text-teal-700">
-                      {formatAmount(totalSales)}
+                      {formatAmount(overview.totalSales)}
                     </div>
                   </div>
 
@@ -280,12 +211,12 @@ const Dashboard = () => {
                     {salesTrend.map((item) => (
                       <div key={item.key} className="flex h-full flex-col justify-end">
                         <div className="mb-2 text-center text-xs font-medium text-dark-4">
-                          {item.amount ? formatAmount(item.amount) : "0"}
+                          {Number(item.revenue || item.amount || 0) ? formatAmount(Number(item.revenue || item.amount || 0)) : "0"}
                         </div>
                         <div className="relative flex-1 rounded-2xl bg-slate-100">
                           <div
                             className="absolute bottom-0 left-0 right-0 rounded-2xl bg-[linear-gradient(180deg,#0f766e_0%,#14b8a6_100%)]"
-                            style={{ height: `${Math.max((item.amount / maxSalesValue) * 100, item.amount ? 12 : 0)}%` }}
+                            style={{ height: `${Math.max(((Number(item.revenue || item.amount || 0)) / maxSalesValue) * 100, Number(item.revenue || item.amount || 0) ? 12 : 0)}%` }}
                           />
                         </div>
                         <div className="mt-3 text-center text-sm font-medium text-dark">
@@ -356,7 +287,7 @@ const Dashboard = () => {
                       <p className="text-sm text-dark-4">Products most likely to need intervention soon.</p>
                     </div>
                     <div className="rounded-full bg-amber-50 px-4 py-2 text-sm font-medium text-amber-700">
-                      {lowStockCount} urgent
+                      {overview.lowStockCount || 0} urgent
                     </div>
                   </div>
 
@@ -373,14 +304,83 @@ const Dashboard = () => {
                               {product.categoryName || "Uncategorized"} • {product.status}
                             </p>
                           </div>
-                          <div className="rounded-full bg-amber-100 px-3 py-1 text-sm font-semibold text-amber-800">
-                            {product.stock} left
+                          <div className="text-right">
+                            <div className="rounded-full bg-amber-100 px-3 py-1 text-sm font-semibold text-amber-800">
+                              {product.stock} left
+                            </div>
+                            <p className="mt-1 text-xs text-dark-4">
+                              {product.restockRequests || 0} restock requests
+                            </p>
                           </div>
                         </div>
                       ))
                     ) : (
                       <div className="rounded-2xl border border-dashed border-gray-3 px-5 py-8 text-center text-dark-4">
                         No low-stock products right now.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+                <div className="surface-card p-5 sm:p-7">
+                  <div className="mb-6">
+                    <h2 className="text-xl font-semibold text-dark">Top Products</h2>
+                    <p className="text-sm text-dark-4">Best-selling products by sold units across completed pipeline stages.</p>
+                  </div>
+                  <div className="space-y-3">
+                    {topProducts.length ? (
+                      topProducts.map((product, index) => (
+                        <div key={product.id} className="flex items-center gap-4 rounded-2xl border border-gray-3 px-4 py-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue/10 text-sm font-semibold text-blue">
+                            {index + 1}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate font-medium text-dark">{product.title}</p>
+                            <p className="text-sm text-dark-4">
+                              {product.categoryName || "Uncategorized"} • {product.unitsSold} units sold
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-semibold text-dark">{formatAmount(product.revenue)}</p>
+                            <p className="text-xs text-dark-4">{product.stock} in stock</p>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="rounded-2xl border border-dashed border-gray-3 px-5 py-8 text-center text-dark-4">
+                        No product sales data available yet.
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="surface-card p-5 sm:p-7">
+                  <div className="mb-6">
+                    <h2 className="text-xl font-semibold text-dark">Category Performance</h2>
+                    <p className="text-sm text-dark-4">Revenue distribution across your top categories.</p>
+                  </div>
+                  <div className="space-y-4">
+                    {categoryPerformance.length ? (
+                      categoryPerformance.map((category) => (
+                        <div key={category.categoryName}>
+                          <div className="mb-2 flex items-center justify-between gap-3 text-sm">
+                            <span className="font-medium text-dark">{category.categoryName || "Uncategorized"}</span>
+                            <span className="text-dark-4">{formatAmount(category.revenue)}</span>
+                          </div>
+                          <div className="h-3 rounded-full bg-slate-100">
+                            <div
+                              className="h-3 rounded-full bg-[linear-gradient(90deg,#f97316_0%,#fb7185_100%)]"
+                              style={{ width: `${(Number(category.revenue || 0) / maxCategoryRevenue) * 100}%` }}
+                            />
+                          </div>
+                          <p className="mt-1 text-xs text-dark-4">{category.unitsSold} units sold</p>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="rounded-2xl border border-dashed border-gray-3 px-5 py-8 text-center text-dark-4">
+                        No category sales data available yet.
                       </div>
                     )}
                   </div>
@@ -459,6 +459,45 @@ const Dashboard = () => {
                   ) : (
                     <div className="rounded-2xl border border-dashed border-gray-3 px-5 py-8 text-center text-dark-4">
                       No orders found yet.
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="surface-card p-5 sm:p-7">
+                <div className="mb-6">
+                  <h2 className="text-xl font-semibold text-dark">Recent Customers</h2>
+                  <p className="text-sm text-dark-4">Newest accounts with their paid-order activity and spend.</p>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  {recentCustomers.length ? (
+                    recentCustomers.map((customer) => (
+                      <div key={customer.id} className="rounded-2xl border border-gray-3 px-5 py-4">
+                        <p className="font-semibold text-dark">{customer.name}</p>
+                        <p className="mt-1 truncate text-sm text-dark-4">{customer.email}</p>
+                        <div className="mt-4 flex items-center justify-between text-sm">
+                          <span className="text-dark-4">Joined</span>
+                          <span className="font-medium text-dark">
+                            {new Date(customer.createdAt).toLocaleDateString("en-IN", {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </span>
+                        </div>
+                        <div className="mt-2 flex items-center justify-between text-sm">
+                          <span className="text-dark-4">Sales Orders</span>
+                          <span className="font-medium text-dark">{customer.salesOrders}</span>
+                        </div>
+                        <div className="mt-2 flex items-center justify-between text-sm">
+                          <span className="text-dark-4">Spend</span>
+                          <span className="font-medium text-dark">{formatAmount(customer.totalSpend)}</span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="rounded-2xl border border-dashed border-gray-3 px-5 py-8 text-center text-dark-4 md:col-span-2 xl:col-span-3">
+                      No customers found yet.
                     </div>
                   )}
                 </div>
