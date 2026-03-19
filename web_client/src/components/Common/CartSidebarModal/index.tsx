@@ -76,15 +76,24 @@ const CartSidebarModal = () => {
       }`}
     >
       <div className="flex items-center justify-end">
-        <div className="w-full max-w-[500px] shadow-1 bg-white px-4 sm:px-7.5 lg:px-11 relative modal-content">
-          <div className="sticky top-0 bg-white flex items-center justify-between pb-7 pt-4 sm:pt-7.5 lg:pt-11 border-b border-gray-3 mb-7.5">
-            <h2 className="font-medium text-dark text-lg sm:text-2xl">
-              Cart View
-            </h2>
+        <div className="modal-content relative flex h-screen w-full max-w-[540px] flex-col overflow-hidden border-l border-slate-200 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] shadow-[0_24px_70px_rgba(15,23,42,0.18)]">
+          <div className="sticky top-0 z-10 border-b border-slate-200 bg-white/95 px-5 pb-6 pt-5 backdrop-blur sm:px-7 lg:px-8">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-sky-700">
+                  Quick Cart
+                </p>
+                <h2 className="mt-2 text-xl font-semibold text-dark sm:text-2xl">
+                  Cart View
+                </h2>
+                <p className="mt-2 text-sm text-dark-4">
+                  {cartItems.length} items selected for checkout.
+                </p>
+              </div>
             <button
               onClick={() => closeCartModal()}
               aria-label="button for close modal"
-              className="flex items-center justify-center ease-in duration-150 bg-meta text-dark-5 hover:text-dark"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-dark-5 transition hover:bg-slate-200 hover:text-dark"
             >
               <svg
                 className="fill-current"
@@ -106,9 +115,10 @@ const CartSidebarModal = () => {
                 />
               </svg>
             </button>
+            </div>
           </div>
 
-          <div className="h-[66vh] overflow-y-auto no-scrollbar">
+          <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-7 lg:px-8">
             <div className="flex flex-col gap-6">
               {/* <!-- cart item --> */}
               {cartItems.length > 0 ? (
@@ -125,27 +135,30 @@ const CartSidebarModal = () => {
             </div>
           </div>
 
-          <div className="border-t border-gray-3 bg-white pt-5 pb-4 sm:pb-7.5 lg:pb-11 mt-7.5 sticky bottom-0">
-            <div className="flex items-center justify-between gap-5 mb-6">
-              <p className="font-medium text-xl text-dark">Subtotal:</p>
+          <div className="sticky bottom-0 border-t border-slate-200 bg-white/95 px-5 pb-5 pt-5 backdrop-blur sm:px-7 lg:px-8">
+            <div className="mb-6 flex items-center justify-between gap-5 rounded-[22px] bg-slate-50 px-4 py-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-dark-4">Subtotal</p>
+                <p className="mt-1 text-sm text-dark-4">Taxes and shipping calculated at checkout</p>
+              </div>
 
-              <p className="font-medium text-xl text-dark">{getCurrencyDetails().currencySymbol}{totalPrice}</p>
+              <p className="font-semibold text-xl text-dark">{getCurrencyDetails().currencySymbol}{totalPrice}</p>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col gap-3">
               {(productItems.length > 0)
                 ?
                 <Link
                   href="/checkout"
                   onClick={() => closeCartModal()}
-                  className="w-full flex justify-center font-medium text-white bg-dark py-[13px] px-6 rounded-md ease-out duration-200 hover:bg-opacity-95"
+                  className="btn-primary w-full justify-center"
                 >
                   Checkout
                 </Link>
                 :
                 <Button
                   disabled
-                  className="h-12 w-full flex justify-center font-medium bg-gray py-[13px] px-6 rounded-md ease-out duration-200 hover:bg-opacity-95"
+                  className="h-12 w-full justify-center rounded-2xl border border-slate-200 bg-slate-100 font-medium text-slate-400"
                 >
                   Checkout
                 </Button>

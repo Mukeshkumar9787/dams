@@ -6,12 +6,15 @@ const EmptyWishlist = () => {
   const { closeWishlistModal } = useWishlistModalContext();
 
   return (
-    <div className="text-center bg-white p-3">
-      <p className="pb-6">Your wishlist is empty!</p>
+    <div className="rounded-[26px] border border-dashed border-slate-200 bg-white px-5 py-8 text-center">
+      <h3 className="text-xl font-semibold text-dark">Your wishlist is empty</h3>
+      <p className="pb-6 pt-2 text-dark-4">
+        Save products you want to revisit later and they will appear here.
+      </p>
       <Link
         onClick={() => closeWishlistModal()}
         href="/shop"
-        className="w-full lg:w-10/12 mx-auto flex justify-center font-medium text-white bg-dark py-[13px] px-6 rounded-md ease-out duration-200 hover:bg-opacity-95"
+        className="btn-primary mx-auto inline-flex w-full justify-center lg:w-10/12"
       >
         Continue Shopping
       </Link>

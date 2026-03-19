@@ -7,12 +7,12 @@ const CourierDetails = ({ couriers, handleChange, additionalInfo, isAdmin, onSub
         <div className="font-medium text-dark">
             {isAdmin ?
                 <>
-                    <h3 className="font-semibold">Courier:</h3>
+                    <h3 className="mb-3 text-base font-semibold text-dark">Courier Details</h3>
                     <select
                         name="courier"
                         value={additionalInfo?.courier || ''}
                         onChange={handleChange}
-                        className="w-full p-2 text-sm rounded-md"
+                        className="form-input w-full bg-white text-dark"
                     >
                         <option value="">Select Courier</option>
                         {couriers.map(courier => (
@@ -24,14 +24,14 @@ const CourierDetails = ({ couriers, handleChange, additionalInfo, isAdmin, onSub
                         value={additionalInfo?.trackingId || ''}
                     />
                     <div className='flex items-center justify-end'>
-                        <button type='button' onClick={onSubmit} className="mt-3 p-2 bg-blue text-white rounded-md">Save</button>
+                        <button type='button' onClick={onSubmit} className="btn-primary mt-3 px-5">Save Courier</button>
                     </div>
                 </>
                 :
                 <>
                     {additionalInfo?.courier
                         &&
-                        <a href={link} target="_blank" className="text-blue-600 underline">
+                        <a href={link} target="_blank" className="inline-flex flex-wrap gap-1 text-blue-600 underline">
                             <span>Courier:</span>&nbsp;{additionalInfo?.courier}
                             {additionalInfo?.trackingId && <span>,&nbsp;Tracking-ID:&nbsp;{additionalInfo?.trackingId || ''}</span>}
                         </a>

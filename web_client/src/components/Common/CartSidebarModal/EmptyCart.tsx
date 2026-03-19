@@ -6,7 +6,7 @@ const EmptyCart = () => {
   const { closeCartModal } = useCartModalContext();
 
   return (
-    <div className="text-center bg-white p-3">
+    <div className="rounded-[26px] border border-dashed border-slate-200 bg-white px-5 py-8 text-center">
       <div className="mx-auto pb-7.5">
         <svg
           className="mx-auto"
@@ -38,12 +38,15 @@ const EmptyCart = () => {
         </svg>
       </div>
 
-      <p className="pb-6">Your cart is empty!</p>
+      <h3 className="text-xl font-semibold text-dark">Your cart is empty</h3>
+      <p className="pb-6 pt-2 text-dark-4">
+        Add products to the cart and they will appear here for quick checkout.
+      </p>
 
       <Link
         onClick={() => closeCartModal()}
         href="/shop"
-        className="w-full lg:w-10/12 mx-auto flex justify-center font-medium text-white bg-dark py-[13px] px-6 rounded-md ease-out duration-200 hover:bg-opacity-95"
+        className="btn-primary mx-auto inline-flex w-full justify-center lg:w-10/12"
       >
         Continue Shopping
       </Link>

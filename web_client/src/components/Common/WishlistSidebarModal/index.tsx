@@ -55,13 +55,20 @@ const WishlistSidebarModal = () => {
       }`}
     >
       <div className="flex items-center justify-end">
-        <div className="w-full h-screen max-w-[500px] shadow-1 bg-white px-4 sm:px-7.5 lg:px-11 relative wishlist-modal-content">
-          <div className="sticky top-0 bg-white flex items-center justify-between pb-7 pt-4 sm:pt-7.5 lg:pt-11 border-b border-gray-3 mb-7.5">
-            <h2 className="font-medium text-dark text-lg sm:text-2xl">Wishlist View</h2>
+        <div className="wishlist-modal-content relative flex h-screen w-full max-w-[540px] flex-col overflow-hidden border-l border-slate-200 bg-[linear-gradient(180deg,#ffffff_0%,#fbfbff_100%)] shadow-[0_24px_70px_rgba(15,23,42,0.18)]">
+          <div className="sticky top-0 z-10 border-b border-slate-200 bg-white/95 px-5 pb-6 pt-5 backdrop-blur sm:px-7 lg:px-8">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-sky-700">Saved List</p>
+                <h2 className="mt-2 text-xl font-semibold text-dark sm:text-2xl">Wishlist View</h2>
+                <p className="mt-2 text-sm text-dark-4">
+                  {productItems.length} saved products ready to revisit.
+                </p>
+              </div>
             <button
               onClick={() => closeWishlistModal()}
               aria-label="button for close modal"
-              className="flex items-center justify-center ease-in duration-150 bg-meta text-dark-5 hover:text-dark"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-dark-5 transition hover:bg-slate-200 hover:text-dark"
             >
               <svg
                 className="fill-current"
@@ -83,9 +90,10 @@ const WishlistSidebarModal = () => {
                 />
               </svg>
             </button>
+            </div>
           </div>
 
-          <div className="h-[66vh] overflow-y-auto no-scrollbar">
+          <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-7 lg:px-8">
             <div className="flex flex-col gap-6">
               {productItems.length > 0 ? (
                 productItems.map((item) => <SingleItem key={item.id} item={item} />)
@@ -95,6 +103,11 @@ const WishlistSidebarModal = () => {
             </div>
           </div>
 
+          <div className="sticky bottom-0 border-t border-slate-200 bg-white/95 px-5 pb-5 pt-5 backdrop-blur sm:px-7 lg:px-8">
+            <div className="rounded-[22px] bg-slate-50 px-4 py-4 text-sm text-dark-4">
+              Keep products here while you compare styles, pricing, and availability.
+            </div>
+          </div>
         </div>
       </div>
     </div>
