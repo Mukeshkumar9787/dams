@@ -4,7 +4,7 @@ import Breadcrumb from "../Common/Breadcrumb";
 import RecentlyViewdItems from "./RecentlyViewd";
 import PreLoader from "../Common/PreLoader";
 import { addProductReview, deleteMyProductReview, getMyProductReview, getProductBySlug, getProductReviews, updateMyProductReview } from "@/http/apiCalls";
-import { getCurrencyDetails, getOfferPercent, redirectToSignIn } from "@/utils/helper";
+import { getCurrencyDetails, getOfferPercent, getStoredToken, redirectToSignIn } from "@/utils/helper";
 import AddToCart from "../Common/AddToCart";
 import AvailableStock from "../Common/AvailableStock";
 import WishlistButton from "../Common/WishlistButton";
@@ -64,7 +64,7 @@ const ShopDetails = ({ params }) => {
 
   const fetchMyReview = async (productId) => {
     try {
-      if (!localStorage.getItem("token")) {
+      if (!getStoredToken()) {
         setMyReviews([]);
         return;
       }
@@ -101,7 +101,7 @@ const ShopDetails = ({ params }) => {
   }, [myReviewIds, reviews]);
 
   const handleOpenCreateReview = () => {
-    if (!localStorage.getItem("token")) {
+    if (!getStoredToken()) {
       redirectToSignIn(`/shop-details/${params.slug}`);
       return;
     }
@@ -112,7 +112,7 @@ const ShopDetails = ({ params }) => {
   };
 
   const handleOpenEditReview = (review) => {
-    if (!localStorage.getItem("token")) {
+    if (!getStoredToken()) {
       redirectToSignIn(`/shop-details/${params.slug}`);
       return;
     }
@@ -125,7 +125,7 @@ const ShopDetails = ({ params }) => {
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     if (!product?.id) return;
-    if (!localStorage.getItem("token")) {
+    if (!getStoredToken()) {
       redirectToSignIn(`/shop-details/${params.slug}`);
       return;
     }
@@ -159,7 +159,7 @@ const ShopDetails = ({ params }) => {
 
   const handleDeleteReview = async (review) => {
     if (!product?.id || !review?.id) return;
-    if (!localStorage.getItem("token")) {
+    if (!getStoredToken()) {
       redirectToSignIn(`/shop-details/${params.slug}`);
       return;
     }

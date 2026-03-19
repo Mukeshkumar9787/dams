@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Breadcrumb from "../Common/Breadcrumb";
 import Image from "next/image";
 import Orders from "../Orders";
-import { getLoggedInUserData, getMemberSince, logout } from "@/utils/helper";
+import { getLoggedInUserData, getMemberSince, getStoredToken, logout } from "@/utils/helper";
 import { updateProfile } from "@/http/apiCalls";
 import { Button, Popconfirm } from "antd";
 import ResetPassword from "../Auth/ResetPassword";
@@ -22,7 +22,7 @@ const MyAccount = () => {
 
   
   useEffect(()=>{
-    if(!localStorage.getItem('token')) {
+    if(!getStoredToken()) {
       window.location.href = '/';
       return
     };

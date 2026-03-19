@@ -1,6 +1,51 @@
 import { getUserInfo } from "@/http/apiCalls";
 import { ORDER_STATUS } from "./constants";
 
+const clearExpiredSession = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("cart");
+};
+
+const parseJwtPayload = (token) => {
+  try {
+    const [, payload] = token.split(".");
+    if (!payload) return null;
+
+    const normalizedPayload = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const paddedPayload = normalizedPayload.padEnd(
+      normalizedPayload.length + ((4 - normalizedPayload.length % 4) % 4),
+      "="
+    );
+
+    return JSON.parse(window.atob(paddedPayload));
+  } catch (error) {
+    return null;
+  }
+};
+
+export const isTokenExpired = (token) => {
+  if (!token) return true;
+
+  const payload = parseJwtPayload(token);
+  if (!payload?.exp) return true;
+
+  return payload.exp * 1000 <= Date.now();
+};
+
+export const getStoredToken = () => {
+  if (typeof window === "undefined") return null;
+
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+
+  if (isTokenExpired(token)) {
+    clearExpiredSession();
+    return null;
+  }
+
+  return token;
+};
+
 export function getContrastTextColor(hexColor) {
   // Remove #
   const hex = hexColor.replace('#', '');
@@ -36,6 +81,7 @@ export const getProductCountFromCart = (id, cartItems) => cartItems.find(i => i.
 
 export const getLoggedInUserData = async () => {
   try {
+    if (!getStoredToken()) return null;
     const user = await getUserInfo();
     return user.data || null;
   } catch (error) {

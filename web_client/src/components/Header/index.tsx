@@ -7,7 +7,7 @@ import { useAppSelector } from "@/redux/store";
 import { useCartModalContext } from "@/app/context/CartSidebarModalContext";
 import { useWishlistModalContext } from "@/app/context/WishlistSidebarModalContext";
 import Image from "next/image";
-import { getLoggedInUserData } from "@/utils/helper";
+import { getLoggedInUserData, getStoredToken } from "@/utils/helper";
 import { CONFIG_KEYS, ROLE_TYPES } from "@/utils/constants";
 import { getConfig } from "@/http/apiCalls";
 
@@ -63,7 +63,7 @@ const Header = () => {
   }, []);
 
   useEffect(()=>{
-    if(!localStorage.getItem('token')) return;
+    if(!getStoredToken()) return;
     const fetchUser = async() => {
       const userData = await getLoggedInUserData();
       if(userData){

@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { getWishlist, replaceWishlist } from "@/http/apiCalls";
 import { setWishlistItems } from "@/redux/features/wishlist-slice";
 import { AppDispatch, useAppSelector } from "@/redux/store";
+import { getStoredToken } from "@/utils/helper";
 
 type WishEntry = { id: number };
 
@@ -25,7 +26,7 @@ const WishlistSync = () => {
   const skipNextSyncRef = React.useRef(false);
 
   React.useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = getStoredToken();
     if (!token) {
       isInitializedRef.current = true;
       return;
@@ -52,7 +53,7 @@ const WishlistSync = () => {
 
   React.useEffect(() => {
     if (!isInitializedRef.current) return;
-    const token = localStorage.getItem("token");
+    const token = getStoredToken();
     if (!token) return;
 
     if (skipNextSyncRef.current) {

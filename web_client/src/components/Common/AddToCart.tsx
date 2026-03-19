@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { addItemToCart, removeItemFromCart } from "@/redux/features/cart-slice";
 import { AppDispatch, useAppSelector } from "@/redux/store";
-import { getProductCountFromCart, redirectToSignIn } from "@/utils/helper";
+import { getProductCountFromCart, getStoredToken, redirectToSignIn } from "@/utils/helper";
 import { useDispatch } from "react-redux";
 import { DeleteFilled, MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import { useRouter } from "next/navigation";
@@ -37,7 +37,7 @@ const AddToCart = ({ id, align='center', stack = true, purchase = true, stock=0,
     };
 
     const handleNotifyMe = async () => {
-        if (!localStorage.getItem("token")) {
+        if (!getStoredToken()) {
             redirectToSignIn();
             return;
         }

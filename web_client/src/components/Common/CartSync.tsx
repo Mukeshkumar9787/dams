@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { getCart, replaceCart } from "@/http/apiCalls";
 import { setCartItems } from "@/redux/features/cart-slice";
 import { AppDispatch, useAppSelector } from "@/redux/store";
+import { getStoredToken } from "@/utils/helper";
 
 type CartEntry = { id: number; quantity: number };
 
@@ -36,7 +37,7 @@ const CartSync = () => {
   const skipNextSyncRef = React.useRef(false);
 
   React.useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = getStoredToken();
     if (!token) {
       isInitializedRef.current = true;
       return;
@@ -64,7 +65,7 @@ const CartSync = () => {
   React.useEffect(() => {
     if (!isInitializedRef.current) return;
 
-    const token = localStorage.getItem("token");
+    const token = getStoredToken();
     if (!token) return;
 
     if (skipNextSyncRef.current) {

@@ -1,4 +1,4 @@
-import { redirectToSignIn } from '@/utils/helper';
+import { getStoredToken, redirectToSignIn } from '@/utils/helper';
 import axios from 'axios';
 import { message } from 'antd';
 
@@ -15,7 +15,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use((config) => {
   try {
     // Do something before request is sent
-    const token = localStorage.getItem('token');
+    const token = getStoredToken();
     if (token) {
       config.headers.authorization = `Bearer ${token}`; // eslint-disable-line
     }

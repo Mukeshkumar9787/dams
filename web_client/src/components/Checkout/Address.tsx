@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import countryList from "../../data/countries.json";
-import { getLoggedInUserData } from "@/utils/helper";
+import { getLoggedInUserData, getStoredToken } from "@/utils/helper";
 import { ADDRESS_TYPES } from "@/utils/constants";
 import { Button, Modal, message } from "antd";
 
@@ -52,7 +52,7 @@ const Address = ({
     : [];
 
   useEffect(() => {
-    if (!localStorage.getItem("token")) return;
+    if (!getStoredToken()) return;
     const fetchUser = async () => {
       const userDataDetails = await getLoggedInUserData();
       if (userDataDetails) {
