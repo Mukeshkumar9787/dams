@@ -15,6 +15,8 @@ const Header = () => {
   const [menuItems, setMenuItems] = useState(menuData);
   const [navigationOpen, setNavigationOpen] = useState(false);
   const [stickyMenu, setStickyMenu] = useState(false);
+  const navRef = React.useRef<HTMLDivElement | null>(null);
+  const navToggleRef = React.useRef<HTMLButtonElement | null>(null);
   const { openCartModal } = useCartModalContext();
   const { openWishlistModal } = useWishlistModalContext();
   const [user, setUser] = useState(null);
@@ -76,6 +78,23 @@ const Header = () => {
     fetchUser();
   },[])
 
+  useEffect(() => {
+    if (!navigationOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (navRef.current?.contains(target) || navToggleRef.current?.contains(target)) {
+        return;
+      }
+      setNavigationOpen(false);
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [navigationOpen]);
+
   return (
     <header
       className={`sticky left-0 top-0 w-full z-50 border-b border-gray-3/70 bg-white/95 backdrop-blur transition-all ease-in-out duration-300 ${
@@ -106,6 +125,7 @@ const Header = () => {
           <div className="flex w-full lg:w-auto items-center gap-7.5">
             {/* <!--=== Main Nav Start ===--> */}
             <div
+              ref={navRef}
               className={`w-[288px] absolute right-4 top-full xl:static xl:w-auto h-0 xl:h-auto invisible xl:visible xl:flex items-center justify-between ${
                 navigationOpen &&
                 `!visible bg-white shadow-xl border border-gray-3 !h-auto max-h-[400px] overflow-y-scroll rounded-xl p-5`
@@ -128,6 +148,7 @@ const Header = () => {
                       >
                         <Link
                           href={menuItem.path}
+                          onClick={() => setNavigationOpen(false)}
                           className={`hover:text-blue text-custom-sm font-medium text-dark flex rounded-md px-3 ${
                             stickyMenu ? "xl:py-2.5" : "xl:py-3"
                           }`}
@@ -271,6 +292,7 @@ const Header = () => {
                 id="Toggle"
                 aria-label="Toggler"
                 className="xl:hidden block"
+                ref={navToggleRef}
                 onClick={() => setNavigationOpen(!navigationOpen)}
               >
                 <span className="block relative cursor-pointer w-5.5 h-5.5">

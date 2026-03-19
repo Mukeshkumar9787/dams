@@ -62,9 +62,8 @@ const ProductItem = ({ item }: { item: Product }) => {
           </span>
           <div className="my-2.5 flex flex-wrap items-center gap-x-3 gap-y-2">
             {reviewCount > 0 && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center">
                 {renderStars(item?.avgRating || 0)}
-                <span className="text-sm text-dark-4">({reviewCount})</span>
               </div>
             )}
             <AvailableStock stock={item.stock} />
