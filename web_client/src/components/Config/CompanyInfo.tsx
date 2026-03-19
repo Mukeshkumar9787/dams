@@ -80,7 +80,7 @@ const CompanyInfo = ({ compInfo, setCompInfo }) => {
   ];
 
   return (
-    <div className="mb-8 rounded-[26px] bg-white p-5 sm:p-6">
+    <div className="mb-8 rounded-[24px] bg-white/80 p-4 shadow-sm sm:p-5">
       <div className="mb-6 pb-5">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">
           Company Info
@@ -92,10 +92,10 @@ const CompanyInfo = ({ compInfo, setCompInfo }) => {
           These details power the footer, support contact info, and policy links across the storefront.
         </p>
       </div>
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="admin-form-grid">
         {fields.map((field) => (
         <div className={field.col === 2 ? "md:col-span-2" : ""} key={field.key}>
-          <label className="mb-2 block text-sm font-medium text-slate-700">{field.label}</label>
+          <label className="form-label">{field.label}</label>
 
           {field.type === "textarea" ? (
             <textarea
@@ -106,7 +106,7 @@ const CompanyInfo = ({ compInfo, setCompInfo }) => {
                 handleOnChange(field.key, e.target.value)
               }
               required={field.required}
-              className="min-h-[120px] w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-sky-500"
+              className="form-input min-h-[140px] resize-y bg-white text-slate-950 placeholder:text-slate-400"
             />
           ) : (
             <input
@@ -117,7 +117,7 @@ const CompanyInfo = ({ compInfo, setCompInfo }) => {
                 handleOnChange(field.key, e.target.value)
               }
               required={field.required}
-              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-sky-500"
+              className="form-input bg-white text-slate-950 placeholder:text-slate-400"
             />
           )}
         </div>

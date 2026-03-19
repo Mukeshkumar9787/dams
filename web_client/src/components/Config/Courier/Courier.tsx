@@ -30,7 +30,7 @@ function Courier({ setCouriers, rowIndex, courier }) {
     }
 
     return (
-        <div className="mb-4 pb-4 last:mb-0 last:pb-0">
+        <div className="mb-4 rounded-[22px] bg-slate-50/80 p-4 last:mb-0">
             <div className='flex flex-col gap-3 xl:flex-row'>
                 <input
                     type="text"
@@ -39,7 +39,7 @@ function Courier({ setCouriers, rowIndex, courier }) {
                     name="name"
                     onChange={handleChange}
                     required
-                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-sky-500 xl:w-[220px] xl:flex-none"
+                    className="form-input w-full bg-white text-slate-950 placeholder:text-slate-400 xl:w-[220px] xl:flex-none"
                 />
                 <input
                     type="text"
@@ -48,10 +48,10 @@ function Courier({ setCouriers, rowIndex, courier }) {
                     name="link"
                     onChange={handleChange}
                     required
-                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-sky-500 xl:min-w-0 xl:flex-1"
+                    className="form-input w-full bg-white text-slate-950 placeholder:text-slate-400 xl:min-w-0 xl:flex-1"
                 />
                 <div className="flex justify-end gap-1 xl:ml-auto">
-                    <Button className="h-12 rounded-2xl bg-red px-5 text-white" onClick={handleRemove}>Remove</Button>
+                    <Button className="btn-danger h-auto px-5" onClick={handleRemove}>Remove</Button>
                 </div>
             </div>
         </div>

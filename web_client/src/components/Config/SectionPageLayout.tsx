@@ -34,11 +34,11 @@ const SectionPageLayout = ({
         <div className="surface-card max-w-[1040px] w-full overflow-hidden p-0 shadow-[0_20px_55px_rgba(15,23,42,0.08)]">
           <form onSubmit={onSubmit} className="p-5 sm:p-7">
             {children}
-            <div className="mt-8 flex justify-end pt-6">
+            <div className="mt-8 flex justify-end border-t border-slate-200/80 pt-6">
               <button
                 type="submit"
                 disabled={isSaving}
-                className="inline-flex min-w-[220px] items-center justify-center rounded-2xl bg-blue px-6 py-3 text-sm font-medium text-white transition hover:bg-blue-dark disabled:cursor-not-allowed disabled:opacity-70"
+                className="btn-primary min-w-[220px] text-sm disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {isSaving ? "Saving..." : saveLabel}
               </button>

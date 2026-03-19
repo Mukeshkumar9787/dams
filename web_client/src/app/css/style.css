@@ -56,22 +56,23 @@
   .ant-input,
   .ant-input-affix-wrapper,
   .ant-select-selector {
-    border-radius: 10px !important;
+    border-radius: 16px !important;
     border-color: var(--border-soft) !important;
     box-shadow: none !important;
   }
 
   .ant-input,
   .ant-input-affix-wrapper {
-    min-height: 44px;
+    min-height: 48px;
     background-color: #f8f9fc !important;
+    padding-inline: 16px !important;
   }
 
   .ant-select-selector {
-    min-height: 44px !important;
+    min-height: 48px !important;
     background-color: #f8f9fc !important;
     align-items: center !important;
-    padding-inline: 14px !important;
+    padding-inline: 16px !important;
   }
 
   button {
@@ -94,29 +95,52 @@
 
 @layer components {
   .surface-card {
-    @apply rounded-xl border border-gray-3 bg-white;
-    box-shadow: 0px 12px 32px rgba(28, 39, 76, 0.06);
+    @apply rounded-[28px] border border-gray-3 bg-white;
+    box-shadow: 0px 18px 46px rgba(15, 23, 42, 0.08);
   }
 
   .form-card {
     @apply surface-card p-5 sm:p-8 xl:p-10;
-    background: linear-gradient(180deg, #ffffff 0%, #fcfdff 100%);
+    background:
+      radial-gradient(circle at top right, rgba(14, 165, 233, 0.1), transparent 24%),
+      linear-gradient(180deg, #ffffff 0%, #fcfdff 100%);
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-lg bg-blue px-6 py-3 font-medium text-white transition hover:bg-blue-dark;
+    @apply inline-flex min-h-[50px] items-center justify-center rounded-2xl bg-blue px-6 py-3 font-medium text-white transition hover:bg-blue-dark;
+    box-shadow: 0 14px 28px rgba(37, 99, 235, 0.2);
   }
 
   .btn-danger {
-    @apply inline-flex items-center justify-center rounded-lg bg-red px-6 py-3 font-medium text-white transition hover:opacity-90;
+    @apply inline-flex min-h-[50px] items-center justify-center rounded-2xl bg-red px-6 py-3 font-medium text-white transition hover:opacity-90;
+    box-shadow: 0 14px 28px rgba(239, 68, 68, 0.16);
   }
 
   .form-label {
-    @apply mb-2.5 block text-sm font-medium text-dark;
+    @apply mb-2.5 block text-sm font-semibold uppercase tracking-[0.12em];
+    color: #64748b;
   }
 
   .form-input {
-    @apply w-full rounded-lg border border-gray-3 bg-gray-1 px-5 py-3 text-dark placeholder:text-dark-5 outline-none;
+    @apply w-full rounded-2xl border border-gray-3 bg-gray-1 px-5 py-3.5 text-dark placeholder:text-dark-5 outline-none;
+    min-height: 52px;
+  }
+
+  .admin-page-card {
+    @apply surface-card p-5 sm:p-7;
+    background:
+      linear-gradient(180deg, rgba(248, 250, 252, 0.68) 0%, rgba(255, 255, 255, 1) 30%),
+      #ffffff;
+  }
+
+  .admin-form-grid {
+    @apply grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-2;
+  }
+
+  .admin-form-section {
+    @apply mb-6 rounded-[24px] border border-gray-3 bg-white p-4 sm:p-5;
+    background-color: rgba(255, 255, 255, 0.82);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
   }
 
   .dropdown {
@@ -328,7 +352,10 @@ input[type='search']::-webkit-search-results-decoration {
   border: 1px solid #e2e8f0;
   border-radius: 24px;
   overflow: hidden;
-  background: #fff;
+  background:
+    linear-gradient(180deg, rgba(248, 250, 252, 0.55) 0%, rgba(255, 255, 255, 1) 25%),
+    #fff;
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.06);
 }
 
 .admin-data-table .ant-table-container {
@@ -336,7 +363,7 @@ input[type='search']::-webkit-search-results-decoration {
 }
 
 .admin-data-table .ant-table-thead > tr > th {
-  background: #f8fafc !important;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%) !important;
   color: #475569 !important;
   font-size: 12px;
   font-weight: 700;
@@ -352,17 +379,37 @@ input[type='search']::-webkit-search-results-decoration {
   padding-top: 16px !important;
   padding-bottom: 16px !important;
   vertical-align: middle;
+  background: rgba(255, 255, 255, 0.94);
 }
 
 .admin-data-table .ant-table-tbody > tr:last-child > td {
   border-bottom: 0 !important;
 }
 
+.admin-data-table .ant-table-tbody > tr:nth-child(even) > td {
+  background: rgba(248, 250, 252, 0.82);
+}
+
 .admin-data-table .ant-table-tbody > tr:hover > td {
-  background: #f8fbff !important;
+  background: #eff6ff !important;
 }
 
 .admin-data-table .ant-pagination {
   margin-top: 20px !important;
   margin-bottom: 0 !important;
+}
+
+.admin-data-table .ant-pagination .ant-pagination-item,
+.admin-data-table .ant-pagination .ant-pagination-prev,
+.admin-data-table .ant-pagination .ant-pagination-next {
+  border-radius: 12px !important;
+}
+
+.admin-data-table .ant-pagination .ant-pagination-item-active {
+  background: #2563eb !important;
+  border-color: #2563eb !important;
+}
+
+.admin-data-table .ant-pagination .ant-pagination-item-active a {
+  color: #fff !important;
 }

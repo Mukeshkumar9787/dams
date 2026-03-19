@@ -89,7 +89,7 @@ const CategoryForm = ({ params }) => {
             title={isNew ? "Create a new category." : "Edit category details."}
             description="Define category names, artwork, and status so catalog organization stays clean and storefront-ready."
           />
-          <div className="form-card max-w-[570px] w-full mx-auto">
+          <div className="form-card max-w-[620px] w-full mx-auto">
 
             <div className="text-center mb-8">
               <h2 className="font-semibold text-xl sm:text-2xl text-dark">
@@ -132,10 +132,10 @@ const CategoryForm = ({ params }) => {
               </div>
 
               {/* Submit */}
-              <div className="w-full flex">
+              <div className="flex w-full flex-col gap-3 sm:flex-row">
               <button
                 type="submit"
-                className="btn-primary w-3/4"
+                className="btn-primary w-full sm:flex-1"
               >
                 Save Category
               </button>
@@ -143,7 +143,7 @@ const CategoryForm = ({ params }) => {
                   <button
                   type="button"
                   onClick={handleDelete}
-                  className="btn-danger ml-3 w-1/4"
+                  className="btn-danger w-full sm:w-auto sm:min-w-[160px]"
                   >
                   Delete
                   </button>

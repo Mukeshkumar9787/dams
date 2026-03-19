@@ -76,7 +76,7 @@ const ColorForm = ({ params }) => {
             title={isNew ? "Create a new color." : "Edit color details."}
             description="Define display names, swatches, and active status for color options used across the product catalog."
           />
-          <div className="form-card max-w-[570px] w-full mx-auto">
+          <div className="form-card max-w-[620px] w-full mx-auto">
 
             <div className="text-center mb-8">
               <h2 className="font-semibold text-xl sm:text-2xl text-dark">
@@ -86,7 +86,7 @@ const ColorForm = ({ params }) => {
 
             <form onSubmit={handleSubmit}>
               {/* Color Name */}
-              <div className="mb-5">
+              <div className="admin-form-section mb-6">
                 <label className="form-label">Color</label>
                 <input
                   type="text"
@@ -98,24 +98,26 @@ const ColorForm = ({ params }) => {
                 />
               </div>
 
-              <div className="mb-5">
+              <div className="admin-form-section mb-6">
                 <label className="form-label">Code</label>
-                <div>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                   <input
                     type="color"
                     placeholder="Enter Code"
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
                     required
-                    className="form-input"
+                    className="h-14 w-full rounded-2xl border border-slate-200 bg-white p-2 sm:w-24"
                   />
-                  <div key={code} className={`w-10 h-10`} style={{backgroundColor: code}}>
+                  <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                    <div key={code} className="h-8 w-8 rounded-xl border border-slate-200" style={{backgroundColor: code}} />
+                    <span className="text-sm font-medium text-slate-600">{code}</span>
                   </div>
                 </div>
               </div>
 
               {/* Status */}
-              <div className="mb-7">
+              <div className="admin-form-section mb-7">
                 <label className="form-label">Status</label>
                 <select
                   value={status}
@@ -129,10 +131,10 @@ const ColorForm = ({ params }) => {
               </div>
 
               {/* Submit */}
-              <div className="w-full flex">
+              <div className="flex w-full flex-col gap-3 sm:flex-row">
               <button
                 type="submit"
-                className="btn-primary w-3/4"
+                className="btn-primary w-full sm:flex-1"
               >
                 Save Color
               </button>
@@ -140,7 +142,7 @@ const ColorForm = ({ params }) => {
                   <button
                   type="button"
                   onClick={handleDelete}
-                  className="btn-danger ml-3 w-1/4"
+                  className="btn-danger w-full sm:w-auto sm:min-w-[160px]"
                   >
                   Delete
                   </button>

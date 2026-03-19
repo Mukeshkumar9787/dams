@@ -140,7 +140,7 @@ const Product = () => {
               description="Track catalog coverage, update details, and keep inventory-ready products visible to customers."
               stats={[{ label: "Products", value: totalCount }]}
             />
-            <div className="surface-card p-5 sm:p-7">
+            <div className="admin-page-card">
               <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
                 <div>
                   <h2 className="text-xl font-semibold text-dark">Product List</h2>

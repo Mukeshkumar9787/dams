@@ -6,7 +6,7 @@ import Breadcrumb from "../Common/Breadcrumb";
 import { getAdminDashboard } from "@/http/apiCalls";
 import { getCurrencyDetails, getLoggedInUserData, getShippingDisplay, getStoredToken, redirectToSignIn } from "@/utils/helper";
 import { ORDER_STATUS, ORDER_STATUS_COLOR, ROLE_TYPES, STATUS_TYPES } from "@/utils/constants";
-import { ORDER_URL, USER_URL } from "@/utils/appUrls";
+import { ORDER_URL, PRODUCT_URL, USER_URL } from "@/utils/appUrls";
 
 const SALES_STATUSES = new Set([
   ORDER_STATUS.PLACED,
@@ -308,7 +308,12 @@ const Dashboard = () => {
                           className="flex items-center justify-between gap-4 rounded-2xl border border-gray-3 px-4 py-3"
                         >
                           <div className="min-w-0">
-                            <p className="truncate font-medium text-dark">{product.title}</p>
+                            <Link
+                              href={`${PRODUCT_URL}/${product.slug}`}
+                              className="block truncate font-medium text-dark transition hover:text-blue"
+                            >
+                              {product.title}
+                            </Link>
                             <p className="text-sm text-dark-4">
                               {product.categoryName || "Uncategorized"} • {product.status}
                             </p>
@@ -346,7 +351,12 @@ const Dashboard = () => {
                             {index + 1}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="truncate font-medium text-dark">{product.title}</p>
+                            <Link
+                              href={`${PRODUCT_URL}/${product.slug}`}
+                              className="block truncate font-medium text-dark transition hover:text-blue"
+                            >
+                              {product.title}
+                            </Link>
                             <p className="text-sm text-dark-4">
                               {product.categoryName || "Uncategorized"} • {product.unitsSold} units sold
                             </p>

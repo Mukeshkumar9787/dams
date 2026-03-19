@@ -183,7 +183,7 @@ const ProductForm = ({ params }) => {
             title={isNew ? "Create a new product." : "Edit product details."}
             description="Manage pricing, stock, media, attributes, and review moderation from a single product workspace."
           />
-          <div className="form-card max-w-[570px] w-full mx-auto">
+          <div className="form-card max-w-[760px] w-full mx-auto">
 
             <div className="text-center mb-8">
               <h2 className="font-semibold text-xl sm:text-2xl text-dark">
@@ -235,10 +235,10 @@ const ProductForm = ({ params }) => {
               </div>
 
               {/* Color / Size */}
-              <div className="mb-7 flex w-full gap-5">
-                <div className="w-1/2">
+              <div className="admin-form-grid mb-7">
+                <div>
                   <label className="form-label">Color</label>
-                  <Select value={colorId} onChange={(value) => setColorId(value)} style={{ width: 200 }} className="h-13 bg-gray">
+                  <Select value={colorId} onChange={(value) => setColorId(value)} style={{ width: "100%" }} className="h-13 bg-gray w-full">
                     {colorItems.map(item => (
                       <Select.Option key={item.id} value={item.id}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -258,7 +258,7 @@ const ProductForm = ({ params }) => {
                     ))}
                   </Select>
                 </div>
-                <div className="w-1/2">
+                <div>
                   <label className="form-label">Size</label>
                   <select
                     itemType="number"
@@ -277,8 +277,8 @@ const ProductForm = ({ params }) => {
               </div>
 
               {/* Hsn */}
-              <div className="mb-7 flex w-full gap-5">
-                <div className="w-1/2">
+              <div className="admin-form-grid mb-7">
+                <div>
                   <label className="form-label">Hsn</label>
                   <select
                     itemType="number"
@@ -294,7 +294,7 @@ const ProductForm = ({ params }) => {
                     )}
                   </select>
                 </div>
-                <div className="w-1/2">
+                <div>
                 <label className="form-label">Tax</label>
                 <input
                   type="text"
@@ -306,8 +306,8 @@ const ProductForm = ({ params }) => {
               </div>
               </div>
 
-              <div className="mb-7 flex w-full gap-5">
-                <div className="w-1/2">
+              <div className="admin-form-grid mb-7">
+                <div>
                   <label className="form-label">Mrp</label>
                   <input
                   type="number"
@@ -319,7 +319,7 @@ const ProductForm = ({ params }) => {
                   className="form-input"
                   />
                 </div>
-                <div className="w-1/2">
+                <div>
                   <label className="form-label">Price</label>
                   <input
                   type="number"
@@ -369,10 +369,10 @@ const ProductForm = ({ params }) => {
               </div>
 
               {/* Submit */}
-              <div className="w-full flex">
+              <div className="flex w-full flex-col gap-3 sm:flex-row">
               <button
                 type="submit"
-                className="btn-primary w-3/4"
+                className="btn-primary w-full sm:flex-1"
               >
                 Save Product
               </button>
@@ -380,7 +380,7 @@ const ProductForm = ({ params }) => {
                   <button
                   type="button"
                   onClick={handleDelete}
-                  className="btn-danger ml-3 w-1/4"
+                  className="btn-danger w-full sm:w-auto sm:min-w-[160px]"
                   >
                   Delete
                   </button>

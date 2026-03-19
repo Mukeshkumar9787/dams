@@ -74,7 +74,7 @@ const SizeForm = ({ params }) => {
             title={isNew ? "Create a new size." : "Edit size details."}
             description="Maintain consistent size options and control whether they remain available across the catalog."
           />
-          <div className="form-card max-w-[570px] w-full mx-auto">
+          <div className="form-card max-w-[620px] w-full mx-auto">
 
             <div className="text-center mb-8">
               <h2 className="font-semibold text-xl sm:text-2xl text-dark">
@@ -84,7 +84,7 @@ const SizeForm = ({ params }) => {
 
             <form onSubmit={handleSubmit}>
               {/* Size Name */}
-              <div className="mb-5">
+              <div className="admin-form-section mb-6">
                 <label className="form-label">Size</label>
                 <input
                   type="text"
@@ -97,7 +97,7 @@ const SizeForm = ({ params }) => {
               </div>
 
               {/* Status */}
-              <div className="mb-7">
+              <div className="admin-form-section mb-7">
                 <label className="form-label">Status</label>
                 <select
                   value={status}
@@ -111,10 +111,10 @@ const SizeForm = ({ params }) => {
               </div>
 
               {/* Submit */}
-              <div className="w-full flex">
+              <div className="flex w-full flex-col gap-3 sm:flex-row">
               <button
                 type="submit"
-                className="btn-primary w-3/4"
+                className="btn-primary w-full sm:flex-1"
               >
                 Save Size
               </button>
@@ -122,7 +122,7 @@ const SizeForm = ({ params }) => {
                   <button
                   type="button"
                   onClick={handleDelete}
-                  className="btn-danger ml-3 w-1/4"
+                  className="btn-danger w-full sm:w-auto sm:min-w-[160px]"
                   >
                   Delete
                   </button>

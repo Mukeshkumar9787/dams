@@ -26,7 +26,7 @@ const Ship = ({ shipInfo, setShipInfo }) => {
     }
 
     return (
-        <div className="mb-8 mt-8 rounded-[26px] bg-white p-5 sm:p-6">
+        <div className="mb-8 mt-8 rounded-[24px] bg-white/80 p-4 shadow-sm sm:p-5">
             <div className="pb-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">
                     Shipping Info
@@ -42,7 +42,7 @@ const Ship = ({ shipInfo, setShipInfo }) => {
             <div className="mt-5">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                   <div className="w-full max-w-[320px]">
-                    <label className="mb-2 block text-sm font-medium text-slate-700">Default Amount</label>
+                    <label className="form-label">Default Amount</label>
                     <input
                         type="number"
                         placeholder="Enter amount"
@@ -51,10 +51,10 @@ const Ship = ({ shipInfo, setShipInfo }) => {
                         min={0}
                         onChange={(e) => handleChange(e)}
                         required
-                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-sky-500"
+                        className="form-input bg-white text-slate-950 placeholder:text-slate-400"
                     />
                   </div>
-                  <Button className="h-12 rounded-2xl bg-blue px-5 text-white" onClick={handleAddCountry}>Add Country</Button>
+                  <Button className="btn-primary h-auto px-5" onClick={handleAddCountry}>Add Country</Button>
                 </div>
 
                 {(countries.length > 0) && (

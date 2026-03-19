@@ -141,7 +141,7 @@ const AdminOrders = () => {
               description="Review pipeline activity, search active orders, and move fulfillment forward from one operational screen."
               stats={[{ label: "Orders", value: totalCount }]}
             />
-            <div className="surface-card p-5 sm:p-7">
+            <div className="admin-page-card">
               <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
                 <div>
                   <h2 className="text-xl font-semibold text-dark">Order List</h2>

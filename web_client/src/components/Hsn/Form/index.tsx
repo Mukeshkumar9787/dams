@@ -76,7 +76,7 @@ const HsnForm = ({ params }) => {
             title={isNew ? "Create a new HSN record." : "Edit HSN details."}
             description="Manage HSN code metadata and tax rates used during catalog setup and order calculation."
           />
-          <div className="form-card max-w-[570px] w-full mx-auto">
+          <div className="form-card max-w-[620px] w-full mx-auto">
 
             <div className="text-center mb-8">
               <h2 className="font-semibold text-xl sm:text-2xl text-dark">
@@ -86,7 +86,7 @@ const HsnForm = ({ params }) => {
 
             <form onSubmit={handleSubmit}>
               {/* Hsn Name */}
-              <div className="mb-5">
+              <div className="admin-form-section mb-6">
                 <label className="form-label">Hsn Code</label>
                 <input
                   type="text"
@@ -98,7 +98,7 @@ const HsnForm = ({ params }) => {
                 />
               </div>
 
-              <div className="mb-5">
+              <div className="admin-form-section mb-6">
                 <label className="form-label">Tax</label>
                 <input
                   type="number"
@@ -111,7 +111,7 @@ const HsnForm = ({ params }) => {
               </div>
 
               {/* Status */}
-              <div className="mb-7">
+              <div className="admin-form-section mb-7">
                 <label className="form-label">Status</label>
                 <select
                   value={status}
@@ -125,10 +125,10 @@ const HsnForm = ({ params }) => {
               </div>
 
               {/* Submit */}
-              <div className="w-full flex">
+              <div className="flex w-full flex-col gap-3 sm:flex-row">
               <button
                 type="submit"
-                className="btn-primary w-3/4"
+                className="btn-primary w-full sm:flex-1"
               >
                 Save Hsn
               </button>
@@ -136,7 +136,7 @@ const HsnForm = ({ params }) => {
                   <button
                   type="button"
                   onClick={handleDelete}
-                  className="btn-danger ml-3 w-1/4"
+                  className="btn-danger w-full sm:w-auto sm:min-w-[160px]"
                   >
                   Delete
                   </button>
