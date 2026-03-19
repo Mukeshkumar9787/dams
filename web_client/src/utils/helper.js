@@ -1,5 +1,7 @@
 import { getUserInfo } from "@/http/apiCalls";
+import { DASHBOARD_URL } from "./appUrls";
 import { ORDER_STATUS } from "./constants";
+import { ROLE_TYPES } from "./constants";
 
 const clearExpiredSession = () => {
   localStorage.removeItem("token");
@@ -89,13 +91,27 @@ export const getLoggedInUserData = async () => {
   } 
 }
 
-export const afterSucessfullLogin = (token) => {
+export const afterSucessfullLogin = async (token) => {
   localStorage.setItem("token", token);
   const next = localStorage.getItem('next'); 
   if(next){
     localStorage.removeItem('next');
   }
-  window.location.href = next ? next : '/'
+
+  if (next) {
+    window.location.href = next;
+    return;
+  }
+
+  try {
+    const user = await getUserInfo();
+    if (user?.data?.role === ROLE_TYPES.ADMIN) {
+      window.location.href = DASHBOARD_URL;
+      return;
+    }
+  } catch (error) {}
+
+  window.location.href = '/';
 }
 
 export const getOfferPercent = (mrp, price) => {

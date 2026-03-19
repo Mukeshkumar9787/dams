@@ -1,5 +1,5 @@
 import { Menu } from "@/types/Menu";
-import { CATEGORY_URL, COLOR_URL, CONFIG_URL, HSN_URL, ORDER_URL, PRODUCT_URL, SIZE_URL, USER_URL } from "@/utils/appUrls";
+import { CATEGORY_URL, COLOR_URL, CONFIG_URL, DASHBOARD_URL, HSN_URL, ORDER_URL, PRODUCT_URL, SIZE_URL, USER_URL } from "@/utils/appUrls";
 
 export const menuData: Menu[] = [
   {
@@ -30,6 +30,11 @@ export const adminMenuData: Menu[] = [
     newTab: false,
     path: "/",
     submenu: [
+      {
+        title: "Dashboard",
+        newTab: false,
+        path: DASHBOARD_URL,
+      },
       {
         title: "Orders",
         newTab: false,

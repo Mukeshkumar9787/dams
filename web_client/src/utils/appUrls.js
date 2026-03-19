@@ -14,6 +14,7 @@ export const COLOR_URL = '/color';
 export const COLOR_NEW_URL = `${COLOR_URL}/new`;
 
 export const ORDER_URL = '/orders';
+export const DASHBOARD_URL = '/dashboard';
 
 export const USER_URL = '/users';
 
