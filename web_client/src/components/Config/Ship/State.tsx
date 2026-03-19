@@ -39,13 +39,13 @@ function State({ country, state, setShipInfo, countryIndex, rowIndex }) {
     }
     const stateList = countryList.find(i => i.name === country.name)?.states || [];
     return (
-        <div className="mb-5 flex gap-3">
+        <div className="mb-3 flex flex-col gap-3 rounded-2xl bg-white p-3 md:flex-row">
             <select
                 name='name'
                 value={state?.name}
                 onChange={handleChange}
                 required
-                className="form-input"
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition focus:border-sky-500"
             >
                 <option value="">Select State</option>
                 {stateList.map((state) => (
@@ -62,9 +62,9 @@ function State({ country, state, setShipInfo, countryIndex, rowIndex }) {
                 min={0}
                 onChange={handleChange}
                 required
-                className="form-input"
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition focus:border-sky-500 md:max-w-[220px]"
             />
-            <Button className="bg-red text-white p-5 rounded-md" onClick={handleRemove}>Remove</Button>
+            <Button className="h-12 rounded-2xl bg-red px-5 text-white md:ml-auto" onClick={handleRemove}>Remove</Button>
         </div>
     )
 }

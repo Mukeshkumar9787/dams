@@ -1,6 +1,6 @@
 "use client";
 
-import Breadcrumb from "@/components/Common/Breadcrumb";
+import AdminOverview from "@/components/Common/AdminOverview";
 import FileUploader from "@/components/Common/FileUploader";
 import { createProduct, deleteProduct, getCategories, getColors, getHsnCodes, getProductBySlug, getProductReviewsForAdmin, getSizes, updateProduct, updateProductReviewVisibility } from "@/http/apiCalls";
 import { STATUS_TYPES } from "@/utils/constants";
@@ -176,10 +176,13 @@ const ProductForm = ({ params }) => {
 
   return (
     <>
-      <Breadcrumb title={"Product"} pages={["Product /", params.slug]} />
-
       <section className="page-section bg-gray-2/60">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
+          <AdminOverview
+            eyebrow="Catalog Admin"
+            title={isNew ? "Create a new product." : "Edit product details."}
+            description="Manage pricing, stock, media, attributes, and review moderation from a single product workspace."
+          />
           <div className="form-card max-w-[570px] w-full mx-auto">
 
             <div className="text-center mb-8">

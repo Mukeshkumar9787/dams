@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import Breadcrumb from "../Common/Breadcrumb";
+import AdminOverview from "../Common/AdminOverview";
 import Link from "next/link";
 import { getCategories } from "../../http/apiCalls.js";
 import { Table } from "antd"
@@ -28,8 +28,9 @@ const Category = () => {
       title: 'Image',
       dataIndex: 'img',
       key: 'img',
+      align: 'center',
       render: (text) => {
-        return <img className="h-14 w-14 rounded-lg border border-gray-3 object-cover" src={text}/>
+        return <img alt="" className="mx-auto h-14 w-14 rounded-xl border border-gray-3 object-cover" src={text}/>
       },
     },
     {
@@ -42,6 +43,7 @@ const Category = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      align: 'center',
       render: (text) => {
         const isActive = text === STATUS_TYPES.ACTIVE;
         return (
@@ -59,6 +61,7 @@ const Category = () => {
       title: 'Action',
       dataIndex: 'slug',
       key: 'action',
+      align: 'center',
       render: (slug) => {
         return(
           <Link
@@ -89,13 +92,14 @@ const Category = () => {
   
   return (
     <>
-      {/* <!-- ===== Breadcrumb Section Start ===== --> */}
-      <section>
-        <Breadcrumb title={"Category"} pages={["Category"]} />
-      </section>
-      {/* <!-- ===== Breadcrumb Section End ===== --> */}
         <section className="page-section bg-gray-2/60">
           <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
+            <AdminOverview
+              eyebrow="Catalog Admin"
+              title="Manage product categories."
+              description="Create, edit, and control the category structure used across the storefront catalog."
+              stats={[{ label: "Categories", value: categoryItems.length }]}
+            />
             <div className="surface-card p-5 sm:p-7">
               <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
                 <div>
@@ -125,9 +129,12 @@ const Category = () => {
               </Link>
               </div>
               <Table
+                className="admin-data-table"
                 dataSource={categoryItems}
                 columns={columns}
                 rowKey="id"
+                size="middle"
+                scroll={{ x: 640 }}
                 pagination={false}
                 locale={{ emptyText: "No categories found." }}
               />

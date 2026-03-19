@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import Breadcrumb from "../Common/Breadcrumb";
+import AdminOverview from "../Common/AdminOverview";
 import Link from "next/link";
 import { getColors } from "../../http/apiCalls.js";
 import { Table } from "antd"
@@ -34,9 +34,10 @@ const Color = () => {
       title: 'Color',  
       dataIndex: 'code',
       key: 'code',
+      align: 'center',
       render: (code) => {
         return (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-center gap-2">
             <div style={{backgroundColor: code}} className="h-5 w-10 rounded border border-gray-3"></div>
             <span className="text-sm text-dark-4">{code}</span>
           </div> )
@@ -46,6 +47,7 @@ const Color = () => {
       title: 'Status',  
       dataIndex: 'status',
       key: 'status',
+      align: 'center',
       render: (text) => {
         const isActive = text === STATUS_TYPES.ACTIVE;
         return (
@@ -63,6 +65,7 @@ const Color = () => {
       title: 'Action',
       dataIndex: 'title',
       key: 'action',
+      align: 'center',
       render: (title) => {
         return(
           <Link
@@ -93,13 +96,14 @@ const Color = () => {
   
   return (
     <>
-      {/* <!-- ===== Breadcrumb Section Start ===== --> */}
-      <section>
-        <Breadcrumb title={"Color"} pages={["Color"]} />
-      </section>
-      {/* <!-- ===== Breadcrumb Section End ===== --> */}
         <section className="page-section bg-gray-2/60">
           <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
+            <AdminOverview
+              eyebrow="Catalog Admin"
+              title="Manage product colors."
+              description="Keep color names, swatches, and storefront availability organized in one place."
+              stats={[{ label: "Colors", value: items.length }]}
+            />
             <div className="surface-card p-5 sm:p-7">
               <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
                 <div>
@@ -129,9 +133,12 @@ const Color = () => {
               </Link>
               </div>
               <Table
+                className="admin-data-table"
                 dataSource={items}
                 columns={columns}
                 rowKey="id"
+                size="middle"
+                scroll={{ x: 640 }}
                 pagination={false}
                 locale={{ emptyText: "No colors found." }}
               />

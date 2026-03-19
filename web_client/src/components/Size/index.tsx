@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import Breadcrumb from "../Common/Breadcrumb";
+import AdminOverview from "../Common/AdminOverview";
 import Link from "next/link";
 import { getSizes } from "../../http/apiCalls.js";
 import { Table } from "antd"
@@ -34,6 +34,7 @@ const Size = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      align: 'center',
       render: (text) => {
         const isActive = text === STATUS_TYPES.ACTIVE;
         return (
@@ -51,6 +52,7 @@ const Size = () => {
       title: 'Action',
       dataIndex: 'title',
       key: 'action',
+      align: 'center',
       render: (title) => {
         return(
           <Link
@@ -81,13 +83,14 @@ const Size = () => {
   
   return (
     <>
-      {/* <!-- ===== Breadcrumb Section Start ===== --> */}
-      <section>
-        <Breadcrumb title={"Size"} pages={["Size"]} />
-      </section>
-      {/* <!-- ===== Breadcrumb Section End ===== --> */}
         <section className="page-section bg-gray-2/60">
           <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
+            <AdminOverview
+              eyebrow="Catalog Admin"
+              title="Manage product sizes."
+              description="Define the size options available to products and keep the size catalog consistent."
+              stats={[{ label: "Sizes", value: sizeItems.length }]}
+            />
             <div className="surface-card p-5 sm:p-7">
               <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
                 <div>
@@ -117,9 +120,12 @@ const Size = () => {
               </Link>
               </div>
               <Table
+                className="admin-data-table"
                 dataSource={sizeItems}
                 columns={columns}
                 rowKey="id"
+                size="middle"
+                scroll={{ x: 560 }}
                 pagination={false}
                 locale={{ emptyText: "No sizes found." }}
               />

@@ -80,16 +80,22 @@ const CompanyInfo = ({ compInfo, setCompInfo }) => {
   ];
 
   return (
-    <>
-      <div className="text-center mb-8">
-        <h2 className="font-semibold text-xl sm:text-2xl text-dark">
+    <div className="mb-8 rounded-[26px] border border-slate-200 bg-white p-5 sm:p-6">
+      <div className="mb-6 border-b border-slate-200 pb-5">
+        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">
           Company Info
+        </p>
+        <h2 className="mt-2 text-2xl font-semibold text-slate-950">
+          Brand and contact settings
         </h2>
+        <p className="mt-2 text-sm text-slate-600">
+          These details power the footer, support contact info, and policy links across the storefront.
+        </p>
       </div>
-      <div className="grid md:grid-cols-2 gap-2">
-      {fields.map((field) => (
-        <div className={`mb-5 col-span-${field.col || 1}`} key={field.key}>
-          <label className="form-label">{field.label}</label>
+      <div className="grid gap-4 md:grid-cols-2">
+        {fields.map((field) => (
+        <div className={field.col === 2 ? "md:col-span-2" : ""} key={field.key}>
+          <label className="mb-2 block text-sm font-medium text-slate-700">{field.label}</label>
 
           {field.type === "textarea" ? (
             <textarea
@@ -100,7 +106,7 @@ const CompanyInfo = ({ compInfo, setCompInfo }) => {
                 handleOnChange(field.key, e.target.value)
               }
               required={field.required}
-              className="form-input"
+              className="min-h-[120px] w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-sky-500"
             />
           ) : (
             <input
@@ -111,13 +117,13 @@ const CompanyInfo = ({ compInfo, setCompInfo }) => {
                 handleOnChange(field.key, e.target.value)
               }
               required={field.required}
-              className="form-input"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-sky-500"
             />
           )}
         </div>
       ))}
       </div>
-    </>
+    </div>
   );
 };
 

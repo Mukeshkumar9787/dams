@@ -1,6 +1,6 @@
 "use client";
 
-import Breadcrumb from "@/components/Common/Breadcrumb";
+import AdminOverview from "@/components/Common/AdminOverview";
 import { createColor, deleteColor, getColorBySlug, updateColor } from "@/http/apiCalls";
 import { STATUS_TYPES } from "@/utils/constants";
 import { COLOR_URL } from "@/utils/appUrls";
@@ -69,10 +69,13 @@ const ColorForm = ({ params }) => {
 
   return (
     <>
-      <Breadcrumb title={"Color"} pages={["Color /", params.slug]} />
-
       <section className="page-section bg-gray-2/60">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
+          <AdminOverview
+            eyebrow="Catalog Admin"
+            title={isNew ? "Create a new color." : "Edit color details."}
+            description="Define display names, swatches, and active status for color options used across the product catalog."
+          />
           <div className="form-card max-w-[570px] w-full mx-auto">
 
             <div className="text-center mb-8">

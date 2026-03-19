@@ -1,6 +1,6 @@
 "use client";
 
-import Breadcrumb from "@/components/Common/Breadcrumb";
+import AdminOverview from "@/components/Common/AdminOverview";
 import { getConfig, updateConfig } from "@/http/apiCalls";
 import { CONFIG_KEYS } from "@/utils/constants";
 import React, { useState } from "react";
@@ -13,14 +13,17 @@ const ConfigForm = () => {
   const [compInfo, setCompInfo] = useState({});
   const [shipInfo, setShipInfo] = useState({});
   const [couriers, setCouriers] = useState([]);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSaving(true);
     const response = await updateConfig({config: { [CONFIG_KEYS.COMP_INFO]: compInfo, [CONFIG_KEYS.SHIPPING]: shipInfo, [CONFIG_KEYS.COURIER]: couriers }});
     if (response.success) {
       notifySuccess("Updated successfully.");
       fetchConfig();
     }
+    setIsSaving(false);
   };
 
   const fetchConfig = React.useCallback(async () => {
@@ -44,21 +47,31 @@ const ConfigForm = () => {
 
   return (
     <>
-      <Breadcrumb title={"Config"} pages={["Config"]} />
-
       <section className="page-section bg-gray-2/60">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
-          <div className="form-card max-w-[1000px] w-full mx-auto">
-            <form onSubmit={handleSubmit}>
+          <AdminOverview
+            eyebrow="Admin Settings"
+            title="Configure store identity, shipping rules, and courier links."
+            description="Keep the operational basics in one place so storefront details and fulfillment settings stay aligned."
+            stats={[
+              { label: "Company", value: compInfo?.name || "Not set" },
+              { label: "Countries", value: (shipInfo?.countries || []).length },
+              { label: "Couriers", value: couriers.length },
+            ]}
+          />
+
+          <div className="surface-card max-w-[1040px] w-full mx-auto overflow-hidden p-0 shadow-[0_20px_55px_rgba(15,23,42,0.08)]">
+            <form onSubmit={handleSubmit} className="p-5 sm:p-7">
               <CompanyInfo compInfo={compInfo} setCompInfo={setCompInfo} />
               <Ship shipInfo={shipInfo} setShipInfo={setShipInfo} />
               <CourierList couriers={couriers} setCouriers={setCouriers} />
-              <div className="w-full flex justify-end mt-4">
+              <div className="mt-8 flex justify-end border-t border-slate-200 pt-6">
                 <button
                   type="submit"
-                  className="btn-primary w-1/2"
+                  disabled={isSaving}
+                  className="inline-flex min-w-[220px] items-center justify-center rounded-2xl bg-blue px-6 py-3 text-sm font-medium text-white transition hover:bg-blue-dark disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  Save
+                  {isSaving ? "Saving..." : "Save Settings"}
                 </button>
               </div>
             </form>

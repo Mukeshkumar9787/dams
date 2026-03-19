@@ -4,6 +4,7 @@ import "../css/euclid-circular-a-font.css";
 import "../css/style.css";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
+import AdminDesktopShell from "@/components/AdminDesktopShell";
 
 import { ModalProvider } from "../context/QuickViewModalContext";
 import { CartModalProvider } from "../context/CartSidebarModalContext";
@@ -50,7 +51,7 @@ export default function RootLayout({
                       <PreviewSliderProvider>
                         <Header />
                         <main className="relative z-10 min-h-[70vh]">
-                          {children}
+                          <AdminDesktopShell>{children}</AdminDesktopShell>
                         </main>
 
                         <QuickViewModal />

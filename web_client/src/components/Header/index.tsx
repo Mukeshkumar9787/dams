@@ -120,6 +120,7 @@ const Header = () => {
                         key={i}
                         menuItem={menuItem}
                         stickyMenu={stickyMenu}
+                        className={user?.role === ROLE_TYPES.ADMIN ? "xl:hidden" : ""}
                       />
                     ) : (
                       <li

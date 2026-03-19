@@ -30,8 +30,8 @@ function Courier({ setCouriers, rowIndex, courier }) {
     }
 
     return (
-        <div className="mb-5 bg-white">
-            <div className='flex gap-2'>
+        <div className="mb-4 border-b border-slate-200 pb-4 last:mb-0 last:border-b-0 last:pb-0">
+            <div className='flex flex-col gap-3 xl:flex-row'>
                 <input
                     type="text"
                     placeholder="Enter name"
@@ -39,7 +39,7 @@ function Courier({ setCouriers, rowIndex, courier }) {
                     name="name"
                     onChange={handleChange}
                     required
-                    className="form-input"
+                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-sky-500 xl:w-[220px] xl:flex-none"
                 />
                 <input
                     type="text"
@@ -48,10 +48,10 @@ function Courier({ setCouriers, rowIndex, courier }) {
                     name="link"
                     onChange={handleChange}
                     required
-                    className="form-input"
+                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-sky-500 xl:min-w-0 xl:flex-1"
                 />
-                <div className="flex justify-end gap-1">
-                    <Button className="bg-red text-white p-5 rounded-md" onClick={handleRemove}>Remove</Button>
+                <div className="flex justify-end gap-1 xl:ml-auto">
+                    <Button className="h-12 rounded-2xl bg-red px-5 text-white" onClick={handleRemove}>Remove</Button>
                 </div>
             </div>
         </div>

@@ -6,7 +6,7 @@ import Breadcrumb from "../Common/Breadcrumb";
 import { getAdminDashboard } from "@/http/apiCalls";
 import { getCurrencyDetails, getLoggedInUserData, getShippingDisplay, getStoredToken, redirectToSignIn } from "@/utils/helper";
 import { ORDER_STATUS, ORDER_STATUS_COLOR, ROLE_TYPES, STATUS_TYPES } from "@/utils/constants";
-import { ORDER_URL } from "@/utils/appUrls";
+import { ORDER_URL, USER_URL } from "@/utils/appUrls";
 
 const SALES_STATUSES = new Set([
   ORDER_STATUS.PLACED,
@@ -46,6 +46,18 @@ const formatAmount = (value = 0) => {
   return `${getCurrencyDetails().currencySymbol}${amount.toLocaleString("en-IN", {
     maximumFractionDigits: 0,
   })}`;
+};
+
+const HERO_BACKGROUND = {
+  background:
+    "radial-gradient(circle at top left, rgba(56,189,248,0.22), transparent 28%), linear-gradient(135deg, #07111f 0%, #102541 55%, #173f6b 100%)",
+};
+
+const SUMMARY_ACCENTS = {
+  Sales: "linear-gradient(135deg, #0f766e 0%, #14b8a6 55%, #99f6e4 100%)",
+  Products: "linear-gradient(135deg, #1d4ed8 0%, #3b82f6 55%, #bfdbfe 100%)",
+  "Stock Units": "linear-gradient(135deg, #9f1239 0%, #f43f5e 55%, #fecdd3 100%)",
+  Customers: "linear-gradient(135deg, #6d28d9 0%, #8b5cf6 55%, #ddd6fe 100%)",
 };
 
 const Dashboard = () => {
@@ -108,25 +120,21 @@ const Dashboard = () => {
       label: "Sales",
       value: formatAmount(overview.totalSales),
       detail: `${overview.salesOrderCount || 0} paid or fulfilled orders`,
-      accent: "from-[#0f766e] via-[#14b8a6] to-[#99f6e4]",
     },
     {
       label: "Products",
       value: Number(overview.totalProducts || 0).toLocaleString("en-IN"),
       detail: `${overview.activeProducts || 0} active listings`,
-      accent: "from-[#1d4ed8] via-[#3b82f6] to-[#bfdbfe]",
     },
     {
       label: "Stock Units",
       value: Number(overview.stockUnits || 0).toLocaleString("en-IN"),
       detail: `${overview.outOfStockCount || 0} products out of stock`,
-      accent: "from-[#9f1239] via-[#f43f5e] to-[#fecdd3]",
     },
     {
       label: "Customers",
       value: Number(overview.totalUsers || 0).toLocaleString("en-IN"),
       detail: `${formatAmount(overview.averageOrderValue)} average order value`,
-      accent: "from-[#9f1239] via-[#f43f5e] to-[#fecdd3]",
     },
   ];
 
@@ -143,13 +151,13 @@ const Dashboard = () => {
 
       <section className="page-section bg-gray-2/60">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
-          <div className="mb-6 rounded-[28px] bg-[radial-gradient(circle_at_top_left,_rgba(56,189,248,0.22),_transparent_28%),linear-gradient(135deg,#07111f_0%,#102541_55%,#173f6b_100%)] p-6 text-white shadow-[0_24px_80px_rgba(7,17,31,0.28)] sm:p-8">
+          <div className="mb-6 rounded-[28px] p-6 text-white shadow-[0_24px_80px_rgba(7,17,31,0.28)] sm:p-8" style={HERO_BACKGROUND}>
             <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-[620px]">
                 <p className="mb-2 text-xs font-semibold uppercase tracking-[0.3em] text-sky-200">
                   Admin Overview
                 </p>
-                <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+                <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
                   Sales, catalog, and stock health in one screen.
                 </h1>
                 <p className="mt-3 text-sm text-slate-200 sm:text-base">
@@ -160,15 +168,15 @@ const Dashboard = () => {
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 <div className="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur">
                   <p className="text-xs uppercase tracking-[0.2em] text-sky-100">Orders</p>
-                  <p className="mt-2 text-2xl font-semibold">{Number(statusStats?.ALL || overview.totalOrders || 0).toLocaleString("en-IN")}</p>
+                  <p className="mt-2 text-2xl font-semibold text-white">{Number(statusStats?.ALL || overview.totalOrders || 0).toLocaleString("en-IN")}</p>
                 </div>
                 <div className="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur">
                   <p className="text-xs uppercase tracking-[0.2em] text-sky-100">Low Stock</p>
-                  <p className="mt-2 text-2xl font-semibold">{Number(overview.lowStockCount || 0).toLocaleString("en-IN")}</p>
+                  <p className="mt-2 text-2xl font-semibold text-white">{Number(overview.lowStockCount || 0).toLocaleString("en-IN")}</p>
                 </div>
                 <div className="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur">
                   <p className="text-xs uppercase tracking-[0.2em] text-sky-100">Restock Requests</p>
-                  <p className="mt-2 text-2xl font-semibold">{Number(overview.restockRequestCount || 0).toLocaleString("en-IN")}</p>
+                  <p className="mt-2 text-2xl font-semibold text-white">{Number(overview.restockRequestCount || 0).toLocaleString("en-IN")}</p>
                 </div>
               </div>
             </div>
@@ -182,7 +190,8 @@ const Dashboard = () => {
                 {summaryCards.map((card) => (
                   <div
                     key={card.label}
-                    className={`overflow-hidden rounded-[24px] bg-gradient-to-br ${card.accent} p-[1px] shadow-lg`}
+                    className="overflow-hidden rounded-[24px] p-[1px] shadow-lg"
+                    style={{ background: SUMMARY_ACCENTS[card.label] }}
                   >
                     <div className="h-full rounded-[23px] bg-white px-5 py-5">
                       <p className="text-xs font-semibold uppercase tracking-[0.24em] text-dark-4">
@@ -465,9 +474,17 @@ const Dashboard = () => {
               </div>
 
               <div className="surface-card p-5 sm:p-7">
-                <div className="mb-6">
-                  <h2 className="text-xl font-semibold text-dark">Recent Customers</h2>
-                  <p className="text-sm text-dark-4">Newest accounts with their paid-order activity and spend.</p>
+                <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-xl font-semibold text-dark">Recent Customers</h2>
+                    <p className="text-sm text-dark-4">Newest accounts with their paid-order activity and spend.</p>
+                  </div>
+                  <Link
+                    href={USER_URL}
+                    className="inline-flex items-center rounded-full border border-gray-3 px-4 py-2 text-sm font-medium text-dark transition hover:border-blue hover:text-blue"
+                  >
+                    View all users
+                  </Link>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                   {recentCustomers.length ? (

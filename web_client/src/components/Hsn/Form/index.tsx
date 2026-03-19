@@ -1,6 +1,6 @@
 "use client";
 
-import Breadcrumb from "@/components/Common/Breadcrumb";
+import AdminOverview from "@/components/Common/AdminOverview";
 import { createHsn, deleteHsn, getHsnByCode, updateHsn } from "@/http/apiCalls";
 import { STATUS_TYPES } from "@/utils/constants";
 import { HSN_URL } from "@/utils/appUrls";
@@ -69,10 +69,13 @@ const HsnForm = ({ params }) => {
 
   return (
     <>
-      <Breadcrumb title={"Hsn"} pages={["Hsn /", params.slug]} />
-
       <section className="page-section bg-gray-2/60">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
+          <AdminOverview
+            eyebrow="Tax Admin"
+            title={isNew ? "Create a new HSN record." : "Edit HSN details."}
+            description="Manage HSN code metadata and tax rates used during catalog setup and order calculation."
+          />
           <div className="form-card max-w-[570px] w-full mx-auto">
 
             <div className="text-center mb-8">

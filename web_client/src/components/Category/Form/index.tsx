@@ -1,6 +1,6 @@
 "use client";
 
-import Breadcrumb from "@/components/Common/Breadcrumb";
+import AdminOverview from "@/components/Common/AdminOverview";
 import FileUploader from "@/components/Common/FileUploader";
 import { createCategory, deleteCategory, getCategoryBySlug, updateCategory } from "@/http/apiCalls";
 import { STATUS_TYPES } from "@/utils/constants";
@@ -82,10 +82,13 @@ const CategoryForm = ({ params }) => {
 
   return (
     <>
-      <Breadcrumb title={"Category"} pages={["Category /", params.slug]} />
-
       <section className="page-section bg-gray-2/60">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
+          <AdminOverview
+            eyebrow="Catalog Admin"
+            title={isNew ? "Create a new category." : "Edit category details."}
+            description="Define category names, artwork, and status so catalog organization stays clean and storefront-ready."
+          />
           <div className="form-card max-w-[570px] w-full mx-auto">
 
             <div className="text-center mb-8">

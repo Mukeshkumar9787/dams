@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import Breadcrumb from "../Common/Breadcrumb";
+import AdminOverview from "../Common/AdminOverview";
 import Link from "next/link";
 import { getProducts } from "../../http/apiCalls.js";
 import { Input, Table } from "antd"
@@ -32,8 +32,9 @@ const Product = () => {
       title: 'Image',
       dataIndex: 'img',
       key: 'img',
+      align: 'center',
       render: (text) => {
-        return <img className="h-14 w-14 rounded-lg border border-gray-3 object-cover" src={text}/>
+        return <img alt="" className="mx-auto h-14 w-14 rounded-xl border border-gray-3 object-cover" src={text}/>
       },
     },
     {
@@ -46,14 +47,16 @@ const Product = () => {
       title: 'Category',
       dataIndex: 'categoryName',
       key: 'categoryName',
+      render: (categoryName) => <span className="text-dark-4">{categoryName || "Uncategorized"}</span>,
     },
     {
       title: 'Color',  
       dataIndex: 'colorCode',
       key: 'color',
+      align: 'center',
       render: (code) => {
         return (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-center gap-2">
             <div style={{backgroundColor: code}} className="h-5 w-10 rounded border border-gray-3"></div>
             <span className="text-sm text-dark-4">{code}</span>
           </div> )
@@ -63,11 +66,14 @@ const Product = () => {
       title: 'Size',  
       dataIndex: 'sizeName',
       key: 'size',
+      align: 'center',
+      render: (sizeName) => <span className="text-dark-4">{sizeName || "-"}</span>,
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      align: 'center',
       render: (text) => {
         const isActive = text === STATUS_TYPES.ACTIVE;
         return (
@@ -85,6 +91,7 @@ const Product = () => {
       title: 'Action',
       dataIndex: 'slug',
       key: 'action',
+      align: 'center',
       render: (slug) => {
         return(
           <Link
@@ -115,13 +122,14 @@ const Product = () => {
   
   return (
     <>
-      {/* <!-- ===== Breadcrumb Section Start ===== --> */}
-      <section>
-        <Breadcrumb title={"Product"} pages={["Product"]} />
-      </section>
-      {/* <!-- ===== Breadcrumb Section End ===== --> */}
         <section className="page-section bg-gray-2/60">
           <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
+            <AdminOverview
+              eyebrow="Catalog Admin"
+              title="Manage product inventory and listing quality."
+              description="Track catalog coverage, update details, and keep inventory-ready products visible to customers."
+              stats={[{ label: "Products", value: totalCount }]}
+            />
             <div className="surface-card p-5 sm:p-7">
               <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
                 <div>
@@ -153,13 +161,16 @@ const Product = () => {
               <div className="mb-5 w-full max-w-[320px]">
                 <Input placeholder="Search products" type="text" value={search} onChange={(e) => setSearch(e.target.value)} />
               </div>
-              <Table dataSource={productItems} columns={columns} rowKey="id"
+              <Table className="admin-data-table" dataSource={productItems} columns={columns} rowKey="id"
+                size="middle"
+                scroll={{ x: 900 }}
                 pagination={{
                   current: pagination.pageNumber,
                   pageSize: pagination.pageSize,
                   total: totalCount,
                   showSizeChanger: true,
                   pageSizeOptions: ['10', '20'],
+                  showTotal: (total, range) => `${range[0]}-${range[1]} of ${total}`,
                   onChange(page, pageSize) {
                     setPagination({pageNumber: page, pageSize});
                   },

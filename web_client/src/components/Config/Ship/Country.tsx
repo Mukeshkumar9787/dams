@@ -42,15 +42,15 @@ function Country({ country, setShipInfo, rowIndex }) {
         })
     }
     return (
-        <div className="mb-5 bg-white">
-            <div className='flex gap-2'>
+        <div className="mb-5 border-b border-slate-200 pb-5 last:mb-0 last:border-b-0 last:pb-0">
+            <div className='flex flex-col gap-3 xl:flex-row'>
                 <select
                     name='name'
                     onChange={handleChange}
                     required
                     value={country?.name}
                     disabled={country?.states && (country?.states.length > 0)}
-                    className="form-input"
+                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition focus:border-sky-500 xl:flex-1"
                 >
                     <option value="">Select Country</option>
                     {countryList.map((country) => (
@@ -68,16 +68,16 @@ function Country({ country, setShipInfo, rowIndex }) {
                     min={0}
                     onChange={handleChange}
                     required
-                    className="form-input"
+                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition focus:border-sky-500 xl:max-w-[220px]"
                 />
-                <div className="flex justify-end gap-1">
-                    <Button className="bg-red text-white p-5 rounded-md" onClick={handleRemove}>Remove</Button>
-                    <Button className="bg-blue text-white p-5 rounded-md" disabled={!country?.name} onClick={handleAddState}>Add State</Button>
+                <div className="flex justify-end gap-2 xl:ml-auto">
+                    <Button className="h-12 rounded-2xl bg-red px-5 text-white" onClick={handleRemove}>Remove</Button>
+                    <Button className="h-12 rounded-2xl bg-blue px-5 text-white" disabled={!country?.name} onClick={handleAddState}>Add State</Button>
                 </div>
             </div>
             {stateList.length > 0 &&
-                <div className='mt-2 flex flex-col pl-15'>
-                    <div className='text-xl py-2 font-bold'>{country?.name} States:</div>
+                <div className='mt-4 rounded-2xl bg-slate-50 p-4'>
+                    <div className='pb-3 text-base font-semibold text-slate-950'>{country?.name} States</div>
                     <div className=''>
                         {stateList.map((state, index) => <State key={index} country={country} countryIndex={rowIndex} rowIndex={index} state={state} setShipInfo={setShipInfo} />)}
                     </div>

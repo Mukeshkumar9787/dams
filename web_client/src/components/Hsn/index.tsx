@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import Breadcrumb from "../Common/Breadcrumb";
+import AdminOverview from "../Common/AdminOverview";
 import Link from "next/link";
 import { getHsnCodes } from "../../http/apiCalls.js";
 import { Table } from "antd"
@@ -34,11 +34,14 @@ const Hsn = () => {
       title: 'Tax',
       dataIndex: 'tax',
       key: 'tax',
+      align: 'center',
+      render: (tax) => <span className="font-medium text-dark">{tax}%</span>,
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      align: 'center',
       render: (text) => {
         const isActive = text === STATUS_TYPES.ACTIVE;
         return (
@@ -56,6 +59,7 @@ const Hsn = () => {
       title: 'Action',
       dataIndex: 'code',
       key: 'action',
+      align: 'center',
       render: (code) => {
         return(
           <Link
@@ -86,13 +90,14 @@ const Hsn = () => {
   
   return (
     <>
-      {/* <!-- ===== Breadcrumb Section Start ===== --> */}
-      <section>
-        <Breadcrumb title={"Hsn"} pages={["Hsn"]} />
-      </section>
-      {/* <!-- ===== Breadcrumb Section End ===== --> */}
         <section className="page-section bg-gray-2/60">
           <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
+            <AdminOverview
+              eyebrow="Tax Admin"
+              title="Manage HSN codes and tax rates."
+              description="Centralize tax slabs and HSN mapping used by product setup and order calculations."
+              stats={[{ label: "HSN Codes", value: hsnItems.length }]}
+            />
             <div className="surface-card p-5 sm:p-7">
               <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
                 <div>
@@ -122,9 +127,12 @@ const Hsn = () => {
               </Link>
               </div>
               <Table
+                className="admin-data-table"
                 dataSource={hsnItems}
                 columns={columns}
                 rowKey="id"
+                size="middle"
+                scroll={{ x: 620 }}
                 pagination={false}
                 locale={{ emptyText: "No HSN records found." }}
               />
