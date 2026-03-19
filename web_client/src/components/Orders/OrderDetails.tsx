@@ -230,16 +230,43 @@ const OrderDetails = ({ params }) => {
                   </div>
                 </div>
 
-                <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+                <div className="space-y-6">
                   <div className="surface-card p-5 sm:p-6">
-                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">
-                      Payment
-                    </p>
-                    <h2 className="mt-3 text-lg font-semibold text-dark">Payment Summary</h2>
+                    <h2 className="mt-3 text-lg font-semibold text-dark">Order Summary</h2>
                     <div className="mt-4 space-y-3 text-sm">
-                      <div className="flex items-center justify-between gap-4">
-                        <span className="text-dark-4">Payment Type</span>
-                        <span className="font-medium text-dark">{data?.paymentType || "-"}</span>
+                      <div className="space-y-3">
+                        {productItems.map((product) => (
+                          <div
+                            key={product.id}
+                            className="flex items-start justify-between gap-3 text-sm"
+                          >
+                            <div className="flex min-w-0 flex-1 items-center gap-3">
+                              <Link href={`${SHOP_DETAILS}/${product.slug}`} className="flex-shrink-0">
+                                <img
+                                  src={product.img}
+                                  className="h-14 w-14 rounded-xl object-cover"
+                                  alt={product.title}
+                                />
+                              </Link>
+                              <div className="min-w-0">
+                                <Link
+                                  href={`${SHOP_DETAILS}/${product.slug}`}
+                                  className="block truncate font-medium text-dark transition hover:text-blue"
+                                >
+                                  {product.title}
+                                </Link>
+                                <p className="mt-1 text-xs text-dark-4">
+                                  {currency}
+                                  {Number(product.price).toFixed(2)} x {product.quantity}
+                                </p>
+                              </div>
+                            </div>
+                            <span className="whitespace-nowrap font-medium text-dark">
+                              {currency}
+                              {Number(product.price * product.quantity).toFixed(2)}
+                            </span>
+                          </div>
+                        ))}
                       </div>
                       <div className="flex items-center justify-between gap-4">
                         <span className="text-dark-4">Shipping</span>
@@ -323,66 +350,6 @@ const OrderDetails = ({ params }) => {
                   </div>
                 )}
 
-                <div className="surface-card p-5 sm:p-6">
-                  <div className="mb-6 flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">
-                        Items
-                      </p>
-                      <h2 className="mt-2 text-xl font-semibold text-dark">
-                        Products in this order
-                      </h2>
-                    </div>
-                    <div className="rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
-                      {productItems.length} items
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    {productItems.map((product) => (
-                      <div
-                        key={product.id}
-                        className="flex flex-col gap-4 rounded-[24px] border border-gray-3 bg-slate-50/70 p-4 sm:flex-row sm:items-center sm:justify-between"
-                      >
-                        <div className="flex min-w-0 flex-1 items-center gap-4">
-                          <Link href={`${SHOP_DETAILS}/${product.slug}`} className="flex-shrink-0">
-                            <img
-                              src={product.img}
-                              className="h-20 w-20 rounded-2xl border border-gray-3 object-cover"
-                              alt={product.title}
-                            />
-                          </Link>
-                          <div className="min-w-0">
-                            <Link
-                              href={`${SHOP_DETAILS}/${product.slug}`}
-                              className="block truncate font-semibold text-dark transition hover:text-blue"
-                            >
-                              {product.title}
-                            </Link>
-                            <p className="mt-1 text-sm text-dark-4">
-                              Unit price: {currency}
-                              {Number(product.price).toFixed(2)}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between gap-6 sm:block sm:text-right">
-                          <div>
-                            <p className="text-xs uppercase tracking-[0.2em] text-dark-4">Qty</p>
-                            <p className="mt-1 font-medium text-dark">{product.quantity}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs uppercase tracking-[0.2em] text-dark-4">
-                              Subtotal
-                            </p>
-                            <p className="mt-1 font-semibold text-dark">
-                              {currency}
-                              {parseFloat(product.price * product.quantity).toFixed(2)}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
               </div>
 
               <div className="space-y-6">
@@ -472,38 +439,7 @@ const OrderDetails = ({ params }) => {
                 )}
 
                 <div className="surface-card p-5 sm:p-6">
-                  <div className="mb-5">
-                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">
-                      Timeline
-                    </p>
-                    <h2 className="mt-2 text-xl font-semibold text-dark">
-                      Order Status History
-                    </h2>
-                  </div>
                   <OrderStatusTimeline history={orderStatusHistory} />
-                </div>
-
-                <div className="surface-card p-5 sm:p-6">
-                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">
-                    Snapshot
-                  </p>
-                  <h2 className="mt-2 text-xl font-semibold text-dark">Quick Summary</h2>
-                  <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                    <div className="rounded-2xl bg-slate-50 px-4 py-4">
-                      <p className="text-xs uppercase tracking-[0.2em] text-dark-4">
-                        Current Status
-                      </p>
-                      <p className="mt-2 font-semibold text-dark">
-                        {formatStatusLabel(data?.status)}
-                      </p>
-                    </div>
-                    <div className="rounded-2xl bg-slate-50 px-4 py-4">
-                      <p className="text-xs uppercase tracking-[0.2em] text-dark-4">Total Paid</p>
-                      <p className="mt-2 font-semibold text-dark">
-                        {getCurrencyDetails().currencySymbol} {totalAmount.toFixed(2)}
-                      </p>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
