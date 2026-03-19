@@ -42,6 +42,7 @@ const OrderDetails = ({ params }) => {
   const [disputeMessage, setDisputeMessage] = useState("");
   const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
   const [isSubmittingDispute, setIsSubmittingDispute] = useState(false);
+  const [isEditingDispute, setIsEditingDispute] = useState(false);
 
   const handlePrint = useReactToPrint({ contentRef: componentRef });
 
@@ -124,16 +125,35 @@ const OrderDetails = ({ params }) => {
         message: trimmedMessage,
       });
       if (response.success) {
-        notifySuccess(response.message || "Dispute raised successfully.");
+        notifySuccess(
+          response.message ||
+            (isEditingDispute ? "Dispute updated successfully." : "Dispute raised successfully."),
+        );
         setIsDisputeModalOpen(false);
         setDisputeMessage("");
+        setIsEditingDispute(false);
         fetchOrder();
       }
     } catch (error) {
-      notifyError(error?.response?.data?.message || "Unable to raise dispute.");
+      notifyError(
+        error?.response?.data?.message ||
+          (isEditingDispute ? "Unable to update dispute." : "Unable to raise dispute."),
+      );
     } finally {
       setIsSubmittingDispute(false);
     }
+  };
+
+  const openCreateDisputeModal = () => {
+    setIsEditingDispute(false);
+    setDisputeMessage("");
+    setIsDisputeModalOpen(true);
+  };
+
+  const openEditDisputeModal = () => {
+    setIsEditingDispute(true);
+    setDisputeMessage(dispute?.message || "");
+    setIsDisputeModalOpen(true);
   };
 
   useEffect(() => {
@@ -294,61 +314,70 @@ const OrderDetails = ({ params }) => {
                   </div>
                 </div>
 
-                {(dispute || !data?.isAdmin) && (
-                  <div className="surface-card p-5 sm:p-6">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                      <div className="min-w-0">
-                        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">
-                          Dispute
+                <div className="surface-card p-5 sm:p-6">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">
+                        Dispute
+                      </p>
+                      <h2 className="mt-2 text-lg font-semibold text-dark">
+                        Order dispute support
+                      </h2>
+                      {!dispute && !data?.isAdmin && (
+                        <p className="mt-3 text-sm text-dark-4">
+                          If there is an issue with this order, raise a dispute and the admin
+                          team will be notified by email.
                         </p>
-                        <h2 className="mt-2 text-lg font-semibold text-dark">
-                          Order dispute support
-                        </h2>
-                        {!dispute && (
-                          <p className="mt-3 text-sm text-dark-4">
-                            If there is an issue with this order, raise a dispute and the admin
-                            team will be notified by email.
-                          </p>
-                        )}
-                      </div>
-                      {!data?.isAdmin && !dispute && (
-                        <button
-                          type="button"
-                          onClick={() => setIsDisputeModalOpen(true)}
-                          className="btn-primary px-5 text-sm"
-                        >
-                          Raise a Dispute
-                        </button>
+                      )}
+                      {!dispute && data?.isAdmin && (
+                        <p className="mt-3 text-sm text-dark-4">
+                          Review the dispute status for this order here when a customer raises one.
+                        </p>
                       )}
                     </div>
+                    {!data?.isAdmin && !dispute && (
+                      <button
+                        type="button"
+                        onClick={openCreateDisputeModal}
+                        className="btn-primary px-5 text-sm"
+                      >
+                        Raise a Dispute
+                      </button>
+                    )}
+                  </div>
 
                     {dispute ? (
                       <div className="mt-5 rounded-[24px] border border-red-100 bg-red-50/70 p-5">
-                        <div className="flex flex-wrap items-center gap-3">
-                          <span className="inline-flex rounded-full bg-red-600 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-white">
-                            {dispute.status}
-                          </span>
-                          <span className="text-sm text-dark-4">
-                            Raised on{" "}
-                            {dispute.createdAt
-                              ? new Date(dispute.createdAt).toLocaleString()
-                              : "-"}
-                          </span>
+                        <div className="flex items-start justify-between gap-3">
+                          <p className="mt-0 whitespace-pre-line text-dark-4">
+                            {dispute.message}
+                            {dispute.updatedAt && (
+                              <span className="ml-2 whitespace-nowrap text-sm font-medium text-red-700">
+                                (Edited)
+                              </span>
+                            )}
+                          </p>
+                          {!data?.isAdmin && dispute.status === "OPEN" && (
+                            <button
+                              type="button"
+                              onClick={openEditDisputeModal}
+                              className="shrink-0 rounded-full border border-red-200 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-300 hover:bg-red-100"
+                            >
+                              Edit
+                            </button>
+                          )}
                         </div>
-                        <p className="mt-4 text-sm font-medium text-dark">
-                          Raised by: {dispute.raisedByName || "Customer"}
-                        </p>
-                        <p className="mt-3 whitespace-pre-line text-dark-4">
-                          {dispute.message}
+                        <p className="mt-3 text-sm text-dark-4">
+                          Raised on{" "}
+                          {dispute.createdAt ? new Date(dispute.createdAt).toLocaleString() : "-"}
                         </p>
                       </div>
-                    ) : (
-                      <div className="mt-5 rounded-[24px] border border-dashed border-gray-3 bg-slate-50/60 p-5 text-sm text-dark-4">
-                        No dispute has been raised for this order.
-                      </div>
-                    )}
-                  </div>
-                )}
+                  ) : (
+                    <div className="mt-5 rounded-[24px] border border-dashed border-gray-3 bg-slate-50/60 p-5 text-sm text-dark-4">
+                      No dispute has been raised for this order.
+                    </div>
+                  )}
+                </div>
 
               </div>
 
@@ -451,16 +480,22 @@ const OrderDetails = ({ params }) => {
         onClose={() => {
           if (isSubmittingDispute) return;
           setIsDisputeModalOpen(false);
+          setIsEditingDispute(false);
+          setDisputeMessage("");
         }}
         onOk={handleRaiseDispute}
         content={
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">
-              Raise dispute
+              {isEditingDispute ? "Edit dispute" : "Raise dispute"}
             </p>
-            <h2 className="mt-2 text-xl font-semibold text-dark">Report an issue with this order</h2>
+            <h2 className="mt-2 text-xl font-semibold text-dark">
+              {isEditingDispute ? "Update the issue details" : "Report an issue with this order"}
+            </h2>
             <p className="mt-3 text-sm text-dark-4">
-              This message will be sent to the admin team and attached to the order.
+              {isEditingDispute
+                ? "Your updated message will be attached to the order and sent to the admin team."
+                : "This message will be sent to the admin team and attached to the order."}
             </p>
             <Input.TextArea
               className="mt-4"

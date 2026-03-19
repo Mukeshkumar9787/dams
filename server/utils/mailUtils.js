@@ -1,10 +1,12 @@
 import nodemailer from "nodemailer"
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT || 587),
+  secure: Number(process.env.SMTP_PORT) === 465,
   auth: {
-    user: process.env.GMAIL_USER, // your@gmail.com
-    pass: process.env.GMAIL_APP_PASSWORD // app password
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
   }
 });
 
@@ -13,7 +15,7 @@ export async function sendMail({
   subject,
   text,
   html,
-  from = `"No Reply" <${process.env.GMAIL_USER}>`
+  from = `"No Reply" <${process.env.SMTP_USER}>`
 }) {
   try {
     const info = await transporter.sendMail({
@@ -29,11 +31,10 @@ export async function sendMail({
       messageId: info.messageId
     };
   } catch (error) {
-    console.error('Gmail Send Error:', error);
+    console.error('SMTP Send Error:', error);
     return {
       success: false,
       error: error.message
     };
   }
 }
-

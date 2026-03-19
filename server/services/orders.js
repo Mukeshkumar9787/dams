@@ -247,18 +247,16 @@ const raiseDispute = async ({ orderNo, userId, userName, message }) => {
     throw err;
   }
 
-  if(order.additionalInfo?.dispute?.status === "OPEN") {
-    const err = new Error("Dispute already raised for this order");
-    err.statusCode = 400;
-    throw err;
-  }
+  const existingDispute = order.additionalInfo?.dispute || null;
+  const isEditingOpenDispute = existingDispute?.status === "OPEN";
 
   const dispute = {
     message,
-    status: "OPEN",
-    createdAt: new Date().toISOString(),
-    raisedByUserId: userId,
-    raisedByName: userName || order.user?.name || "",
+    status: existingDispute?.status || "OPEN",
+    createdAt: existingDispute?.createdAt || new Date().toISOString(),
+    raisedByUserId: existingDispute?.raisedByUserId || userId,
+    raisedByName: existingDispute?.raisedByName || userName || order.user?.name || "",
+    ...(isEditingOpenDispute ? { updatedAt: new Date().toISOString() } : {}),
   };
 
   const additionalInfo = {
@@ -284,6 +282,7 @@ const raiseDispute = async ({ orderNo, userId, userName, message }) => {
   return {
     ...updatedOrder,
     dispute,
+    isEditing: isEditingOpenDispute,
   };
 }
 

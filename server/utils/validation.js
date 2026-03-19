@@ -190,6 +190,7 @@ export const updateOrderSchema = Joi.object({
       message: Joi.string().min(5).max(1000).required(),
       status: Joi.string().valid("OPEN").required(),
       createdAt: Joi.string().required(),
+      updatedAt: Joi.string().optional(),
       raisedByUserId: Joi.number().required(),
       raisedByName: Joi.string().allow("").required(),
     }).optional(),

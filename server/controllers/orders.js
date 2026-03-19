@@ -109,14 +109,14 @@ const raiseDispute = async (req, res) => {
       userName: req.user.name,
       message: req.body.message,
     });
-    await sendOrderDisputeMail({
+    sendOrderDisputeMail({
       orderNo: data.orderNo,
       customerName: data.user?.name || req.user.name,
       message: data.dispute.message,
     });
     return res.status(200).json({
       success: true,
-      message: "Dispute raised successfully.",
+      message: data.isEditing ? "Dispute updated successfully." : "Dispute raised successfully.",
       data,
     });
   } catch (err) {
