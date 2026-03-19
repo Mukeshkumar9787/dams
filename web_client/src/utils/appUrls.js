@@ -21,3 +21,6 @@ export const USER_URL = '/users';
 export const SHOP_DETAILS = '/shop-details'
 
 export const CONFIG_URL = '/config'
+export const CONFIG_COMPANY_URL = `${CONFIG_URL}/company-info`;
+export const CONFIG_SHIPPING_URL = `${CONFIG_URL}/shipping-info`;
+export const CONFIG_COURIER_URL = `${CONFIG_URL}/courier`;

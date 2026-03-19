@@ -1,13 +1,8 @@
-import React from "react";
-import ConfigForm from "@/components/Config";
-
-import { Metadata } from "next";
-export const metadata: Metadata = {
-  title: "Config",
-};
+import { redirect } from "next/navigation";
+import { CONFIG_COMPANY_URL } from "@/utils/appUrls";
 
 const ConfigPage = () => {
-  return (<ConfigForm />);
+  redirect(CONFIG_COMPANY_URL);
 };
 
 export default ConfigPage;

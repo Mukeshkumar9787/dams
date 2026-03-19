@@ -1,5 +1,5 @@
 import { Menu } from "@/types/Menu";
-import { CATEGORY_URL, COLOR_URL, CONFIG_URL, DASHBOARD_URL, HSN_URL, ORDER_URL, PRODUCT_URL, SIZE_URL, USER_URL } from "@/utils/appUrls";
+import { CATEGORY_URL, COLOR_URL, CONFIG_COMPANY_URL, CONFIG_COURIER_URL, CONFIG_SHIPPING_URL, DASHBOARD_URL, HSN_URL, ORDER_URL, PRODUCT_URL, SIZE_URL, USER_URL } from "@/utils/appUrls";
 
 export const menuData: Menu[] = [
   {
@@ -28,7 +28,7 @@ export const adminMenuData: Menu[] = [
     {
     title: "Manage",
     newTab: false,
-    path: "/",
+    path: DASHBOARD_URL,
     submenu: [
       {
         title: "Dashboard",
@@ -66,9 +66,19 @@ export const adminMenuData: Menu[] = [
         path: COLOR_URL,
       },
       {
-        title: "Config",
+        title: "Company Info",
         newTab: false,
-        path: CONFIG_URL,
+        path: CONFIG_COMPANY_URL,
+      },
+      {
+        title: "Shipping Info",
+        newTab: false,
+        path: CONFIG_SHIPPING_URL,
+      },
+      {
+        title: "Courier",
+        newTab: false,
+        path: CONFIG_COURIER_URL,
       },
       {
         title: "Users",

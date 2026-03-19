@@ -12,6 +12,9 @@ const adminLinks = adminMenuData.flatMap((item) => item.submenu || []);
 const AdminDesktopShell = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const [isAdmin, setIsAdmin] = React.useState(false);
+  const isAdminPage = adminLinks.some((item) =>
+    item.path ? pathname === item.path || pathname.startsWith(`${item.path}/`) : false
+  );
 
   React.useEffect(() => {
     const loadUser = async () => {
@@ -24,7 +27,7 @@ const AdminDesktopShell = ({ children }: { children: React.ReactNode }) => {
     loadUser();
   }, []);
 
-  if (!isAdmin) {
+  if (!isAdmin || !isAdminPage) {
     return <>{children}</>;
   }
 
@@ -37,7 +40,9 @@ const AdminDesktopShell = ({ children }: { children: React.ReactNode }) => {
           </p>
           <nav className="mt-5 space-y-2">
             {adminLinks.map((item) => {
-              const isActive = pathname === item.path;
+              const isActive = item.path
+                ? pathname === item.path || pathname.startsWith(`${item.path}/`)
+                : false;
 
               return (
                 <Link

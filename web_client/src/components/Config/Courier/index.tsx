@@ -9,8 +9,8 @@ const CourierList = ({ couriers, setCouriers }) => {
     }
 
     return (
-        <div className="mb-8 mt-8 rounded-[26px] border border-slate-200 bg-white p-5 sm:p-6">
-            <div className="border-b border-slate-200 pb-5">
+        <div className="mb-8 mt-8 rounded-[26px] bg-white p-5 sm:p-6">
+            <div className="pb-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">
                     Courier List
                 </p>
@@ -26,7 +26,7 @@ const CourierList = ({ couriers, setCouriers }) => {
                 <Button className="h-12 rounded-2xl bg-blue px-5 text-white" onClick={handleAddCourier}>Add Courier</Button>
             </div>
             {(couriers.length > 0) &&
-                <div className="mt-5 border-t border-slate-200 pt-5">
+                <div className="mt-5 pt-5">
                     <span className="mb-4 block text-lg font-semibold text-slate-950">Couriers</span>
                     {couriers.map((courier, index) => <Courier key={courier || index} rowIndex={index} courier={courier} setCouriers={setCouriers} />)}
                 </div>

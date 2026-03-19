@@ -202,7 +202,7 @@ export const configBodySchema = Joi.object({
       privacy: Joi.string().allow("").optional(),
       refund: Joi.string().allow("").optional(),
       terms: Joi.string().allow("").optional(),
-    }).required(),
+    }).optional(),
 
     SHIPPING: Joi.object({
       amount: Joi.number().required(),
@@ -220,14 +220,14 @@ export const configBodySchema = Joi.object({
           ).optional()
         })
       ).optional()
-    }).required(),
+    }).optional(),
 
     COURIER: Joi.array().items(
       Joi.object({
         name: Joi.string().required(),
         link: Joi.string().allow("").optional()
       })
-    ).required(),
+    ).optional(),
 
   }).required()
 });

@@ -80,8 +80,8 @@ const CompanyInfo = ({ compInfo, setCompInfo }) => {
   ];
 
   return (
-    <div className="mb-8 rounded-[26px] border border-slate-200 bg-white p-5 sm:p-6">
-      <div className="mb-6 border-b border-slate-200 pb-5">
+    <div className="mb-8 rounded-[26px] bg-white p-5 sm:p-6">
+      <div className="mb-6 pb-5">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">
           Company Info
         </p>

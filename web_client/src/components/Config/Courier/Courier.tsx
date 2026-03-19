@@ -30,7 +30,7 @@ function Courier({ setCouriers, rowIndex, courier }) {
     }
 
     return (
-        <div className="mb-4 border-b border-slate-200 pb-4 last:mb-0 last:border-b-0 last:pb-0">
+        <div className="mb-4 pb-4 last:mb-0 last:pb-0">
             <div className='flex flex-col gap-3 xl:flex-row'>
                 <input
                     type="text"

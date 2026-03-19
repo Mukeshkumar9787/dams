@@ -42,7 +42,7 @@ function Country({ country, setShipInfo, rowIndex }) {
         })
     }
     return (
-        <div className="mb-5 border-b border-slate-200 pb-5 last:mb-0 last:border-b-0 last:pb-0">
+        <div className="mb-5 pb-5 last:mb-0 last:pb-0">
             <div className='flex flex-col gap-3 xl:flex-row'>
                 <select
                     name='name'
