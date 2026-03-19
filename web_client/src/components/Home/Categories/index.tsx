@@ -52,13 +52,13 @@ const Categories = () => {
   }, []);
 
   return (
-    <section className="overflow-hidden pt-17.5">
-      <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0 pb-15 border-b border-gray-3">
-        <div className="swiper categories-carousel common-carousel">
+    <section className="overflow-hidden bg-[radial-gradient(circle_at_top_left,_rgba(199,160,92,0.16),_transparent_26%),linear-gradient(135deg,#f8efe0_0%,#fffaf3_52%,#fff_100%)] pb-14 pt-10 sm:pt-12 lg:pt-16">
+      <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
+        <div className="px-1 py-2 sm:px-0">
           {/* <!-- section title --> */}
-          <div className="mb-10 flex items-center justify-between">
-            <div>
-              <span className="flex items-center gap-2.5 font-medium text-dark mb-1.5">
+          <div className="mb-8 flex flex-col gap-5 lg:mb-10 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-[620px]">
+              <span className="mb-2 inline-flex items-center gap-2.5 rounded-full border border-[#e5d6bc] bg-white/80 px-3 py-1 text-sm font-medium text-[#7a5a2b] shadow-sm">
                 <svg
                   width="20"
                   height="20"
@@ -95,17 +95,24 @@ const Categories = () => {
                 </svg>
                 Categories
               </span>
-              <h2 className="font-semibold text-xl xl:text-heading-5 text-dark">
+              <h2 className="font-semibold text-2xl tracking-tight text-dark sm:text-3xl xl:text-heading-4">
                 Browse by Category
               </h2>
+              <p className="mt-3 max-w-[520px] text-sm leading-6 text-dark-4 sm:text-base">
+                Move through the catalog by collection first, then narrow into the products that match your space, finish, and mood.
+              </p>
             </div>
 
-            <div className="flex items-center gap-3">
-              <button onClick={handlePrev} className="swiper-button-prev">
+            <div className="ml-auto flex items-center gap-3 self-end lg:self-auto">
+              <button
+                onClick={handlePrev}
+                className="!static !mt-0 flex items-center justify-center rounded-full border border-[#e5d6bc] bg-white text-[#7a5a2b] shadow-sm transition hover:border-[#caa56a] hover:text-[#a76d1e]"
+                style={{ width: 32, height: 32, minWidth: 32 }}
+              >
                 <svg
                   className="fill-current"
-                  width="24"
-                  height="24"
+                  width="12"
+                  height="12"
                   viewBox="0 0 24 24"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -119,11 +126,15 @@ const Categories = () => {
                 </svg>
               </button>
 
-              <button onClick={handleNext} className="swiper-button-next">
+              <button
+                onClick={handleNext}
+                className="!static !mt-0 flex items-center justify-center rounded-full border border-[#e5d6bc] bg-white text-[#7a5a2b] shadow-sm transition hover:border-[#caa56a] hover:text-[#a76d1e]"
+                style={{ width: 32, height: 32, minWidth: 32 }}
+              >
                 <svg
                   className="fill-current"
-                  width="24"
-                  height="24"
+                  width="12"
+                  height="12"
                   viewBox="0 0 24 24"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -142,18 +153,21 @@ const Categories = () => {
           <Swiper
             ref={sliderRef}
             slidesPerView={6}
+            spaceBetween={18}
             breakpoints={{
               // when window width is >= 640px
               0: {
                 slidesPerView: 2,
+                spaceBetween: 14,
               },
               1000: {
                 slidesPerView: 4,
-                // spaceBetween: 4,
+                spaceBetween: 18,
               },
               // when window width is >= 768px
               1200: {
                 slidesPerView: 6,
+                spaceBetween: 18,
               },
             }}
           >

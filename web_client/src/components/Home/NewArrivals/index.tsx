@@ -7,12 +7,13 @@ const NewArrival = async () => {
   const data = await getProducts({pageSize: 8, status: STATUS_TYPES.ACTIVE});
   const shopData = data.data || [];
   return (
-    <section className="overflow-hidden pt-15 pb-16">
+    <section className="overflow-hidden bg-[radial-gradient(circle_at_top_right,_rgba(14,165,233,0.12),_transparent_24%),linear-gradient(180deg,#ffffff_0%,#f6faff_100%)] pb-18 pt-10 sm:pt-12">
       <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
-        {/* <!-- section title --> */}
-        <div className="mb-7 flex items-center justify-between">
-          <div>
-            <span className="flex items-center gap-2.5 font-medium text-dark mb-1.5">
+        <div className="px-1 py-2 sm:px-0">
+          {/* <!-- section title --> */}
+          <div className="mb-8 flex flex-col gap-5 lg:mb-9 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-[620px]">
+              <span className="mb-2 inline-flex items-center gap-2.5 rounded-full border border-sky-100 bg-sky-50 px-3 py-1 text-sm font-medium text-sky-700">
               <svg
                 width="20"
                 height="20"
@@ -33,25 +34,29 @@ const NewArrival = async () => {
                 />
               </svg>
               This Week’s
-            </span>
-            <h2 className="font-semibold text-xl xl:text-heading-5 text-dark">
-              New Arrivals
-            </h2>
+              </span>
+              <h2 className="font-semibold text-2xl tracking-tight text-dark sm:text-3xl xl:text-heading-4">
+                New Arrivals
+              </h2>
+              <p className="mt-3 max-w-[540px] text-sm leading-6 text-dark-4 sm:text-base">
+                Fresh products selected for the front page, with updated pricing, availability, and quick access to the full catalog.
+              </p>
+            </div>
+
+            <Link
+              href="/shop"
+              className="inline-flex h-12 items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 text-sm font-semibold text-dark shadow-sm transition hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700"
+            >
+              View All Products
+            </Link>
           </div>
 
-          <Link
-            href="/shop"
-            className="inline-flex font-medium text-custom-sm py-2.5 px-7 rounded-md border-gray-3 border bg-gray-1 text-dark ease-out duration-200 hover:bg-dark hover:text-white hover:border-transparent"
-          >
-            View All
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-7.5 gap-y-9">
-          {/* <!-- New Arrivals item --> */}
-          {shopData.map((item) => (
-            <ProductItem item={item} key={item.id} />
-          ))}
+          <div className="grid grid-cols-1 gap-x-7.5 gap-y-9 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {/* <!-- New Arrivals item --> */}
+            {shopData.map((item) => (
+              <ProductItem item={item} key={item.id} />
+            ))}
+          </div>
         </div>
       </div>
     </section>

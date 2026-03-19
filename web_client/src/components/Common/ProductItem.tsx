@@ -36,13 +36,13 @@ const ProductItem = ({ item }: { item: Product }) => {
   return (
     <div className="group surface-card overflow-hidden p-3 sm:p-3.5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
         <Link href={`/shop-details/${item.slug}`}> 
-          <div className="relative overflow-hidden flex items-center justify-center rounded-xl bg-gray-1">
+          <div className="relative overflow-hidden flex items-center justify-center rounded-xl bg-gray-1 p-3 sm:p-0">
             <img
               src={item.img}
               alt={item.title}
               width={300}
               height={220}
-              className="h-[220px] w-full object-cover transition duration-300 group-hover:scale-105"
+              className="h-[180px] w-full object-contain transition duration-300 group-hover:scale-105 sm:h-[220px] sm:object-cover"
             />
             {discount > 0 && (
               <span className="absolute left-3 top-3 rounded-full bg-blue px-2.5 py-1 text-xs font-semibold text-white">

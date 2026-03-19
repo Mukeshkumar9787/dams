@@ -50,7 +50,7 @@ export default function RootLayout({
                     <ModalProvider>
                       <PreviewSliderProvider>
                         <Header />
-                        <main className="relative z-10 min-h-[70vh]">
+                        <main className="relative min-h-[70vh]">
                           <AdminDesktopShell>{children}</AdminDesktopShell>
                         </main>
 
