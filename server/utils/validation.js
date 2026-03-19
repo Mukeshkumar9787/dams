@@ -186,7 +186,18 @@ export const updateOrderSchema = Joi.object({
   additionalInfo: Joi.object({
     courier: Joi.string().allow("").required(),
     trackingId: Joi.string().allow("").optional(),
+    dispute: Joi.object({
+      message: Joi.string().min(5).max(1000).required(),
+      status: Joi.string().valid("OPEN").required(),
+      createdAt: Joi.string().required(),
+      raisedByUserId: Joi.number().required(),
+      raisedByName: Joi.string().allow("").required(),
+    }).optional(),
   }).required()
+});
+
+export const createOrderDisputeSchema = Joi.object({
+  message: Joi.string().trim().min(5).max(1000).required(),
 });
 
 export const configBodySchema = Joi.object({

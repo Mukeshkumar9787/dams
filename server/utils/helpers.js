@@ -222,6 +222,55 @@ export const sendOrderStatusMail = async ({
   }
 };
 
+export const sendOrderDisputeMail = async ({
+  orderNo,
+  customerName,
+  message,
+}) => {
+  const adminUsers = await userService.getUsers({ role: ROLE_TYPES.ADMIN });
+  if (!adminUsers?.length) return;
+
+  const appName = await getAppName();
+  const orderLink = `${process.env.FRONTEND_URL}/orders/${orderNo}`;
+
+  await Promise.all(
+    adminUsers.map((admin) =>
+      sendMail({
+        to: admin.email,
+        subject: `${appName} - Order dispute raised - ${orderNo}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; font-size: 16px;">
+            <h2 style="color:#333;">New Order Dispute</h2>
+            <p>Hi ${admin.name},</p>
+            <p>A customer has raised a dispute for an order.</p>
+            <p><strong>Order No:</strong> ${orderNo}</p>
+            <p><strong>Customer:</strong> ${customerName}</p>
+            <p><strong>Dispute:</strong><br/>${message}</p>
+            <div style="margin: 25px 0;">
+              <a href="${orderLink}"
+                style="
+                  background-color: #dc2626;
+                  color: #ffffff;
+                  padding: 8px 12px;
+                  text-decoration: none;
+                  border-radius: 6px;
+                  display: inline-block;
+                  font-weight: bold;
+                ">
+                View Order
+              </a>
+            </div>
+            <p style="font-size: 12px; color: #777;">
+              If the button doesn’t work, copy this link:<br/>
+              ${orderLink}
+            </p>
+          </div>
+        `,
+      })
+    )
+  );
+};
+
 export const getAppName = async() => {
   const config = await configService.getAll({});
   const appName = await config[CONFIG_KEYS.COMP_INFO]?.name || '';

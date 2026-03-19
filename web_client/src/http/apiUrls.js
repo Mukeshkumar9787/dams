@@ -25,6 +25,7 @@ export const API_USER_INFO = '/users/getUserInfo';
 export const API_USER_UPDATE_PROFILE = '/users/updateProfile';
 export const API_ADDRESS = '/address';
 export const API_ORDERS = '/orders';
+export const API_ORDER_DISPUTE = (slug) => `${API_ORDERS}/${slug}/dispute`;
 export const GET_ACTIVE_API = (API, params) => (params?.status === STATUS_TYPES.ACTIVE) ? `${API}/active` : API ; 
 export const API_ADMIN_ORDERS = `${API_ORDERS}/admin`
 export const API_PAYMENT_VERIFY = `${API_ORDERS}/payment/verify`;

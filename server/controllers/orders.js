@@ -2,7 +2,7 @@ import { errorHandler } from "../utils/errorHandler.js";
 import orderService from "../services/orders.js"
 import { ORDER_STATUS, STOCK_TYPES } from "../utils/constants.js";
 import crypto from 'crypto';
-import { sendOrderStatusMail } from "../utils/helpers.js";
+import { sendOrderDisputeMail, sendOrderStatusMail } from "../utils/helpers.js";
 
 const createOrder = async (req, res) => {
   try {
@@ -100,6 +100,30 @@ const updateOrder = async (req, res) => {
   }
 };
 
+const raiseDispute = async (req, res) => {
+  try {
+    const orderNo = req.params.slug;
+    const data = await orderService.raiseDispute({
+      orderNo,
+      userId: req.user.id,
+      userName: req.user.name,
+      message: req.body.message,
+    });
+    await sendOrderDisputeMail({
+      orderNo: data.orderNo,
+      customerName: data.user?.name || req.user.name,
+      message: data.dispute.message,
+    });
+    return res.status(200).json({
+      success: true,
+      message: "Dispute raised successfully.",
+      data,
+    });
+  } catch (err) {
+    return errorHandler(err, res);
+  }
+};
+
 const verifyPayment = async (req, res) => {
   const {
     razorpay_order_id,
@@ -152,5 +176,6 @@ export default {
   updateOrderStatus,
   verifyPayment,
   updateOrder,
+  raiseDispute,
   getOrderStatsAdmin
 };

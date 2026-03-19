@@ -10,6 +10,7 @@ import {
   getConfig,
   getOrderDetailsBySlug,
   getOrderDetailsBySlugAdmin,
+  raiseOrderDispute,
   updateOrderBySlugAdmin,
   updateOrderStatusBySlugAdmin,
 } from "@/http/apiCalls";
@@ -38,6 +39,9 @@ const OrderDetails = ({ params }) => {
   const componentRef = useRef(null);
   const [compInfo, setCompInfo] = React.useState({});
   const [couriers, setCouriers] = useState([]);
+  const [disputeMessage, setDisputeMessage] = useState("");
+  const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
+  const [isSubmittingDispute, setIsSubmittingDispute] = useState(false);
 
   const handlePrint = useReactToPrint({ contentRef: componentRef });
 
@@ -106,6 +110,32 @@ const OrderDetails = ({ params }) => {
     });
   };
 
+  const handleRaiseDispute = async () => {
+    const trimmedMessage = disputeMessage.trim();
+    if (trimmedMessage.length < 5) {
+      notifyError("Please enter at least 5 characters.");
+      return;
+    }
+
+    try {
+      setIsSubmittingDispute(true);
+      const response = await raiseOrderDispute({
+        slug: params.slug,
+        message: trimmedMessage,
+      });
+      if (response.success) {
+        notifySuccess(response.message || "Dispute raised successfully.");
+        setIsDisputeModalOpen(false);
+        setDisputeMessage("");
+        fetchOrder();
+      }
+    } catch (error) {
+      notifyError(error?.response?.data?.message || "Unable to raise dispute.");
+    } finally {
+      setIsSubmittingDispute(false);
+    }
+  };
+
   useEffect(() => {
     fetchOrder();
   }, [fetchOrder]);
@@ -136,6 +166,7 @@ const OrderDetails = ({ params }) => {
   const orderStatusHistory = data?.orderStatusHistory || [];
   const currentComments =
     orderStatusHistory.find((item) => item.status === data?.status)?.meta?.comments || "";
+  const dispute = data?.dispute;
 
   if (!data) return null;
 
@@ -236,15 +267,59 @@ const OrderDetails = ({ params }) => {
                   </div>
                 </div>
 
-                {(data?.isAdmin || data?.additionalInfo?.courier) && (
+                {(dispute || !data?.isAdmin) && (
                   <div className="surface-card p-5 sm:p-6">
-                    <CourierDetails
-                      couriers={couriers}
-                      handleChange={handleChange}
-                      additionalInfo={data?.additionalInfo}
-                      isAdmin={data?.isAdmin}
-                      onSubmit={handleUpdateOrder}
-                    />
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">
+                          Dispute
+                        </p>
+                        <h2 className="mt-2 text-lg font-semibold text-dark">
+                          Order dispute support
+                        </h2>
+                        {!dispute && (
+                          <p className="mt-3 text-sm text-dark-4">
+                            If there is an issue with this order, raise a dispute and the admin
+                            team will be notified by email.
+                          </p>
+                        )}
+                      </div>
+                      {!data?.isAdmin && !dispute && (
+                        <button
+                          type="button"
+                          onClick={() => setIsDisputeModalOpen(true)}
+                          className="btn-primary px-5 text-sm"
+                        >
+                          Raise a Dispute
+                        </button>
+                      )}
+                    </div>
+
+                    {dispute ? (
+                      <div className="mt-5 rounded-[24px] border border-red-100 bg-red-50/70 p-5">
+                        <div className="flex flex-wrap items-center gap-3">
+                          <span className="inline-flex rounded-full bg-red-600 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-white">
+                            {dispute.status}
+                          </span>
+                          <span className="text-sm text-dark-4">
+                            Raised on{" "}
+                            {dispute.createdAt
+                              ? new Date(dispute.createdAt).toLocaleString()
+                              : "-"}
+                          </span>
+                        </div>
+                        <p className="mt-4 text-sm font-medium text-dark">
+                          Raised by: {dispute.raisedByName || "Customer"}
+                        </p>
+                        <p className="mt-3 whitespace-pre-line text-dark-4">
+                          {dispute.message}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="mt-5 rounded-[24px] border border-dashed border-gray-3 bg-slate-50/60 p-5 text-sm text-dark-4">
+                        No dispute has been raised for this order.
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -384,6 +459,18 @@ const OrderDetails = ({ params }) => {
                   </div>
                 )}
 
+                {(data?.isAdmin || data?.additionalInfo?.courier) && (
+                  <div className="surface-card p-5 sm:p-6">
+                    <CourierDetails
+                      couriers={couriers}
+                      handleChange={handleChange}
+                      additionalInfo={data?.additionalInfo}
+                      isAdmin={data?.isAdmin}
+                      onSubmit={handleUpdateOrder}
+                    />
+                  </div>
+                )}
+
                 <div className="surface-card p-5 sm:p-6">
                   <div className="mb-5">
                     <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">
@@ -423,6 +510,33 @@ const OrderDetails = ({ params }) => {
           </form>
         </div>
       </section>
+      <ModalInfo
+        isOpen={isDisputeModalOpen}
+        onClose={() => {
+          if (isSubmittingDispute) return;
+          setIsDisputeModalOpen(false);
+        }}
+        onOk={handleRaiseDispute}
+        content={
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">
+              Raise dispute
+            </p>
+            <h2 className="mt-2 text-xl font-semibold text-dark">Report an issue with this order</h2>
+            <p className="mt-3 text-sm text-dark-4">
+              This message will be sent to the admin team and attached to the order.
+            </p>
+            <Input.TextArea
+              className="mt-4"
+              rows={5}
+              maxLength={1000}
+              placeholder="Describe the issue with this order"
+              value={disputeMessage}
+              onChange={(e) => setDisputeMessage(e.target.value)}
+            />
+          </div>
+        }
+      />
     </>
   );
 };

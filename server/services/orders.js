@@ -133,6 +133,7 @@ const getOrders = async ({ userId=null, skip=0, take=10, search=null, status=nul
         user: i.user,
         totalAmount: i.totalAmount,
         shippingAmount: i.shippingAmount,
+        dispute: i.additionalInfo?.dispute || null,
       }
     )),
     totalCount
@@ -216,7 +217,73 @@ const getOrder = async ({ userId=null, orderNo }) => {
     })),
     user: order.user,
     orderStatusHistory,
-    additionalInfo: order.additionalInfo
+    additionalInfo: order.additionalInfo,
+    dispute: order.additionalInfo?.dispute || null
+  };
+}
+
+const raiseDispute = async ({ orderNo, userId, userName, message }) => {
+  const order = await prisma.order.findFirst({
+    where: {
+      orderNo,
+      userId,
+    },
+    select: {
+      id: true,
+      orderNo: true,
+      additionalInfo: true,
+      user: {
+        select: {
+          email: true,
+          name: true,
+        }
+      }
+    }
+  });
+
+  if(!order) {
+    const err = new Error("Order Not found");
+    err.statusCode = 404;
+    throw err;
+  }
+
+  if(order.additionalInfo?.dispute?.status === "OPEN") {
+    const err = new Error("Dispute already raised for this order");
+    err.statusCode = 400;
+    throw err;
+  }
+
+  const dispute = {
+    message,
+    status: "OPEN",
+    createdAt: new Date().toISOString(),
+    raisedByUserId: userId,
+    raisedByName: userName || order.user?.name || "",
+  };
+
+  const additionalInfo = {
+    ...(order.additionalInfo || {}),
+    dispute,
+  };
+
+  const updatedOrder = await prisma.order.update({
+    where: { orderNo },
+    data: { additionalInfo },
+    select: {
+      orderNo: true,
+      additionalInfo: true,
+      user: {
+        select: {
+          name: true,
+          email: true,
+        }
+      }
+    }
+  });
+
+  return {
+    ...updatedOrder,
+    dispute,
   };
 }
 
@@ -326,6 +393,7 @@ export default {
   createOrder,
   getOrders,
   getOrder,
+  raiseDispute,
   updateOrderStatus,
   updateOrderProductStockStatus,
   updateOrderStatusByPaymentId,

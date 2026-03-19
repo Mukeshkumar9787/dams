@@ -113,6 +113,22 @@ const AdminOrders = () => {
       },
     },
     {
+      title: 'Dispute',
+      dataIndex: 'dispute',
+      key: 'dispute',
+      align: 'center',
+      render: (dispute) => {
+        if (!dispute) {
+          return <span className="text-sm text-dark-4">-</span>;
+        }
+        return (
+          <span className="inline-flex rounded-full bg-red-600 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-white">
+            {dispute.status}
+          </span>
+        );
+      },
+    },
+    {
       title: 'View',
       dataIndex: 'orderNo',
       key: 'action',

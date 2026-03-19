@@ -1,7 +1,7 @@
 import express from "express";
 import orderController from "../controllers/orders.js"; 
 import validateInput from "../middlewares/requestValidationMiddleware.js";
-import { createOrderSchema, updateOrderSchema, updateOrderStatusSchema } from "../utils/validation.js";
+import { createOrderDisputeSchema, createOrderSchema, updateOrderSchema, updateOrderStatusSchema } from "../utils/validation.js";
 import { getAuthMiddleware } from "../middlewares/authMiddleware.js";
 import { ROLE_TYPES } from "../utils/constants.js";
 
@@ -18,6 +18,8 @@ router.get("/admin", getAuthMiddleware([ROLE_TYPES.ADMIN]), orderController.getA
 router.get("/stats", getAuthMiddleware([ROLE_TYPES.ADMIN]), orderController.getOrderStatsAdmin);
 
 router.get("/:slug",getAuthMiddleware(), orderController.getOrderBySlugUser);
+
+router.patch("/:slug/dispute", getAuthMiddleware(), validateInput(createOrderDisputeSchema), orderController.raiseDispute);
 
 router.get("/:slug/admin", getAuthMiddleware([ROLE_TYPES.ADMIN]), orderController.getOrderBySlugAdmin);
 
