@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
-import Breadcrumb from "../Common/Breadcrumb";
 import RecentlyViewdItems from "./RecentlyViewd";
 import PreLoader from "../Common/PreLoader";
 import { addProductReview, deleteMyProductReview, getMyProductReview, getProductBySlug, getProductReviews, updateMyProductReview } from "@/http/apiCalls";
@@ -203,7 +202,6 @@ const ShopDetails = ({ params }) => {
 
   return (
     <>
-      <Breadcrumb title={"Shop Details"} pages={["shop details/", params.slug]} />
       {!product ? (
         <PreLoader />
       ) : (
