@@ -1,5 +1,5 @@
 import { Menu } from "@/types/Menu";
-import { CATEGORY_URL, COLOR_URL, CONFIG_COMPANY_URL, CONFIG_COURIER_URL, CONFIG_SHIPPING_URL, DASHBOARD_URL, HSN_URL, ORDER_URL, PRODUCT_URL, SIZE_URL, USER_URL } from "@/utils/appUrls";
+import { AUDIT_LOG_URL, CATEGORY_URL, COLOR_URL, CONFIG_COMPANY_URL, CONFIG_COURIER_URL, CONFIG_SHIPPING_URL, DASHBOARD_URL, HSN_URL, ORDER_URL, PRODUCT_URL, SIZE_URL, USER_URL } from "@/utils/appUrls";
 
 export const menuData: Menu[] = [
   {
@@ -84,6 +84,11 @@ export const adminMenuData: Menu[] = [
         title: "Users",
         newTab: false,
         path: USER_URL,
+      },
+      {
+        title: "Audit Logs",
+        newTab: false,
+        path: AUDIT_LOG_URL,
       },
     ],
   }

@@ -25,6 +25,12 @@ const Hsn = () => {
 
   const columns = [
     {
+      title: 'S.No',
+      key: 'serialNo',
+      width: 80,
+      render: (_, __, index) => <span className="font-medium text-dark">{index + 1}</span>,
+    },
+    {
       title: 'Hsn',
       dataIndex: 'code',
       key: 'code',

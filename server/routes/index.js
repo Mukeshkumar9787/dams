@@ -13,9 +13,11 @@ import addressRoutes from "./address.js"
 import cartRoutes from "./cart.js"
 import wishlistRoutes from "./wishlist.js"
 import dashboardRoutes from "./dashboard.js"
+import auditLogRoutes from "./auditLogs.js"
 import { getAuthMiddleware } from "../middlewares/authMiddleware.js";
 import { ROLE_TYPES } from "../utils/constants.js";
 import { paginationMiddleware } from "../middlewares/paginationValidationMiddleware.js";
+import { auditLogMiddleware } from "../middlewares/auditLogMiddleware.js";
 
 
 const router = express.Router();
@@ -30,6 +32,7 @@ router.use(
 );
 
 router.use(paginationMiddleware);
+router.use(auditLogMiddleware);
 
 router.use("/auth", authRoutes);
 
@@ -55,6 +58,7 @@ router.use("/config", configRoutes);
 router.use(getAuthMiddleware([ROLE_TYPES.ADMIN]));
 
 router.use("/dashboard", dashboardRoutes);
+router.use("/audit-logs", auditLogRoutes);
 
 router.use("/files", fileRoutes);
 

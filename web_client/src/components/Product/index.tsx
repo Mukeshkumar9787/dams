@@ -29,6 +29,16 @@ const Product = () => {
 
   const columns = [
     {
+      title: 'S.No',
+      key: 'serialNo',
+      width: 80,
+      render: (_, __, index) => (
+        <span className="font-medium text-dark">
+          {(pagination.pageNumber - 1) * pagination.pageSize + index + 1}
+        </span>
+      ),
+    },
+    {
       title: 'Image',
       dataIndex: 'img',
       key: 'img',

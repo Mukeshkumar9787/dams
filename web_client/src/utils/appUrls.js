@@ -15,6 +15,7 @@ export const COLOR_NEW_URL = `${COLOR_URL}/new`;
 
 export const ORDER_URL = '/orders';
 export const DASHBOARD_URL = '/dashboard';
+export const AUDIT_LOG_URL = '/audit-logs';
 
 export const USER_URL = '/users';
 

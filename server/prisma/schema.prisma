@@ -49,6 +49,26 @@ model User {
   cartItems            CartItem[]
   wishlistItems        WishlistItem[]
   productReviews       ProductReview[]
+  auditLogs            AuditLog[]
+}
+
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     Int
+  action     String
+  entity     String
+  entityId   String?
+  method     String
+  route      String
+  statusCode Int
+  ipAddress  String?
+  userAgent  String?
+  meta       Json?
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
 }
 
 model Address {

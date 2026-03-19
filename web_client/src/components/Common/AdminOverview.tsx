@@ -32,11 +32,13 @@ const AdminOverview = ({
         </div>
 
         {stats.length > 0 && (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:w-auto lg:min-w-[360px] lg:grid-cols-3">
             {stats.map((item) => (
-              <div key={item.label} className="rounded-2xl border border-white bg-white px-4 py-3 shadow-sm">
+              <div key={item.label} className="min-w-0 rounded-2xl border border-white bg-white px-4 py-3 shadow-sm">
                 <p className="text-xs uppercase tracking-[0.2em] text-slate-500">{item.label}</p>
-                <p className="mt-2 text-lg font-semibold text-slate-950">{item.value}</p>
+                <p className="mt-2 break-words text-base font-semibold leading-6 text-slate-950 sm:text-lg">
+                  {item.value}
+                </p>
               </div>
             ))}
           </div>
