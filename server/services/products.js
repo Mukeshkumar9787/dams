@@ -86,6 +86,16 @@ const getProducts = async ({ status, pageNumber=1, pageSize=10, search='', color
         c.title as "categoryName",
         s.title as "sizeName",
         color.code as "colorCode",
+        COALESCE((
+          SELECT AVG(pr.rating)
+          FROM "ProductReview" pr
+          WHERE pr."productId" = p."id" AND pr."isHidden" = false
+        ), 0) as "avgRating",
+        (
+          SELECT COUNT(1)
+          FROM "ProductReview" pr
+          WHERE pr."productId" = p."id" AND pr."isHidden" = false
+        )::int as "reviewCount",
         (select f."path"  from "File" f where f.feature = ${FEATURE_TYPES.PRODUCT} and f."featureId" = p."id" order by f."createdAt" asc limit 1) as img
       FROM "Product" p
       LEFT JOIN "Category" c ON c."id" = p."categoryId"

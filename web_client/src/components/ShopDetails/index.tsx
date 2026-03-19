@@ -243,10 +243,12 @@ const ShopDetails = ({ params }) => {
                   </div>
 
                   <div className="flex flex-wrap items-center gap-5.5 mb-4.5">
-                    <div className="flex items-center gap-2.5">
-                      {renderStars(visibleAvg, 18)}
-                      <span className="text-dark-2">({reviewCount} reviews)</span>
-                    </div>
+                    {reviewCount > 0 && (
+                      <div className="flex items-center gap-2.5">
+                        {renderStars(visibleAvg, 18)}
+                        <span className="text-dark-2">({reviewCount} reviews)</span>
+                      </div>
+                    )}
                     <AvailableStock stock={product.stock} />
                   </div>
 

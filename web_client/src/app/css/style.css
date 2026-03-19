@@ -370,16 +370,19 @@ input[type='search']::-webkit-search-results-decoration {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   border-bottom: 1px solid #e2e8f0 !important;
-  padding-top: 16px !important;
-  padding-bottom: 16px !important;
+  padding: 16px 20px !important;
 }
 
 .admin-data-table .ant-table-tbody > tr > td {
   border-bottom: 1px solid #eef2f7 !important;
-  padding-top: 16px !important;
-  padding-bottom: 16px !important;
+  padding: 16px 20px !important;
   vertical-align: middle;
   background: rgba(255, 255, 255, 0.94);
+}
+
+.admin-data-table .ant-table-thead > tr > th:first-child,
+.admin-data-table .ant-table-tbody > tr > td:first-child {
+  text-align: center !important;
 }
 
 .admin-data-table .ant-table-tbody > tr:last-child > td {

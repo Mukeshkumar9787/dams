@@ -7,4 +7,6 @@ export type Product = {
   id: number;
   imgs?: [];
   img?: string;
+  avgRating?: number;
+  reviewCount?: number;
 };

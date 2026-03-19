@@ -16,14 +16,17 @@ const Filter = ({ clearFilter }) => {
     }
     const style = {
         fontSize: 14,
-        padding: '6px 12px',
-        borderRadius: 6,
+        padding: '8px 14px',
+        borderRadius: 999,
         cursor: 'pointer',
         backgroundColor: 'white',
+        border: '1px solid #dbe4f0',
+        color: '#0f172a',
+        fontWeight: 500,
     };
     if(!category && !color && !size) return <span></span>
     return (
-        <div className="flex max-w-full rounded-lg py-4 px-5 items-center flex-wrap gap-3">
+        <div className="mb-4 flex max-w-full flex-wrap items-center gap-3 rounded-[24px] border border-slate-200/80 bg-white px-4 py-4 shadow-[0_12px_30px_rgba(15,23,42,0.06)] sm:px-5">
             {category && 
                 <Tag
                 key={category}
@@ -54,11 +57,11 @@ const Filter = ({ clearFilter }) => {
                 >
                 <span className="flex items-center justify-center rounded-lg">
                     <span> Color: </span>
-                    <span key={color} className={`ml-1 w-5 h-5`} style={{backgroundColor: color}}></span>
+                    <span key={color} className={`ml-2 h-5 w-5 rounded-full border border-slate-200`} style={{backgroundColor: color}}></span>
                 </span>
                 </Tag>
             }
-            <button className="text-blue" onClick={clearFilter}>Clear All Filters</button>
+            <button type="button" className="text-sm font-semibold text-blue" onClick={clearFilter}>Clear All Filters</button>
         </div>
     )
 }
