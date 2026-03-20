@@ -60,7 +60,7 @@ const ResetPassword = ({ email = '', nestedForm=false }) => {
       {enterOTP && <VerifyOTP isOpen={enterOTP} sentTo={emailRef.current} 
       onClose={onOTPVerificationClose} type={VERIFY_OTP_TYPES.RESET_PASSWORD} resendOtp={resendOtp} nestedForm={nestedForm} /> }
       {!nestedForm && <Breadcrumb title={"Reset Password"} pages={["Reset Password"]} /> }
-      <section className={`${nestedForm ? "overflow-hidden bg-gray-2" : "page-section bg-gray-2/60"}`} key={`${resetFormValue}`}>
+      <section className={`${nestedForm ? "overflow-hidden bg-transparent" : "page-section"}`} key={`${resetFormValue}`}>
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
           <div className="form-card max-w-[570px] w-full mx-auto">
             <div className="text-center mb-11">

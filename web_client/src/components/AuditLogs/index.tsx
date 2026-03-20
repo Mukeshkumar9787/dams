@@ -188,7 +188,7 @@ const AuditLogs = () => {
   ];
 
   return (
-    <section className="page-section bg-gray-2/60">
+    <section className="page-section">
       <div className="mx-auto w-full max-w-[1170px] px-4 sm:px-8 xl:px-0">
         <AdminOverview
           eyebrow="Admin Audit"

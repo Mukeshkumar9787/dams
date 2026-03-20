@@ -52,13 +52,13 @@ const Categories = () => {
   }, []);
 
   return (
-    <section className="overflow-hidden bg-[radial-gradient(circle_at_top_left,_rgba(199,160,92,0.16),_transparent_26%),linear-gradient(135deg,#f8efe0_0%,#fffaf3_52%,#fff_100%)] pb-14 pt-10 sm:pt-12 lg:pt-16">
+    <section className="overflow-hidden bg-transparent pb-14 pt-10 sm:pt-12 lg:pt-16">
       <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
         <div className="px-1 py-2 sm:px-0">
           {/* <!-- section title --> */}
           <div className="mb-8 flex flex-col gap-5 lg:mb-10 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-[620px]">
-              <span className="mb-2 inline-flex items-center gap-2.5 rounded-full border border-[#e5d6bc] bg-white/80 px-3 py-1 text-sm font-medium text-[#7a5a2b] shadow-sm">
+              <span className="mb-2 inline-flex items-center gap-2.5 rounded-full border border-sky-100 bg-sky-50 px-3 py-1 text-sm font-medium text-sky-700 shadow-sm">
                 <svg
                   width="20"
                   height="20"
@@ -106,7 +106,7 @@ const Categories = () => {
             <div className="ml-auto flex items-center gap-3 self-end lg:self-auto">
               <button
                 onClick={handlePrev}
-                className="!static !mt-0 flex items-center justify-center rounded-full border border-[#e5d6bc] bg-white text-[#7a5a2b] shadow-sm transition hover:border-[#caa56a] hover:text-[#a76d1e]"
+                className="!static !mt-0 flex items-center justify-center rounded-full border border-slate-200 bg-white text-sky-700 shadow-sm transition hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700"
                 style={{ width: 32, height: 32, minWidth: 32 }}
               >
                 <svg
@@ -128,7 +128,7 @@ const Categories = () => {
 
               <button
                 onClick={handleNext}
-                className="!static !mt-0 flex items-center justify-center rounded-full border border-[#e5d6bc] bg-white text-[#7a5a2b] shadow-sm transition hover:border-[#caa56a] hover:text-[#a76d1e]"
+                className="!static !mt-0 flex items-center justify-center rounded-full border border-slate-200 bg-white text-sky-700 shadow-sm transition hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700"
                 style={{ width: 32, height: 32, minWidth: 32 }}
               >
                 <svg

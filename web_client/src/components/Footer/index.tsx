@@ -25,7 +25,7 @@ const Footer = () => {
     fetchConfig();
   }, [fetchConfig]);
   return (
-    <footer className="overflow-hidden border-t border-gray-3/70 bg-white/80 backdrop-blur">
+    <footer className="overflow-hidden bg-transparent backdrop-blur">
       <div className="max-w-[1170px] mx-auto px-4 sm:px-8 xl:px-0">
         {/* <!-- footer menu start --> */}
         <div className="flex flex-wrap xl:flex-nowrap gap-10 xl:gap-19 xl:justify-between pt-14 xl:pt-18 pb-10 xl:pb-14">

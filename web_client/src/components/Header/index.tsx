@@ -97,7 +97,7 @@ const Header = () => {
 
   return (
     <header
-      className={`sticky left-0 top-0 w-full z-50 border-b border-gray-3/70 bg-white/95 backdrop-blur transition-all ease-in-out duration-300 ${
+      className={`sticky left-0 top-0 w-full z-50 bg-transparent backdrop-blur transition-all ease-in-out duration-300 ${
         stickyMenu ? "shadow-sm" : ""
       }`}
     >

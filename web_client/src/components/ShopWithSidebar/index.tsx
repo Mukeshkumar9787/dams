@@ -92,7 +92,7 @@ const ShopWithSidebar = () => {
         title={"Explore All Products"}
         pages={["shop"]}
       />
-      <section className="overflow-hidden relative pb-20 pt-5 bg-[#f3f4f6]">
+      <section className="overflow-hidden relative bg-transparent pb-20 pt-5">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
           <div className="relative mb-5 xl:hidden">
             <div className="rounded-[24px] border border-slate-200/80 bg-white/95 p-3 shadow-[0_16px_40px_rgba(15,23,42,0.08)] backdrop-blur">

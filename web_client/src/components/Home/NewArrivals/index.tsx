@@ -7,7 +7,7 @@ const NewArrival = async () => {
   const data = await getProducts({pageSize: 8, status: STATUS_TYPES.ACTIVE});
   const shopData = data.data || [];
   return (
-    <section className="overflow-hidden bg-[radial-gradient(circle_at_top_right,_rgba(14,165,233,0.12),_transparent_24%),linear-gradient(180deg,#ffffff_0%,#f6faff_100%)] pb-18 pt-10 sm:pt-12">
+    <section className="overflow-hidden bg-transparent pb-18 pt-10 sm:pt-12">
       <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
         <div className="px-1 py-2 sm:px-0">
           {/* <!-- section title --> */}

@@ -41,7 +41,7 @@ const Signin = () => {
     <>
       <ModalInfo isOpen={alert} content={getAlertContent(alert)} closable={false} onOk={()=> {setAlert(null)}}  />
       <Breadcrumb title={"Signin"} pages={["Signin"]} />
-      <section className="page-section bg-gray-2/60">
+      <section className="page-section">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
           <div className="form-card max-w-[570px] w-full mx-auto">
             <div className="text-center mb-11">

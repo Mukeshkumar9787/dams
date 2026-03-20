@@ -35,7 +35,7 @@ export default function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning={true}>
-      <body>
+      <body className="bg-[radial-gradient(circle_at_top_right,_rgba(14,165,233,0.12),_transparent_24%),linear-gradient(180deg,#ffffff_0%,#f6faff_100%)] text-dark">
 
         {loading ? (
           <PreLoader />
@@ -50,7 +50,7 @@ export default function RootLayout({
                     <ModalProvider>
                       <PreviewSliderProvider>
                         <Header />
-                        <main className="relative min-h-[70vh]">
+                        <main className="relative min-h-[70vh] bg-transparent">
                           <AdminDesktopShell>{children}</AdminDesktopShell>
                         </main>
 

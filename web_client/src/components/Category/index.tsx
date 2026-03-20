@@ -98,7 +98,7 @@ const Category = () => {
   
   return (
     <>
-        <section className="page-section bg-gray-2/60">
+        <section className="page-section">
           <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
             <AdminOverview
               eyebrow="Catalog Admin"

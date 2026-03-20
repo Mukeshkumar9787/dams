@@ -147,7 +147,7 @@ const Breadcrumb = ({
   }
 
   return (
-    <div className={`overflow-hidden border-b border-gray-3/60 bg-white/70 ${className}`}>
+    <div className={`overflow-hidden bg-transparent ${className}`}>
       <div>
         <div className="max-w-[1170px] w-full mx-auto px-4 pb-0 pt-5 sm:px-8 xl:px-0 xl:pb-0 xl:pt-8">
           <div className="surface-card flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 sm:px-6">

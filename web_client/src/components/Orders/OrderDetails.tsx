@@ -195,7 +195,7 @@ const OrderDetails = ({ params }) => {
       <div ref={componentRef} className="hidden print:block">
         <OrderInvoice data={{ ...data, compInfo }} />
       </div>
-      <section className="overflow-hidden bg-gray-2 py-12 pt-5">
+      <section className="overflow-hidden bg-transparent py-12 pt-5">
         <div className="mx-auto w-full max-w-[1240px] px-4 sm:px-8 xl:px-0">
           <form>
             <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">

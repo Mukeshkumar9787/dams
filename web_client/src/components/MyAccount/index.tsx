@@ -63,7 +63,7 @@ const MyAccount = () => {
     <>
       <Breadcrumb title={"My Account"} pages={["my account"]} />
 
-      <section className="page-section bg-gray-2/60">
+      <section className="page-section">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
           <div className="flex flex-col gap-7.5">
             {/* <!--== user dashboard menu start ==--> */}
@@ -72,21 +72,21 @@ const MyAccount = () => {
                 
                 <div className="flex flex-wrap items-center gap-5 py-6 px-4 sm:px-7.5 xl:px-9 border-r xl:border-r-0 xl:border-b border-gray-3">
                   
-                  <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-full">
+                  <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-full">
                     {user?.profilePicture ? (
                       <img
                         src={user.profilePicture}
                         alt={user?.name || "user"}
-                        width={64}
-                        height={64}
+                        width={96}
+                        height={96}
                         className="block h-full w-full object-cover"
                       />
                     ) : (
                       <Image
                         src="/images/icons/icon-08.svg"
                         alt="user"
-                        width={64}
-                        height={64}
+                        width={96}
+                        height={96}
                         className="block h-full w-full object-cover"
                       />
                     )}

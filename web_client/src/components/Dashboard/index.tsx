@@ -145,7 +145,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <section className="page-section bg-gray-2/60">
+      <section className="page-section">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
           <div className="mb-6 rounded-[28px] p-6 text-white shadow-[0_24px_80px_rgba(7,17,31,0.28)] sm:p-8" style={HERO_BACKGROUND}>
             <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
