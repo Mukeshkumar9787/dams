@@ -36,7 +36,7 @@ const getUserInfo = async ({ id }) => {
 
   return {
     ...user,
-    profilePictureFileId: profilePicture?.path ? profilePicture.id : null,
+    profilePictureFileId: profilePicture ? profilePicture.id : null,
     profilePicture: profilePicture?.path ? convertToFullFilePath(profilePicture.path) : null,
   };
 };
@@ -83,7 +83,7 @@ const updateProfile = async (id, { name, mobile, fileIds = [], deletedFileIds = 
   });
 
   if (deletedFiles.length > 0) {
-    deleteFiles(deletedFiles.map((file) => file.path));
+    deleteFiles(deletedFiles);
   }
 
   user = await getUserInfo({ id });

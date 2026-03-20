@@ -114,7 +114,7 @@ const updateCategory = async (id, { title, fileIds, deletedFileIds, status }) =>
     throw err;
   }
 
-  deleteFiles(deletedFiles.map(i => i.path));
+  deleteFiles(deletedFiles);
   return updated;
 };
 

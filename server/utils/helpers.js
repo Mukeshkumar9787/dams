@@ -5,6 +5,7 @@ import { CONFIG_KEYS, ORDER_STATUS, ROLE_TYPES } from './constants.js';
 import { sendMail } from "./mailUtils.js";
 import configService from "../services/config.js";
 import userService from "../services/users.js";
+import { deleteR2FileByPath, isR2Configured } from "./r2.js";
 
 export const toCamelCase = (row) => {
   const obj = {};
@@ -16,6 +17,12 @@ export const toCamelCase = (row) => {
 };
 
 export const convertToFullFilePath = (filePath) => {
+  if (isR2Configured()) {
+    const baseUrl = (process.env.R2_PUBLIC_BASE_URL || process.env.R2_ENDPOINT || "").replace(/\/+$/, "");
+    const bucketPath = (process.env.R2_BUCKET_PATH || "uploads").replace(/^\/+|\/+$/g, "");
+    return filePath ? `${baseUrl}/${bucketPath}/${filePath}` : filePath;
+  }
+
   if (!filePath) return filePath;
   if (/^https?:\/\//i.test(filePath)) {
     return filePath;
@@ -24,6 +31,10 @@ export const convertToFullFilePath = (filePath) => {
 };
 
 export const deleteFile = async(filePath) => {
+  if (isR2Configured()) {
+    await deleteR2FileByPath(filePath);
+    return;
+  }
   const fileFullPath = path.join(process.cwd(), filePath);
   if (fs.existsSync(fileFullPath)) {
     fs.unlinkSync(fileFullPath);
@@ -32,7 +43,7 @@ export const deleteFile = async(filePath) => {
 
 export const deleteFiles = (files) => {
   return Promise.all([
-    files.map(file => deleteFile(file))
+    files.map((file) => typeof file === "object" ? deleteFile(file.path) : deleteFile(file))
   ])
 };
 

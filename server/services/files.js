@@ -1,20 +1,47 @@
 import prisma, { PrismaConfig } from "../prisma/client.js";
 import { convertToFullFilePath } from "../utils/helpers.js";
+import { getDirectUploadConfig, isR2Configured, uploadFileToR2 } from "../utils/r2.js";
 
 /**
  * Create File
  */
-const createFile = async ({ path }) => {
-  
-  const file = await prisma.file.create({
+const createFile = async ({ file }) => {
+  const uploadedFile = await uploadFileToR2(file);
+  const createdFile = await prisma.file.create({
     data: {
-      path
+      path: uploadedFile.path,
+    }
+  });
+
+  return {
+    id: createdFile.id,
+    path: convertToFullFilePath(createdFile.path),
+  };
+};
+
+const createFileFromPath = async ({ path }) => {
+  const createdFile = await prisma.file.create({
+    data: {
+      path,
     },
   });
 
   return {
-    id: file.id,
-    path: convertToFullFilePath(file.path),
+    id: createdFile.id,
+    path: convertToFullFilePath(createdFile.path),
+  };
+};
+
+const getUploadConfig = async ({ filename, contentType }) => {
+  if (isR2Configured()) {
+    return {
+      strategy: "direct",
+      ...(await getDirectUploadConfig({ filename, contentType }))
+    };
+  }
+
+  return {
+    strategy: "server",
   };
 };
 
@@ -62,7 +89,9 @@ const getFilesByFeatureIds = async ({ tx= prisma, feature, featureIds = [] }) =>
 }
 
 export default {
+  getUploadConfig,
   createFile,
+  createFileFromPath,
   updateFilesByIds,
   getFilesByFeatureIds
 };

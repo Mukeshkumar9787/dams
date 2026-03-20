@@ -181,9 +181,7 @@ const getProductBySlug = async (slug) => {
     }),
   ]);
   product.images = images.map(i => {
-    if(i.path){
-      i.path = convertToFullFilePath(i.path);
-    }
+    i.path = convertToFullFilePath(i.path);
     return i;
   });
   product.colorCode = product.Color.code;
@@ -244,7 +242,7 @@ const updateProduct = async (id, { title, fileIds, deletedFileIds, categoryId, h
     restockProductInfo = shouldSendRestockNotification ? { id: updated.id, title: updated.title, slug: updated.slug } : null;
     deletedFiles = deletedRecords;
   })
-  deleteFiles(deletedFiles.map(i => i.path));
+  deleteFiles(deletedFiles);
   if (shouldSendRestockNotification && restockProductInfo) {
     sendRestockNotifications(restockProductInfo);
   }

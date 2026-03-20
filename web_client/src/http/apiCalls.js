@@ -1,5 +1,5 @@
 
-import { API_ADDRESS, API_ADMIN_ORDERS, API_AUDIT_LOGS, API_AUDIT_LOGS_STATS, API_CART, API_CATEGORIES, API_COLOR, API_CONFIG, API_DASHBOARD, API_FILES, API_HSN, API_LOGIN, API_LOGIN_WITH_OTP, API_ORDERS, API_ORDER_DISPUTE, API_PAYMENT_VERIFY, API_PRODUCTS, API_PRODUCTS_NOTIFY, API_PRODUCT_REVIEWS, API_PRODUCT_REVIEWS_ADMIN, API_PRODUCT_REVIEW_ME, API_PRODUCT_REVIEW_SELF, API_PRODUCT_REVIEW_VISIBILITY, API_REGISTER, API_RESET_PASSWORD, API_SIZE, API_USER_INFO, API_USER_UPDATE_PROFILE, API_USERS, API_USERS_ROLE, API_VERIFY_GOOGLE_TOKEN, API_VERIFY_OTP, API_WISHLIST, GET_ACTIVE_API } from './apiUrls';
+import { API_ADDRESS, API_ADMIN_ORDERS, API_AUDIT_LOGS, API_AUDIT_LOGS_STATS, API_CART, API_CATEGORIES, API_COLOR, API_CONFIG, API_DASHBOARD, API_FILES, API_FILES_COMPLETE, API_FILES_UPLOAD_CONFIG, API_HSN, API_LOGIN, API_LOGIN_WITH_OTP, API_ORDERS, API_ORDER_DISPUTE, API_PAYMENT_VERIFY, API_PRODUCTS, API_PRODUCTS_NOTIFY, API_PRODUCT_REVIEWS, API_PRODUCT_REVIEWS_ADMIN, API_PRODUCT_REVIEW_ME, API_PRODUCT_REVIEW_SELF, API_PRODUCT_REVIEW_VISIBILITY, API_REGISTER, API_RESET_PASSWORD, API_SIZE, API_USER_INFO, API_USER_UPDATE_PROFILE, API_USERS, API_USERS_ROLE, API_VERIFY_GOOGLE_TOKEN, API_VERIFY_OTP, API_WISHLIST, GET_ACTIVE_API } from './apiUrls';
 import axiosInstance from './axiosInstance';
 
 export async function getCategories(params) {
@@ -12,8 +12,33 @@ export async function createCategory(data) {
   return res.data;
 }
 
-export async function uploadFile(data) {
-  const res = await axiosInstance.post(API_FILES, data, {
+export async function uploadFile(file) {
+  const uploadConfig = await axiosInstance.post(API_FILES_UPLOAD_CONFIG, {
+    filename: file.name,
+    contentType: file.type,
+  });
+
+  if (uploadConfig?.data?.data?.strategy === "direct") {
+    const { uploadUrl, path } = uploadConfig.data.data;
+    const directUploadResponse = await fetch(uploadUrl, {
+      method: "PUT",
+      headers: {
+        "Content-Type": file.type,
+      },
+      body: file,
+    });
+
+    if (!directUploadResponse.ok) {
+      return { success: false, message: "Direct upload failed" };
+    }
+
+    const completeResponse = await axiosInstance.post(API_FILES_COMPLETE, { path });
+    return completeResponse.data;
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+  const res = await axiosInstance.post(API_FILES, formData, {
     headers: {
       "Content-Type": "multipart/form-data"
     },

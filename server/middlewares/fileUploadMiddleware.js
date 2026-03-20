@@ -1,6 +1,7 @@
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { isR2Configured } from "../utils/r2.js";
 
 // ensure upload directory exists
 const uploadDir = "uploads";
@@ -8,7 +9,7 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-const storage = multer.diskStorage({
+const diskStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
   },
@@ -30,7 +31,7 @@ const fileFilter = (req, file, cb) => {
 };
 
 const multerFileUploadMiddleware = multer({
-  storage,
+  storage: isR2Configured() ? multer.memoryStorage() : diskStorage,
   fileFilter,
   limits: {
     fileSize: 2 * 1024 * 1024, // 2MB

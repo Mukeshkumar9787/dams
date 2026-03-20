@@ -2,6 +2,8 @@ import { STATUS_TYPES } from "@/utils/constants";
 
 export const API_CATEGORIES = '/categories';
 export const API_FILES = '/files';
+export const API_FILES_UPLOAD_CONFIG = `${API_FILES}/upload-config`;
+export const API_FILES_COMPLETE = `${API_FILES}/complete`;
 export const API_HSN = '/hsn';
 export const API_PRODUCTS = '/products';
 export const API_PRODUCTS_NOTIFY = (id) => `${API_PRODUCTS}/${id}/notify-me`;

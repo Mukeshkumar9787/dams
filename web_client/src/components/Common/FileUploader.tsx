@@ -177,9 +177,7 @@ const FileUploader = ({
   };
 
   const handleFileUpload = async(file: Blob) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    const response = await uploadFile(formData);
+    const response = await uploadFile(file);
     if(!response) return
     setFiles((prev) => {
       if(multiSelect){
