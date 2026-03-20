@@ -198,7 +198,7 @@ const verifyOTP = async ({ email, otp, type }) => {
   });
 
   if(type === OTP_TYPES.REGISTER){
-    const user = await prisma.user.create({ ...otpRecord.meta, email });
+    const user = await prisma.user.create({ data: {...otpRecord.meta, email} });
     const token = generateToken(user);
     return {
       id: user.id,
