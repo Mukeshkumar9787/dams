@@ -1,6 +1,4 @@
-import prismaClient from "@prisma/client";
-
-const { Prisma } = prismaClient;
+import { Prisma } from '../prisma/generated/client.ts';
 
 function errorHandler(err, res) {
   // Prisma known errors
