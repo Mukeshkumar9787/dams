@@ -1,6 +1,17 @@
 import Joi from "joi";
 import { CONFIG_KEYS, ORDER_STATUS, OTP_TYPES, ROLE_TYPES, STATUS_TYPES } from "./constants.js";
 
+export const updateProfileSchema = Joi.object({
+  name: Joi.string().min(1).max(100).required(),
+  mobile: Joi.string().min(1).max(12).required(),
+  fileIds: Joi.array()
+    .items(Joi.number().integer().positive())
+    .optional(),
+  deletedFileIds: Joi.array()
+    .items(Joi.number().integer().positive())
+    .optional(),
+});
+
 export const categoryBodySchema = Joi.object({
   title: Joi.string().min(1).max(100).required(),
   fileIds: Joi.array()

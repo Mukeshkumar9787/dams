@@ -1,6 +1,7 @@
 import prisma from "../prisma/client.js";
 import { FEATURE_TYPES } from "../utils/constants.js";
-import { convertToFullFilePath } from "../utils/helpers.js";
+import { convertToFullFilePath, deleteFiles } from "../utils/helpers.js";
+import { fileService } from "./index.js";
 
 const getUserInfo = async ({ id }) => {
   const user = await prisma.user.findUnique({ 
@@ -25,6 +26,7 @@ const getUserInfo = async ({ id }) => {
       featureId: user.id,
     },
     select: {
+      id: true,
       path: true,
     },
     orderBy: {
@@ -34,6 +36,7 @@ const getUserInfo = async ({ id }) => {
 
   return {
     ...user,
+    profilePictureFileId: profilePicture?.path ? profilePicture.id : null,
     profilePicture: profilePicture?.path ? convertToFullFilePath(profilePicture.path) : null,
   };
 };
@@ -54,14 +57,36 @@ const getUsers = async ({ role }) => {
 };
 
 
-const updateProfile = async (id, { name, mobile }) => {
-  const user = await prisma.user.update({ 
-    where: { id  },
-    data: {
-      name,
-      mobile
-    }
+const updateProfile = async (id, { name, mobile, fileIds = [], deletedFileIds = [] }) => {
+  let user = null;
+  let deletedFiles = [];
+
+  await prisma.$transaction(async (tx) => {
+    const [, fileResult] = await Promise.all([
+      tx.user.update({
+        where: { id  },
+        data: {
+          name,
+          mobile
+        }
+      }),
+      fileService.updateFilesByIds({
+        tx,
+        feature: FEATURE_TYPES.USER,
+        featureId: id,
+        fileIds,
+        deletedFileIds
+      })
+    ]);
+
+    deletedFiles = fileResult.deletedRecords || [];
   });
+
+  if (deletedFiles.length > 0) {
+    deleteFiles(deletedFiles.map((file) => file.path));
+  }
+
+  user = await getUserInfo({ id });
 
   return user;
 };

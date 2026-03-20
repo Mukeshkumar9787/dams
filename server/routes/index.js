@@ -49,6 +49,7 @@ router.use("/users",getAuthMiddleware(), userRoutes);
 router.use("/orders", orderRoutes);
 
 router.use("/address", getAuthMiddleware(), addressRoutes);
+router.use("/files", getAuthMiddleware(), fileRoutes);
 
 router.use("/cart", cartRoutes);
 router.use("/wishlist", wishlistRoutes);
@@ -59,8 +60,6 @@ router.use(getAuthMiddleware([ROLE_TYPES.ADMIN]));
 
 router.use("/dashboard", dashboardRoutes);
 router.use("/audit-logs", auditLogRoutes);
-
-router.use("/files", fileRoutes);
 
 router.use("/hsn", hsnRoutes);
 

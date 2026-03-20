@@ -9,10 +9,14 @@ import { Button, Popconfirm } from "antd";
 import ResetPassword from "../Auth/ResetPassword";
 import Addresses from "./Addresses";
 import { notifySuccess } from "@/utils/notify";
+import FileUploader from "../Common/FileUploader";
 
 const MyAccount = () => {
   const [activeTab, setActiveTab] = useState("orders");
   const [user, setUser] = useState({});
+  const [profileImage, setProfileImage] = useState(null);
+  const fileIdsRef = React.useRef(new Set());
+  const deletedFileIdsRef = React.useRef(new Set());
   const tabs = [
     { key: "orders", label: "Orders" },
     { key: "addresses", label: "Addresses" },
@@ -29,6 +33,11 @@ const MyAccount = () => {
     const fetchUser = async() => {
       const userData = await getLoggedInUserData();
       setUser(userData);
+      setProfileImage(
+        userData?.profilePicture
+          ? { id: userData.profilePictureFileId, path: userData.profilePicture }
+          : null
+      );
     }
     fetchUser();
   },[])
@@ -37,7 +46,11 @@ const MyAccount = () => {
     try {
       e.preventDefault();
       const formData = new FormData(e.target);
-      const values = Object.fromEntries(formData.entries());
+      const values = {
+        ...Object.fromEntries(formData.entries()),
+        fileIds: [...fileIdsRef.current],
+        deletedFileIds: [...deletedFileIdsRef.current],
+      };
       const response = await updateProfile(values);
       notifySuccess(response.message || "Profile updated.");
       window.location.reload();
@@ -171,7 +184,21 @@ const MyAccount = () => {
               <form onSubmit={handleProfileUpdate} className="w-full md:w-1/2">
                 <div className="form-card p-4 sm:p-8.5">
                   <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5">
-                    <div className="w-full">
+                  <div className="w-full">
+                    <label className="form-label">
+                      Profile Image
+                    </label>
+                    <FileUploader
+                      files={profileImage}
+                      setFiles={setProfileImage}
+                      fileIdsRef={fileIdsRef}
+                      deletedFileIdsRef={deletedFileIdsRef}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5">
+                  <div className="w-full">
                       <label htmlFor="email" className="form-label">
                         Email
                       </label>

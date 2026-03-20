@@ -20,15 +20,20 @@ const FileUploader = ({ files, setFiles, multiSelect = false, fileIdsRef, delete
       notifyError("Only image files are allowed.");
     }
 
-    const remainingSlots = maxFiles - localFiles.length;
-    if (remainingSlots <= 0) {
-      notifyError(multiSelect ? "Maximum 5 files allowed." : "Only 1 file allowed.");
-      return;
-    }
+    const filesToUpload = multiSelect
+      ? imageFiles.slice(0, maxFiles - localFiles.length)
+      : imageFiles.slice(-1);
 
-    const filesToUpload = imageFiles.slice(0, remainingSlots);
-    if (imageFiles.length > remainingSlots) {
-      notifyError(multiSelect ? "Maximum 5 files allowed." : "Only 1 file allowed.");
+    if (multiSelect) {
+      const remainingSlots = maxFiles - localFiles.length;
+      if (remainingSlots <= 0) {
+        notifyError("Maximum 5 files allowed.");
+        return;
+      }
+
+      if (imageFiles.length > remainingSlots) {
+        notifyError("Maximum 5 files allowed.");
+      }
     }
 
     await Promise.all(filesToUpload.map((file) => handleFileUpload(file)));
@@ -53,7 +58,11 @@ const FileUploader = ({ files, setFiles, multiSelect = false, fileIdsRef, delete
         if(prev){
           let onlyFileId = prev.id;
           if(onlyFileId){
-            deletedFileIdsRef.current.add(onlyFileId);
+            if(fileIdsRef.current.has(onlyFileId)){
+              fileIdsRef.current.delete(onlyFileId);
+            }else{
+              deletedFileIdsRef.current.add(onlyFileId);
+            }
           };
         };
         fileIdsRef.current.add(response.data.id);
