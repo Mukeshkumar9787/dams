@@ -6,10 +6,8 @@ COPY package*.json ./
 RUN npm ci
 
 COPY . .
-COPY .env .env 
 RUN npm run build
 RUN npm prune --omit=dev
-
 
 # -------- Stage 2: Runner
 FROM node:20-alpine
