@@ -28,6 +28,7 @@ enum OTP_Types {
 }
 
 enum Feature {
+  USER
   CATEGORY
   PRODUCT
 }

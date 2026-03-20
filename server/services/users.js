@@ -1,4 +1,6 @@
 import prisma from "../prisma/client.js";
+import { FEATURE_TYPES } from "../utils/constants.js";
+import { convertToFullFilePath } from "../utils/helpers.js";
 
 const getUserInfo = async ({ id }) => {
   const user = await prisma.user.findUnique({ 
@@ -13,7 +15,27 @@ const getUserInfo = async ({ id }) => {
     }
   });
 
-  return user;
+  if (!user) {
+    return null;
+  }
+
+  const profilePicture = await prisma.file.findFirst({
+    where: {
+      feature: FEATURE_TYPES.USER,
+      featureId: user.id,
+    },
+    select: {
+      path: true,
+    },
+    orderBy: {
+      createdAt: "asc",
+    },
+  });
+
+  return {
+    ...user,
+    profilePicture: profilePicture?.path ? convertToFullFilePath(profilePicture.path) : null,
+  };
 };
 
 const getUsers = async ({ role }) => {

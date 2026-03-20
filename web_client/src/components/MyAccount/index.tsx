@@ -60,12 +60,22 @@ const MyAccount = () => {
                 <div className="flex flex-wrap items-center gap-5 py-6 px-4 sm:px-7.5 xl:px-9 border-r xl:border-r-0 xl:border-b border-gray-3">
                   
                   <div className="max-w-[64px] w-full h-16 rounded-full overflow-hidden">
-                    <Image
-                      src="/images/icons/icon-08.svg"
-                      alt="user"
-                      width={64}
-                      height={64}
-                    />
+                    {user?.profilePicture ? (
+                      <img
+                        src={user.profilePicture}
+                        alt={user?.name || "user"}
+                        width={64}
+                        height={64}
+                        className="h-16 w-16 object-cover"
+                      />
+                    ) : (
+                      <Image
+                        src="/images/icons/icon-08.svg"
+                        alt="user"
+                        width={64}
+                        height={64}
+                      />
+                    )}
                   </div>
 
                   <div>

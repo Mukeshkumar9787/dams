@@ -1,1 +1,2 @@
 - Do not generate `migration.sql` while changing Prisma schema files.
+- Manual schema follow-up: when applying the Prisma schema change for `File.feature`, add the `USER` enum value manually in the database. No migration file should be generated for this.

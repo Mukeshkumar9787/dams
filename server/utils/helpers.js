@@ -15,7 +15,13 @@ export const toCamelCase = (row) => {
   return obj;
 };
 
-export const convertToFullFilePath = (filePath) => process.env.SERVER_ADDRESS + filePath;
+export const convertToFullFilePath = (filePath) => {
+  if (!filePath) return filePath;
+  if (/^https?:\/\//i.test(filePath)) {
+    return filePath;
+  }
+  return process.env.SERVER_ADDRESS + filePath;
+};
 
 export const deleteFile = async(filePath) => {
   const fileFullPath = path.join(process.cwd(), filePath);

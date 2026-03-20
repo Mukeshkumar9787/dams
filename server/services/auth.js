@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import prisma from "../prisma/client.js";
 import { generateSecureOTP, hashedPassword, hashOTP } from "../utils/cryptoUtils.js";
 import { sendMail } from "../utils/mailUtils.js";
-import { OTP_TYPES } from "../utils/constants.js";
+import { FEATURE_TYPES, OTP_TYPES } from "../utils/constants.js";
 import { getAppName, isOtpExpired } from "../utils/helpers.js";
 import { OAuth2Client } from 'google-auth-library';
 
@@ -253,6 +253,29 @@ async function verifyGoogleToken(token) {
         password: null, // No password for Google accounts
       },
     });
+  }
+
+  if (payload.picture) {
+    const existingProfileFile = await prisma.file.findFirst({
+      where: {
+        feature: FEATURE_TYPES.USER,
+        featureId: user.id,
+      },
+      select: { id: true },
+      orderBy: {
+        createdAt: "asc",
+      },
+    });
+
+    if (!existingProfileFile) {
+      await prisma.file.create({
+        data: {
+          feature: FEATURE_TYPES.USER,
+          featureId: user.id,
+          path: payload.picture,
+        },
+      });
+    }
   }
 
   const jwtToken = generateToken(user);

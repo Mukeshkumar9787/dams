@@ -1,5 +1,6 @@
 
 export const FEATURE_TYPES = {
+    USER: 'USER',
     CATEGORY: 'CATEGORY',
     PRODUCT: 'PRODUCT'
 };
