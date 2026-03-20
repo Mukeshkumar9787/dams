@@ -5,7 +5,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node --no-warnings=ExperimentalWarning --loader ts-node/esm index.js",
+    "start": "npx prisma generate && node --no-warnings=ExperimentalWarning --loader ts-node/esm index.js",
     "dev": "nodemon index.js",
     "migrate": "npx prisma migrate dev --name auto && npx prisma generate",
     "test": "echo \"Error: no test specified\" && exit 1"
