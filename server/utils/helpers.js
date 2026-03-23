@@ -17,16 +17,17 @@ export const toCamelCase = (row) => {
 };
 
 export const convertToFullFilePath = (filePath) => {
+  if (!filePath) return filePath;
+  if (/^https?:\/\//i.test(filePath)) {
+    return filePath;
+  }
+  
   if (isR2Configured()) {
     const baseUrl = (process.env.R2_PUBLIC_BASE_URL || process.env.R2_ENDPOINT || "").replace(/\/+$/, "");
     const bucketPath = (process.env.R2_BUCKET_PATH || "uploads").replace(/^\/+|\/+$/g, "");
     return filePath ? `${baseUrl}/${bucketPath}/${filePath}` : filePath;
   }
 
-  if (!filePath) return filePath;
-  if (/^https?:\/\//i.test(filePath)) {
-    return filePath;
-  }
   return process.env.SERVER_ADDRESS + filePath;
 };
 
