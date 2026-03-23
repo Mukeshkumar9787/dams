@@ -229,6 +229,7 @@ const MyAccount = () => {
                         id="name"
                         placeholder="Enter Name"
                         defaultValue={user?.name}
+                        required
                         className="form-input"
                       />
                     </div>
@@ -247,6 +248,7 @@ const MyAccount = () => {
                         placeholder="Enter Mobile"
                         defaultValue={user?.mobile}
                         className="form-input"
+                        required
                       />
                     </div>
                   </div>
