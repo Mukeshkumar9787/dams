@@ -1,6 +1,6 @@
 import prisma, { PrismaConfig } from "../prisma/client.js";
 
-import { ERR_CODES, FEATURE_TYPES, STOCK_TYPES } from "../utils/constants.js";
+import { ERR_CODES, FEATURE_TYPES, STOCK_TYPES, STATUS_TYPES } from "../utils/constants.js";
 import { convertToFullFilePath, deleteFiles, slugText } from "../utils/helpers.js";
 import { sendMail } from "../utils/mailUtils.js";
 import { fileService } from "./index.js";
@@ -131,10 +131,12 @@ const getProducts = async ({ status, pageNumber=1, pageSize=10, search='', color
 /**
  * Get single Product
  */
-const getProductBySlug = async (slug) => {
+const getProductBySlug = async (slug, options = {}) => {
+  const { allowInactive = false } = options;
   const product = await prisma.product.findUnique({
     where: {
-      slug
+      slug,
+      ...(allowInactive ? {} : { status: STATUS_TYPES.ACTIVE })
     },
     include: {
       Color: {

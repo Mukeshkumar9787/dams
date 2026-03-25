@@ -95,8 +95,15 @@
 
 @layer components {
   .surface-card {
-    @apply rounded-[28px] border border-gray-3 bg-white;
+    @apply w-full max-w-full rounded-[28px] border border-gray-3 bg-white;
+    box-sizing: border-box;
     box-shadow: 0px 18px 46px rgba(15, 23, 42, 0.08);
+  }
+
+  .surface-card img {
+    max-width: 100%;
+    height: auto;
+    display: block;
   }
 
   .form-card {
@@ -249,6 +256,24 @@ input[type='search']::-webkit-search-results-decoration {
 }
 .custom-select-common .select-selected.select-arrow-active:after {
   @apply -mt-0.5;
+}
+
+@media print {
+  * {
+    visibility: hidden !important;
+  }
+  body {
+    background: #fff;
+  }
+  .print-only,
+  .print-only * {
+    visibility: visible !important;
+  }
+  .print-only {
+    position: static;
+    width: 100%;
+    display: block !important;
+  }
 }
 
 

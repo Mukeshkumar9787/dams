@@ -2,7 +2,7 @@
 
 import AdminOverview from "@/components/Common/AdminOverview";
 import FileUploader from "@/components/Common/FileUploader";
-import { createProduct, deleteProduct, getCategories, getColors, getHsnCodes, getProductBySlug, getProductReviewsForAdmin, getSizes, updateProduct, updateProductReviewVisibility } from "@/http/apiCalls";
+import { createProduct, deleteProduct, getCategories, getColors, getHsnCodes, getProductBySlugAdmin, getProductReviewsForAdmin, getSizes, updateProduct, updateProductReviewVisibility } from "@/http/apiCalls";
 import { STATUS_TYPES } from "@/utils/constants";
 import { PRODUCT_URL } from "@/utils/appUrls";
 import React from "react";
@@ -143,7 +143,7 @@ const ProductForm = ({ params }) => {
     if(isNew) return;
     const fetchProduct = async () => {
       try {
-        const data = await getProductBySlug(params);
+        const data = await getProductBySlugAdmin(params);
         editDataRef.current = data?.data || {};
         setVariant(editDataRef.current.variant);
         setTitle(editDataRef.current.title);

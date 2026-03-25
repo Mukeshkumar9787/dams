@@ -56,6 +56,19 @@ const getProductBySlug = async (req, res) => {
   }
 };
 
+const getProductBySlugAdmin = async (req, res) => {
+  try {
+    const result = await productService.getProductBySlug(req.params.slug, { allowInactive: true });
+
+    return res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (err) {
+    return errorHandler(err, res);
+  }
+};
+
 const updateProduct = async (req, res) => {
   try {
     const id = Number(req.params.id);
@@ -246,6 +259,7 @@ export default {
   getProducts,
   getActiveProducts,
   getProductBySlug,
+  getProductBySlugAdmin,
   updateProduct,
   deleteProduct,
   subscribeProductRestockNotification,

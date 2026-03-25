@@ -6,6 +6,7 @@ export const API_FILES_UPLOAD_CONFIG = `${API_FILES}/upload-config`;
 export const API_FILES_COMPLETE = `${API_FILES}/complete`;
 export const API_HSN = '/hsn';
 export const API_PRODUCTS = '/products';
+export const API_PRODUCT_ADMIN = `${API_PRODUCTS}/admin`;
 export const API_PRODUCTS_NOTIFY = (id) => `${API_PRODUCTS}/${id}/notify-me`;
 export const API_PRODUCT_REVIEWS = (id) => `${API_PRODUCTS}/${id}/reviews`;
 export const API_PRODUCT_REVIEW_ME = (id) => `${API_PRODUCTS}/${id}/reviews/me`;

@@ -11,6 +11,7 @@ const router = express.Router();
 router.get("/active", productController.getActiveProducts);
 
 // Get single product by ID
+router.get("/admin/:slug", getAuthMiddleware([ROLE_TYPES.ADMIN]), productController.getProductBySlugAdmin);
 router.get("/:slug", productController.getProductBySlug);
 
 router.get("/:id/reviews", productController.getProductReviews);

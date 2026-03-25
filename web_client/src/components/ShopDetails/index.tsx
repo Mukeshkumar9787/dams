@@ -8,6 +8,8 @@ import AddToCart from "../Common/AddToCart";
 import AvailableStock from "../Common/AvailableStock";
 import WishlistButton from "../Common/WishlistButton";
 import { confirmAction, notifyError, notifySuccess } from "@/utils/notify";
+import { useRouter } from "next/navigation";
+import { STATUS_TYPES } from "@/utils/constants";
 
 const renderStars = (rating = 0, size = 18) => {
   const rounded = Math.round(rating);
@@ -31,6 +33,7 @@ const renderStars = (rating = 0, size = 18) => {
 };
 
 const ShopDetails = ({ params }) => {
+  const router = useRouter();
   const [product, setProduct] = useState(null);
   const [previewImg, setPreviewImg] = useState(0);
   const [reviews, setReviews] = useState([]);
@@ -42,13 +45,39 @@ const ShopDetails = ({ params }) => {
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
+  const handleNotFound = () => {
+    router.replace("/404");
+  };
+
   const fetchProduct = async () => {
     try {
       const response = await getProductBySlug(params);
-      if (!response.data) return;
-      setProduct({ ...response.data, images: response.data.images.map((i) => i.path) });
+
+      if (response?.httpStatus === 404) {
+        handleNotFound();
+        return;
+      }
+
+      if (!response?.success) {
+        notifyError(response?.message || "Unable to load product.");
+        return;
+      }
+
+      const productData = response?.data;
+      if (!productData || productData.status !== STATUS_TYPES.ACTIVE) {
+        handleNotFound();
+        return;
+      }
+
+      const images = Array.isArray(productData.images) ? productData.images.map((i) => i.path) : [];
+      setProduct({ ...productData, images });
     } catch (error) {
+      if (error?.response?.status === 404) {
+        handleNotFound();
+        return;
+      }
       console.log(error);
+      notifyError("Unable to load product.");
     }
   };
 

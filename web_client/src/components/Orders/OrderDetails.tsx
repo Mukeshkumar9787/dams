@@ -192,13 +192,13 @@ const OrderDetails = ({ params }) => {
 
   return (
     <>
-      <div ref={componentRef} className="hidden print:block">
+      <div ref={componentRef} className="hidden print:block print-only">
         <OrderInvoice data={{ ...data, compInfo }} />
       </div>
       <section className="overflow-hidden bg-transparent py-12 pt-5">
         <div className="mx-auto w-full max-w-[1240px] px-4 sm:px-8 xl:px-0">
           <form>
-            <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.2fr_0.8fr]">
               <div className="space-y-6">
                 <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.16),_transparent_28%),linear-gradient(135deg,#ffffff_0%,#f8fbff_46%,#eef6ff_100%)] shadow-[0_20px_55px_rgba(15,23,42,0.08)]">
                   <div className="flex flex-col gap-5 px-5 py-6 sm:px-7 sm:py-7 lg:flex-row lg:items-start lg:justify-between">
@@ -258,9 +258,9 @@ const OrderDetails = ({ params }) => {
                         {productItems.map((product) => (
                           <div
                             key={product.id}
-                            className="flex items-start justify-between gap-3 text-sm"
+                            className="flex flex-col gap-4 text-sm sm:flex-row sm:items-start sm:justify-between"
                           >
-                            <div className="flex min-w-0 flex-1 items-center gap-3">
+                            <div className="flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-center">
                               <Link href={`${SHOP_DETAILS}/${product.slug}`} className="flex-shrink-0">
                                 <img
                                   src={product.img}
@@ -281,7 +281,7 @@ const OrderDetails = ({ params }) => {
                                 </p>
                               </div>
                             </div>
-                            <span className="whitespace-nowrap font-medium text-dark">
+                            <span className="whitespace-nowrap font-medium text-dark sm:self-center">
                               {currency}
                               {Number(product.price * product.quantity).toFixed(2)}
                             </span>
