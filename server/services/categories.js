@@ -51,7 +51,7 @@ const getCategories = async ({ status, includeProductCount = false }) => {
       f.path AS img
       ${includeProductCountClause}
     FROM "Category" c
-    LEFT JOIN "File" f ON f."featureId" = c.id
+    LEFT JOIN "File" f ON f."featureId" = c.id and f."feature" = ${FEATURE_TYPES.CATEGORY}
     ${whereClause}
     ORDER BY c."createdAt" DESC;
   `;
@@ -71,7 +71,7 @@ const getCategoryBySlug = async (slug) => {
   const categories = await prisma.$queryRaw`
     select c.id, c.title, c.status, c.slug, f.path as img, f.id as "fileId"
     from "Category" c
-    left join "File" f on f."featureId" = c.id
+    left join "File" f on f."featureId" = c.id and f."feature" = ${FEATURE_TYPES.CATEGORY}
     where c.slug = ${slug}
     order by c."createdAt" desc;
   `;
