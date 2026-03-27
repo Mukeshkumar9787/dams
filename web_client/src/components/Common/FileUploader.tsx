@@ -71,6 +71,17 @@ const cropImageFile = async ({
   }
 };
 
+type TriggerProps = {
+  inputProps: React.InputHTMLAttributes<HTMLInputElement>;
+  inputRef: React.RefObject<HTMLInputElement>;
+  dragHandlers: {
+    onDragOver: (event: React.DragEvent<HTMLLabelElement>) => void;
+    onDragLeave: (event: React.DragEvent<HTMLLabelElement>) => void;
+    onDrop: (event: React.DragEvent<HTMLLabelElement>) => void;
+  };
+  isDragging: boolean;
+};
+
 const FileUploader = ({
   files,
   setFiles,
@@ -78,6 +89,21 @@ const FileUploader = ({
   fileIdsRef,
   deletedFileIdsRef,
   cropShape = "square",
+  hideDropzone = false,
+  hidePreviewList = false,
+  renderTrigger,
+  onFileUploaded,
+}: {
+  files: any;
+  setFiles: React.Dispatch<React.SetStateAction<any>>;
+  multiSelect?: boolean;
+  fileIdsRef: React.MutableRefObject<Set<number>>;
+  deletedFileIdsRef: React.MutableRefObject<Set<number>>;
+  cropShape?: "round" | "square";
+  hideDropzone?: boolean;
+  hidePreviewList?: boolean;
+  renderTrigger?: (props: TriggerProps) => React.ReactNode;
+  onFileUploaded?: (file: any) => void;
 }) => {
   const [isDragging, setIsDragging] = React.useState(false);
   const [cropSource, setCropSource] = React.useState<string | null>(null);
@@ -198,6 +224,7 @@ const FileUploader = ({
       }
       return response.data;
     })
+    onFileUploaded?.(response.data);
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
@@ -235,6 +262,28 @@ const FileUploader = ({
       fileIdsRef.current.delete(id)
     }
   }
+  const dragHandlers = {
+    onDragOver: handleDragOver,
+    onDragLeave: handleDragLeave,
+    onDrop: handleDrop,
+  };
+
+  const inputProps: React.InputHTMLAttributes<HTMLInputElement> = {
+    type: "file",
+    accept: "image/*",
+    onChange: handleImageChange,
+    multiple: multiSelect,
+  };
+
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  const triggerProps: TriggerProps = {
+    inputProps,
+    inputRef,
+    dragHandlers,
+    isDragging,
+  };
+
   return (
     <div className="mb-5">
         {cropSource ? (
@@ -307,31 +356,28 @@ const FileUploader = ({
             </div>
           </div>
         ) : null}
-        <label
-          className={`flex min-h-[124px] cursor-pointer flex-col items-center justify-center rounded-[24px] border border-dashed px-5 py-6 text-center transition ${
-            isDragging
-              ? "border-sky-500 bg-sky-50/80 shadow-[0_0_0_4px_rgba(14,165,233,0.12)]"
-              : "border-slate-300 bg-slate-50/80 hover:border-sky-400 hover:bg-sky-50/60"
-          }`}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-        >
-          <span className="text-sm font-semibold text-slate-900">Upload images</span>
-          <span className="mt-1 text-sm text-slate-500">Click or drag and drop to attach storefront-ready media.</span>
-          <span className="mt-3 inline-flex rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600 shadow-sm">
-            {multiSelect ? `Up to ${maxFiles} images` : "Single image"}
-          </span>
-          <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="hidden"
-              multiple={multiSelect}
-          />
-        </label>
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          {localFiles.map((file: { id: number, path: string }) => 
+        {renderTrigger ? (
+          renderTrigger(triggerProps)
+        ) : !hideDropzone ? (
+          <label
+            className={`flex min-h-[124px] cursor-pointer flex-col items-center justify-center rounded-[24px] border border-dashed px-5 py-6 text-center transition ${
+              isDragging
+                ? "border-sky-500 bg-sky-50/80 shadow-[0_0_0_4px_rgba(14,165,233,0.12)]"
+                : "border-slate-300 bg-slate-50/80 hover:border-sky-400 hover:bg-sky-50/60"
+            }`}
+            {...dragHandlers}
+          >
+            <span className="text-sm font-semibold text-slate-900">Upload images</span>
+            <span className="mt-1 text-sm text-slate-500">Click or drag and drop to attach storefront-ready media.</span>
+            <span className="mt-3 inline-flex rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600 shadow-sm">
+              {multiSelect ? `Up to ${maxFiles} images` : "Single image"}
+            </span>
+            <input {...inputProps} ref={inputRef} className="hidden" />
+          </label>
+        ) : null}
+        {!hidePreviewList ? (
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {localFiles.map((file: { id: number, path: string }) => (
               <div key={file.id} className="overflow-hidden rounded-[22px] border border-slate-200 bg-white p-2 shadow-sm">
                 <button type="button" onClick={()=> handleFileDelete(file.id)} className="mb-2 inline-flex rounded-full bg-slate-100 px-1 py-1 text-xs font-medium text-slate-600 hover:bg-red-50 hover:text-red-600">Remove</button>
                 <img
@@ -340,8 +386,9 @@ const FileUploader = ({
                     className={cropShape === "round" ? "mx-auto w-32 rounded-full border border-slate-200 object-cover" : "h-32 w-full rounded-2xl border border-slate-200 object-cover"}
                 />
               </div>
-          )}
+          ))}
         </div>
+      ) : null}
     </div>
   );
 };

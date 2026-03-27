@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Breadcrumb from "../Common/Breadcrumb";
 import Image from "next/image";
 import Orders from "../Orders";
@@ -8,7 +8,7 @@ import { updateProfile } from "@/http/apiCalls";
 import { Button, Popconfirm } from "antd";
 import ResetPassword from "../Auth/ResetPassword";
 import Addresses from "./Addresses";
-import { notifySuccess } from "@/utils/notify";
+import { notifySuccess, notifyError } from "@/utils/notify";
 import FileUploader from "../Common/FileUploader";
 
 const MyAccount = () => {
@@ -17,6 +17,18 @@ const MyAccount = () => {
   const [profileImage, setProfileImage] = useState(null);
   const fileIdsRef = React.useRef(new Set());
   const deletedFileIdsRef = React.useRef(new Set());
+  const [isImageModalOpen, setImageModalOpen] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
+
+  const fetchUserData = useCallback(async () => {
+    const userData = await getLoggedInUserData();
+    setUser(userData || {});
+    setProfileImage(
+      userData?.profilePicture
+        ? { id: userData.profilePictureFileId, path: userData.profilePicture }
+        : null
+    );
+  }, []);
   const tabs = [
     { key: "orders", label: "Orders" },
     { key: "addresses", label: "Addresses" },
@@ -30,17 +42,28 @@ const MyAccount = () => {
       window.location.href = '/';
       return
     };
-    const fetchUser = async() => {
-      const userData = await getLoggedInUserData();
-      setUser(userData);
-      setProfileImage(
-        userData?.profilePicture
-          ? { id: userData.profilePictureFileId, path: userData.profilePicture }
-          : null
-      );
-    }
-    fetchUser();
-  },[])
+    fetchUserData();
+  },[fetchUserData])
+
+  const sendProfileImageUpdate = useCallback(
+    async (successMessage = "Profile updated.") => {
+      try {
+        const response = await updateProfile({
+          name: user?.name || "",
+          mobile: user?.mobile || "",
+          email: user?.email || "",
+          fileIds: [...fileIdsRef.current],
+          deletedFileIds: [...deletedFileIdsRef.current],
+        });
+        notifySuccess(response.message || successMessage);
+        await fetchUserData();
+        deletedFileIdsRef.current.clear();
+      } catch (error) {
+        notifyError("Unable to update the profile image.");
+      }
+    },
+    [fetchUserData, user]
+  );
 
   const handleProfileUpdate = async (e) => {
     try {
@@ -59,6 +82,24 @@ const MyAccount = () => {
     }
   }
 
+  const handleImageUploadSuccess = async () => {
+    setImageModalOpen(false);
+    await sendProfileImageUpdate("Profile image updated.");
+  };
+
+  const handleRemoveProfileImage = async () => {
+    const currentId = profileImage?.id || user?.profilePictureFileId;
+    if (currentId) {
+      deletedFileIdsRef.current.add(currentId);
+      if (fileIdsRef.current.has(currentId)) {
+        fileIdsRef.current.delete(currentId);
+      }
+    }
+    setProfileImage(null);
+    setImageModalOpen(false);
+    await sendProfileImageUpdate("Profile image removed.");
+  };
+
   return (
     <>
       <Breadcrumb title={"My Account"} pages={["my account"]} />
@@ -72,25 +113,128 @@ const MyAccount = () => {
                 
                 <div className="flex flex-wrap items-center gap-5 py-6 px-4 sm:px-7.5 xl:px-9 border-r xl:border-r-0 xl:border-b border-gray-3">
                   
-                  <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-full">
-                    {user?.profilePicture ? (
-                      <img
-                        src={user.profilePicture}
-                        alt={user?.name || "user"}
-                        width={96}
-                        height={96}
-                        className="block h-full w-full object-cover"
-                      />
-                    ) : (
-                      <Image
-                        src="/images/icons/icon-08.svg"
-                        alt="user"
-                        width={96}
-                        height={96}
-                        className="block h-full w-full object-cover"
-                      />
-                    )}
+                    <div className="h-24 w-24 flex-shrink-0 relative">
+                      <FileUploader
+                        files={profileImage}
+                        setFiles={setProfileImage}
+                        fileIdsRef={fileIdsRef}
+                        deletedFileIdsRef={deletedFileIdsRef}
+                        cropShape="round"
+                        hideDropzone
+                        hidePreviewList
+                        onFileUploaded={handleImageUploadSuccess}
+                        renderTrigger={({ inputProps, inputRef }) => {
+                          const profileSrc = profileImage?.path || user?.profilePicture;
+                          fileInputRef.current = inputRef.current;
+                          return (
+                            <>
+                              <div
+                                className="group relative flex h-full w-full cursor-pointer items-center justify-center overflow-hidden rounded-full border border-gray-200 transition duration-200 hover:ring-2 hover:ring-blue/70"
+                                onClick={() => setImageModalOpen(true)}
+                              >
+                                {profileSrc ? (
+                                  <img
+                                    src={profileSrc}
+                                    alt={user?.name || "user"}
+                                    className="h-full w-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="relative flex h-full w-full items-center justify-center rounded-full bg-slate-100 p-5">
+                                    <Image
+                                      src="/images/icons/icon-08.svg"
+                                      alt="placeholder"
+                                      width={48}
+                                      height={48}
+                                      className="h-full w-full text-slate-400"
+                                    />
+                                  </div>
+                                )}
+                                <div className="pointer-events-none absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 p-1 shadow">
+                                  <svg
+                                    aria-hidden="true"
+                                    viewBox="0 0 20 20"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-3 w-3 text-slate-900"
+                                  >
+                                    <path
+                                      d="M4.333 12.667v2.5h2.5l7.5-7.5-2.5-2.5-7.5 7.5Zm9.583-9.583c.208-.208.417-.417.625-.417.208 0 .417.209.625.417l1.417 1.417c.208.208.417.417.417.625 0 .208-.209.417-.417.625l-1.25 1.25-2.5-2.5 1.25-1.25Z"
+                                      fill="currentColor"
+                                    />
+                                  </svg>
+                                </div>
+                              </div>
+                              <input {...inputProps} ref={inputRef} className="hidden" />
+                            </>
+                          );
+                        }}
+                    />
                   </div>
+                    {isImageModalOpen ? (
+                      <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 px-4 py-6">
+                        <div className="relative w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+                          <button
+                            type="button"
+                            className="absolute right-4 top-4 inline-flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:border-slate-300 hover:text-slate-900"
+                            onClick={() => setImageModalOpen(false)}
+                            aria-label="Close"
+                          >
+                            <span className="sr-only">Close modal</span>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-3.5 w-3.5"
+                              viewBox="0 0 14 14"
+                              fill="none"
+                            >
+                              <path
+                                d="M1 1l12 12m0-12L1 13"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                              />
+                            </svg>
+                          </button>
+                          <div className="mb-4">
+                            <p className="text-sm font-semibold text-slate-900">Profile image</p>
+                          </div>
+                          <div className="mb-5 rounded-2xl bg-slate-50 p-4">
+                            {profileImage?.path || user?.profilePicture ? (
+                              <div className="flex h-72 w-72 items-center justify-center rounded-full bg-white">
+                                <img
+                                  src={profileImage?.path || user?.profilePicture}
+                                  alt="Preview"
+                                  className="h-full w-full rounded-full object-cover"
+                                />
+                              </div>
+                            ) : (
+                              <div className="flex h-72 w-72 items-center justify-center rounded-full bg-white text-sm text-slate-500">
+                                No image uploaded yet
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setImageModalOpen(false);
+                                fileInputRef.current?.click();
+                              }}
+                              className="rounded-full border border-blue px-4 py-2 text-sm font-semibold text-blue transition hover:bg-blue/10"
+                            >
+                              Upload image
+                            </button>
+                            <button
+                              type="button"
+                              disabled={!profileImage?.id && !user?.profilePicture}
+                              onClick={handleRemoveProfileImage}
+                              className="rounded-full border border-red px-4 py-2 text-sm font-semibold text-red transition hover:bg-red/10 disabled:opacity-50 disabled:hover:bg-transparent"
+                            >
+                              Remove image
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : null}
 
                   <div>
                     <p className="font-medium text-dark mb-0.5">
@@ -184,21 +328,6 @@ const MyAccount = () => {
             >
               <form onSubmit={handleProfileUpdate} className="w-full md:w-1/2">
                 <div className="form-card p-4 sm:p-8.5">
-                  <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5">
-                  <div className="w-full">
-                    <label className="form-label">
-                      Profile Image
-                    </label>
-                    <FileUploader
-                      files={profileImage}
-                      setFiles={setProfileImage}
-                      fileIdsRef={fileIdsRef}
-                      deletedFileIdsRef={deletedFileIdsRef}
-                      cropShape="round"
-                    />
-                  </div>
-                </div>
-
                 <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5">
                   <div className="w-full">
                       <label htmlFor="email" className="form-label">
