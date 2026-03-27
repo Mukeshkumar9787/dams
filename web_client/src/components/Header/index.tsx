@@ -14,7 +14,6 @@ import { getConfig } from "@/http/apiCalls";
 const Header = () => {
   const [menuItems, setMenuItems] = useState(menuData);
   const [navigationOpen, setNavigationOpen] = useState(false);
-  const [stickyMenu, setStickyMenu] = useState(false);
   const navRef = React.useRef<HTMLDivElement | null>(null);
   const navToggleRef = React.useRef<HTMLButtonElement | null>(null);
   const { openCartModal } = useCartModalContext();
@@ -50,20 +49,6 @@ const Header = () => {
   }, [fetchConfig]);
 
   // Sticky menu
-  const handleStickyMenu = () => {
-    if (window.scrollY >= 80) {
-      setStickyMenu(true);
-    } else {
-      setStickyMenu(false);
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleStickyMenu);
-    handleStickyMenu();
-    return () => window.removeEventListener("scroll", handleStickyMenu);
-  }, []);
-
   useEffect(()=>{
     if(!getStoredToken()) return;
     const fetchUser = async() => {
@@ -96,17 +81,11 @@ const Header = () => {
   }, [navigationOpen]);
 
   return (
-    <header
-      className={`sticky left-0 top-0 w-full z-50 bg-transparent backdrop-blur transition-all ease-in-out duration-300 ${
-        stickyMenu ? "shadow-sm" : ""
-      }`}
-    >
+    <header className="relative w-full z-50 bg-transparent backdrop-blur transition-all ease-in-out duration-300">
       <div className="max-w-[1170px] mx-auto px-4 sm:px-7.5 xl:px-0">
         {/* <!-- header top start --> */}
         <div
-          className={`relative flex flex-col lg:flex-row gap-4 items-end lg:items-center xl:justify-between ease-out duration-200 ${
-            stickyMenu ? "py-4" : "py-6"
-          }`}
+          className="relative flex flex-col lg:flex-row gap-4 items-end lg:items-center xl:justify-between ease-out duration-200 py-6"
         >
           {/* <!-- header top left --> */}
           <div className="xl:w-auto flex-row w-full flex sm:justify-between items-center gap-4">
@@ -136,11 +115,7 @@ const Header = () => {
                 <ul className="flex xl:items-center flex-col xl:flex-row gap-5 xl:gap-3">
                   {menuItems.map((menuItem, i) =>
                     menuItem.submenu ? (
-                      <Dropdown
-                        key={i}
-                        menuItem={menuItem}
-                        stickyMenu={stickyMenu}
-                      />
+                      <Dropdown key={i} menuItem={menuItem} />
                     ) : (
                       <li
                         key={i}
@@ -149,9 +124,7 @@ const Header = () => {
                         <Link
                           href={menuItem.path}
                           onClick={() => setNavigationOpen(false)}
-                          className={`hover:text-blue text-custom-sm font-medium text-dark flex rounded-md px-3 ${
-                            stickyMenu ? "xl:py-2.5" : "xl:py-3"
-                          }`}
+                          className="hover:text-blue text-custom-sm font-medium text-dark flex rounded-md px-3 xl:py-3"
                         >
                           {menuItem.title}
                         </Link>

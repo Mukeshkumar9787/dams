@@ -2,7 +2,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
-const Dropdown = ({ menuItem, stickyMenu, className = "" }) => {
+const Dropdown = ({ menuItem, className = "" }) => {
   const [dropdownToggler, setDropdownToggler] = useState(false);
   const pathUrl = usePathname();
   const isActive = menuItem.submenu?.some((item) => pathUrl === item.path);
@@ -14,9 +14,7 @@ const Dropdown = ({ menuItem, stickyMenu, className = "" }) => {
       } ${className}`}
     >
       <div
-        className={`flex items-center gap-1.5 capitalize ${
-          stickyMenu ? "xl:py-4" : "xl:py-6"
-        }`}
+        className="flex items-center gap-1.5 capitalize xl:py-6"
       >
         <Link
           href={menuItem.path || "/"}
@@ -52,11 +50,7 @@ const Dropdown = ({ menuItem, stickyMenu, className = "" }) => {
 
       {/* <!-- Dropdown Start --> */}
       <ul
-        className={`dropdown ${dropdownToggler && "flex"} ${
-          stickyMenu
-            ? "xl:group-hover:translate-y-0"
-            : "xl:group-hover:translate-y-0"
-        }`}
+        className={`dropdown ${dropdownToggler && "flex"} xl:group-hover:translate-y-0`}
       >
         {menuItem.submenu.map((item, i) => (
           <li key={i}>
