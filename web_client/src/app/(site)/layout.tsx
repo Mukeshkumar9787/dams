@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "../css/euclid-circular-a-font.css";
 import "../css/style.css";
 import "react-image-crop/dist/ReactCrop.css";
@@ -17,6 +17,9 @@ import WishlistSidebarModal from "@/components/Common/WishlistSidebarModal";
 import { PreviewSliderProvider } from "../context/PreviewSliderContext";
 import PreviewSliderModal from "@/components/Common/PreviewSlider";
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import LoaderOverlay from "@/components/Common/LoaderOverlay";
+import { usePathname } from "next/navigation";
+import { subscribeApiLoader } from "@/http/apiLoader";
 
 import ScrollToTop from "@/components/Common/ScrollToTop";
 import PreLoader from "@/components/Common/PreLoader";
@@ -29,9 +32,44 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const [loading, setLoading] = useState<boolean>(true);
+  const [pageLoading, setPageLoading] = useState(false);
+  const pathname = usePathname();
+  const hasNavigatedRef = useRef(false);
+  const navTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [pendingGetRequests, setPendingGetRequests] = useState(0);
 
   useEffect(() => {
     setTimeout(() => setLoading(false), 1000);
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = subscribeApiLoader(setPendingGetRequests);
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    if (!hasNavigatedRef.current) {
+      hasNavigatedRef.current = true;
+      return;
+    }
+    setPageLoading(true);
+    if (navTimerRef.current) {
+      clearTimeout(navTimerRef.current);
+    }
+    navTimerRef.current = setTimeout(() => setPageLoading(false), 350);
+    return () => {
+      if (navTimerRef.current) {
+        clearTimeout(navTimerRef.current);
+      }
+    };
+  }, [pathname]);
+
+  useEffect(() => {
+    return () => {
+      if (navTimerRef.current) {
+        clearTimeout(navTimerRef.current);
+      }
+    };
   }, []);
 
   return (
@@ -42,6 +80,9 @@ export default function RootLayout({
           <PreLoader />
         ) : (
           <>
+            {!loading && (pageLoading || pendingGetRequests > 0) && (
+              <LoaderOverlay message={pendingGetRequests > 0 ? "Loading..." : "Loading page..."} />
+            )}
             <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
               <ReduxProvider>
                 <CartSync />

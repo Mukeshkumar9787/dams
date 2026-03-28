@@ -2,6 +2,7 @@
 
 import AdminOverview from "@/components/Common/AdminOverview";
 import FileUploader from "@/components/Common/FileUploader";
+import LoaderOverlay from "@/components/Common/LoaderOverlay";
 import { createCategory, deleteCategory, getCategoryBySlug, updateCategory } from "@/http/apiCalls";
 import { STATUS_TYPES } from "@/utils/constants";
 import { CATEGORY_URL } from "@/utils/appUrls";
@@ -14,12 +15,35 @@ const CategoryForm = ({ params }) => {
   const [title, setTitle] = React.useState("");
   const [status, setStatus] = React.useState(STATUS_TYPES.ACTIVE);
   const [image, setImage] = React.useState(null);
+  const [apiState, setApiState] = React.useState<"loading" | "creating" | "updating" | null>(null);
   const editDataRef = React.useRef({ title: '', status: STATUS_TYPES.ACTIVE, id: '', img: null, fileId: '' });
   const fileIdsRef = React.useRef(new Set());
   const deletedFileIdsRef = React.useRef(new Set());
 
   let isNew = params.slug === 'new';
 
+  const buildCategoryFilePayload = React.useCallback(() => {
+    const nextFileIds = [...fileIdsRef.current].slice(0, 1);
+    const nextDeletedFileIds = new Set(deletedFileIdsRef.current);
+    const originalFileId = editDataRef.current.fileId;
+
+    if (!isNew && originalFileId && image?.id !== originalFileId) {
+      nextDeletedFileIds.add(originalFileId);
+    }
+
+    return {
+      fileIds: nextFileIds,
+      deletedFileIds: [...nextDeletedFileIds],
+    };
+  }, [image, isNew]);
+
+  const loaderTextMap = {
+    loading: "Loading category details...",
+    creating: "Creating category...",
+    updating: "Updating category...",
+  } as const;
+
+  const loaderMessage = apiState ? loaderTextMap[apiState] : "";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,20 +51,22 @@ const CategoryForm = ({ params }) => {
       notifyError("Select a file.");
       return;
     }
-    let response:any;
-    if(isNew){
-      response = await createCategory({title, status, fileIds: [...fileIdsRef.current], deletedFileIds: [...deletedFileIdsRef.current]})
-    }else {
-      let fileIds = [];
-      let deleteFileIds = [];
-      if(editDataRef.current.fileId !== image.id){
-        fileIds.push(image.id);
-        deleteFileIds.push(editDataRef.current.fileId);
+
+    const filePayload = buildCategoryFilePayload();
+    setApiState(isNew ? "creating" : "updating");
+    try {
+      const response:any = isNew
+        ? await createCategory({ title, status, ...filePayload })
+        : await updateCategory({ title, status, ...filePayload, id: editDataRef.current.id });
+
+      if(response.success){
+        router.replace(CATEGORY_URL);
       }
-      response = await updateCategory({title, status, fileIds: [...fileIdsRef.current], deletedFileIds: [...deletedFileIdsRef.current], id: editDataRef.current.id })
-    }
-    if(response.success){
-       router.replace(CATEGORY_URL);
+    } catch (err) {
+      console.error(err);
+      notifyError("Unable to save category. Please try again.");
+    } finally {
+      setApiState(null);
     }
   };
   
@@ -66,6 +92,7 @@ const CategoryForm = ({ params }) => {
     if(isNew) return;
     const fetchCategory = async () => {
       try {
+        setApiState("loading");
         const data = await getCategoryBySlug(params);
         editDataRef.current = data?.data || {};
         setTitle(editDataRef.current.title);
@@ -73,6 +100,8 @@ const CategoryForm = ({ params }) => {
         setImage({id: editDataRef.current.fileId, path: editDataRef.current.img});
       } catch (err) {
         console.error(err);
+      } finally {
+        setApiState(null);
       }
     };
 
@@ -82,6 +111,7 @@ const CategoryForm = ({ params }) => {
 
   return (
     <>
+      {apiState && <LoaderOverlay message={loaderMessage} />}
       <section className="page-section">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
           <AdminOverview
@@ -115,6 +145,7 @@ const CategoryForm = ({ params }) => {
               <div className="mb-5">
                 <label className="form-label">Category Image</label>
                 <FileUploader files={image} setFiles={setImage} fileIdsRef={fileIdsRef} deletedFileIdsRef={deletedFileIdsRef} />
+                <p className="mt-2 text-xs text-slate-500">Only one image is allowed for a category.</p>
               </div>
 
               {/* Status */}

@@ -1,6 +1,7 @@
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
 import Breadcrumb from "../Common/Breadcrumb";
+import LoaderOverlay from "@/components/Common/LoaderOverlay";
 import PaymentMethod from "./PaymentMethod";
 import { getLoggedInUserData, getProductCountFromCart, getShippingAmount, redirectToSignIn } from "@/utils/helper";
 import Address from "./Address";
@@ -46,24 +47,35 @@ const Checkout = () => {
   const [shipData, setShipData] = React.useState({});
   const [compInfo, setCompInfo] = React.useState({});
   const [shippingAmount, setShippingAmount] = React.useState("");
+  const [checkoutLoaderMessage, setCheckoutLoaderMessage] = React.useState<string | null>(null);
 
   const cartItems = useAppSelector((state) => state.cartReducer.items);
   const shippingCost = (typeof(shippingAmount) === 'number') ? shippingAmount : 0; 
   const totalPrice = parseFloat(productItems.reduce((acc, c) => acc + (c.price * getProductCountFromCart(c.id, cartItems)), 0)) + (shippingCost);
-  const handleRemoveFromCart = (id) => {
+  const handleRemoveFromCart = useCallback((id) => {
       dispatch(removeItemFromCart(id));
-    };
+    }, [dispatch]);
+  const runWithCheckoutLoader = useCallback(async (message, fn) => {
+    setCheckoutLoaderMessage(message);
+    try {
+      return await fn();
+    } finally {
+      setCheckoutLoaderMessage(null);
+    }
+  }, []);
 
   const fetchConfig = React.useCallback(async () => {
     try {
-        const { success, data } = await getConfig({ configs: [CONFIG_KEYS.SHIPPING, CONFIG_KEYS.COMP_INFO] });
-        if (!success) return;
-        setShipData(data?.[CONFIG_KEYS.SHIPPING] ?? {});
-        setCompInfo(data?.[CONFIG_KEYS.COMP_INFO] ?? {});
+        await runWithCheckoutLoader("Loading configuration...", async () => {
+          const { success, data } = await getConfig({ configs: [CONFIG_KEYS.SHIPPING, CONFIG_KEYS.COMP_INFO] });
+          if (!success) return;
+          setShipData(data?.[CONFIG_KEYS.SHIPPING] ?? {});
+          setCompInfo(data?.[CONFIG_KEYS.COMP_INFO] ?? {});
+        });
     } catch (error) {
         console.error(error);
     }
-    }, []);
+    }, [runWithCheckoutLoader]);
     
   React.useEffect(() => {
       fetchConfig();
@@ -82,6 +94,7 @@ const Checkout = () => {
 
   const fetchProducts = useCallback(async () => {
     try {
+      await runWithCheckoutLoader("Loading cart items...", async () => {
       if(cartItems.length === 0){
         setProductItems([]);
         return;
@@ -100,20 +113,23 @@ const Checkout = () => {
         handleRemoveFromCart(p.id);
       });
       setProductItems(products);
+      });
     } catch (err) {
       console.error(err);
     }
-  }, [cartItems]);
+  }, [cartItems, handleRemoveFromCart, runWithCheckoutLoader]);
 
   const fetchAddresses = useCallback(async () => {
     try {
-      const response = await getAddress();
-      if (!response?.success) return;
-      setSavedAddresses(response?.data || []);
+      await runWithCheckoutLoader("Loading addresses...", async () => {
+        const response = await getAddress();
+        if (!response?.success) return;
+        setSavedAddresses(response?.data || []);
+      })
     } catch (error) {
       console.error(error);
     }
-  }, []);
+  }, [runWithCheckoutLoader]);
 
   useEffect(() => {
     fetchProducts();
@@ -187,41 +203,43 @@ const Checkout = () => {
   };
   
   const handleSubmit = async (e) => {
+    e.preventDefault()
     try {
-      e.preventDefault()
-      await createShippingAddressIfNeeded();
-      await createBillingAddressIfNeeded();
-      const orderResponse = await createOrder({
-        ...checkoutValues,
-        shippingAmount,
-        isDiffBillAdd,
-        orderProducts: productItems.map(i => ({
-          productId: i.id, 
-          title: i.title,
-          price: i.price,
-          mrp: i.mrp,
-          quantity: i.quantity
-        }))
-      })
-      if(orderResponse.success){
-        if(orderResponse.data.payment){
-          const onPaymentSuccess = async function (response) {
-            const verifyRes = await verifyPayment(response);
-            if (verifyRes) {
-              window.location.href = `${ORDER_URL}/${orderResponse.data.orderNo}`
-              if(verifyRes.success) {
-                dispatch(removeAllItemsFromCart());
+      await runWithCheckoutLoader("Processing checkout...", async () => {
+        await createShippingAddressIfNeeded();
+        await createBillingAddressIfNeeded();
+        const orderResponse = await createOrder({
+          ...checkoutValues,
+          shippingAmount,
+          isDiffBillAdd,
+          orderProducts: productItems.map(i => ({
+            productId: i.id, 
+            title: i.title,
+            price: i.price,
+            mrp: i.mrp,
+            quantity: i.quantity
+          }))
+        })
+        if(orderResponse.success){
+          if(orderResponse.data.payment){
+            const onPaymentSuccess = async function (response) {
+              const verifyRes = await verifyPayment(response);
+              if (verifyRes) {
+                window.location.href = `${ORDER_URL}/${orderResponse.data.orderNo}`
+                if(verifyRes.success) {
+                  dispatch(removeAllItemsFromCart());
+                }
               }
             }
+            await handlePayment({...orderResponse.data.payment, compInfo }, onPaymentSuccess);
+          }else{
+            notifyError("Payment failed.");
           }
-          await handlePayment({...orderResponse.data.payment, compInfo }, onPaymentSuccess);
         }else{
-          notifyError("Payment failed.");
+          fetchProducts();
+          fetchConfig();
         }
-      }else{
-        fetchProducts();
-        fetchConfig();
-      }
+      });
     } catch (error) {
       fetchConfig();
       fetchProducts();
@@ -229,6 +247,7 @@ const Checkout = () => {
   };
   return (
     <>
+      {checkoutLoaderMessage && <LoaderOverlay message={checkoutLoaderMessage} />}
       <Breadcrumb title={"Checkout"} pages={["checkout"]} />
       <section className="page-section">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">

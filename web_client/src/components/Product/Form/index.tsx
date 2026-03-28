@@ -2,6 +2,7 @@
 
 import AdminOverview from "@/components/Common/AdminOverview";
 import FileUploader from "@/components/Common/FileUploader";
+import LoaderOverlay from "@/components/Common/LoaderOverlay";
 import { createProduct, deleteProduct, getCategories, getColors, getHsnCodes, getProductBySlugAdmin, getProductReviewsForAdmin, getSizes, updateProduct, updateProductReviewVisibility } from "@/http/apiCalls";
 import { STATUS_TYPES } from "@/utils/constants";
 import { PRODUCT_URL } from "@/utils/appUrls";
@@ -16,6 +17,7 @@ const ProductForm = ({ params }) => {
   const [variant, setVariant] = React.useState("");
   const [status, setStatus] = React.useState(STATUS_TYPES.ACTIVE);
   const [images, setImages] = React.useState([]);
+  const [apiState, setApiState] = React.useState<"loading" | "creating" | "updating" | null>(null);
   const editDataRef = React.useRef({});
   const [categoryItems, setCategoryItems] = React.useState([]);
   const [categoryId, setCategoryId] = React.useState(null);
@@ -32,6 +34,13 @@ const ProductForm = ({ params }) => {
   const tax = hsnItems.find(i => i.id == hsnId)?.tax || 0;
   const fileIdsRef = React.useRef(new Set());
   const deletedFileIdsRef = React.useRef(new Set());
+  
+  const loaderTextMap = {
+    loading: "Loading product details...",
+    creating: "Creating product...",
+    updating: "Updating product...",
+  } as const;
+  const loaderMessage = apiState ? loaderTextMap[apiState] : "";
   
   
   React.useEffect(() => {
@@ -105,19 +114,23 @@ const ProductForm = ({ params }) => {
       return;
     }
     let data = { title, status, categoryId, hsnId, sizeId, colorId, mrp, price, stock,variant, fileIds: [...fileIdsRef.current], deletedFileIds: [...deletedFileIdsRef.current] }
-    let response:any;
-    if(isNew){
-      response = await createProduct(data);
-    }else {
-      response = await updateProduct({...data, id: editDataRef.current.id, oldStockQty: editDataRef.current.stock })
-    }
-    console.log(response, "response")
-    if(response.success){
-      router.replace(PRODUCT_URL);
-    }else{
-      let currentStock = response.data.currentStockQty;
-      setStock(currentStock);
-      editDataRef.current.stock = currentStock;
+    setApiState(isNew ? "creating" : "updating");
+    try {
+      const response:any = isNew
+        ? await createProduct(data)
+        : await updateProduct({...data, id: editDataRef.current.id, oldStockQty: editDataRef.current.stock });
+
+      if(response.success){
+        router.replace(PRODUCT_URL);
+      }else{
+        let currentStock = response.data.currentStockQty;
+        setStock(currentStock);
+        editDataRef.current.stock = currentStock;
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setApiState(null);
     }
   };
   
@@ -143,6 +156,7 @@ const ProductForm = ({ params }) => {
     if(isNew) return;
     const fetchProduct = async () => {
       try {
+        setApiState("loading");
         const data = await getProductBySlugAdmin(params);
         editDataRef.current = data?.data || {};
         setVariant(editDataRef.current.variant);
@@ -159,6 +173,8 @@ const ProductForm = ({ params }) => {
         fetchReviews(editDataRef.current.id);
       } catch (err) {
         console.error(err);
+      } finally {
+        setApiState(null);
       }
     };
 
@@ -176,6 +192,7 @@ const ProductForm = ({ params }) => {
 
   return (
     <>
+      {apiState && <LoaderOverlay message={loaderMessage} />}
       <section className="page-section">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
           <AdminOverview

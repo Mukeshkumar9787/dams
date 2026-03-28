@@ -136,6 +136,7 @@ const FileUploader = ({
   const [pendingCropFile, setPendingCropFile] = React.useState<File | null>(null);
   const [crop, setCrop] = React.useState<Crop>();
   const [completedCrop, setCompletedCrop] = React.useState<PixelCrop | null>(null);
+  const [isUploading, setIsUploading] = React.useState(false);
   const localFiles = multiSelect ? files : (files ? [files] : []);
   const maxFiles = multiSelect ? 5 : 1;
   const cropResolverRef = React.useRef<((value: File | null) => void) | null>(null);
@@ -237,28 +238,34 @@ const FileUploader = ({
   };
 
   const handleFileUpload = async(file: Blob) => {
-    const response = await uploadFile(file);
-    if(!response) return
-    setFiles((prev) => {
-      if(multiSelect){
-        fileIdsRef.current.add(response.data.id);
-        return [...prev, {...response.data}];
-      }else{
-        if(prev){
-          let onlyFileId = prev.id;
-          if(onlyFileId){
-            if(fileIdsRef.current.has(onlyFileId)){
-              fileIdsRef.current.delete(onlyFileId);
-            }else{
-              deletedFileIdsRef.current.add(onlyFileId);
-            }
+    setIsUploading(true);
+    try {
+      const response = await uploadFile(file);
+      if(!response) return;
+
+      setFiles((prev) => {
+        if(multiSelect){
+          fileIdsRef.current.add(response.data.id);
+          return [...prev, {...response.data}];
+        }else{
+          if(prev){
+            let onlyFileId = prev.id;
+            if(onlyFileId){
+              if(fileIdsRef.current.has(onlyFileId)){
+                fileIdsRef.current.delete(onlyFileId);
+              }else{
+                deletedFileIdsRef.current.add(onlyFileId);
+              }
+            };
           };
-        };
-        fileIdsRef.current.add(response.data.id);
-      }
-      return response.data;
-    })
-    onFileUploaded?.(response.data);
+          fileIdsRef.current.add(response.data.id);
+        }
+        return response.data;
+      })
+      onFileUploaded?.(response.data);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
@@ -402,21 +409,31 @@ const FileUploader = ({
         {renderTrigger ? (
           renderTrigger(triggerProps)
         ) : !hideDropzone ? (
-          <label
-            className={`flex min-h-[124px] cursor-pointer flex-col items-center justify-center rounded-[24px] border border-dashed px-5 py-6 text-center transition ${
-              isDragging
-                ? "border-sky-500 bg-sky-50/80 shadow-[0_0_0_4px_rgba(14,165,233,0.12)]"
-                : "border-slate-300 bg-slate-50/80 hover:border-sky-400 hover:bg-sky-50/60"
-            }`}
-            {...dragHandlers}
-          >
-            <span className="text-sm font-semibold text-slate-900">Upload images</span>
-            <span className="mt-1 text-sm text-slate-500">Click or drag and drop to attach storefront-ready media.</span>
-            <span className="mt-3 inline-flex rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600 shadow-sm">
-              {multiSelect ? `Up to ${maxFiles} images` : "Single image"}
-            </span>
-            <input {...inputProps} ref={inputRef} className="hidden" />
-          </label>
+          <div className="relative overflow-hidden rounded-[24px]">
+            <label
+              className={`flex min-h-[124px] cursor-pointer flex-col items-center justify-center rounded-[24px] border border-dashed px-5 py-6 text-center transition ${
+                isDragging
+                  ? "border-sky-500 bg-sky-50/80 shadow-[0_0_0_4px_rgba(14,165,233,0.12)]"
+                  : "border-slate-300 bg-slate-50/80 hover:border-sky-400 hover:bg-sky-50/60"
+              }`}
+              {...dragHandlers}
+            >
+              <span className="text-sm font-semibold text-slate-900">Upload images</span>
+              <span className="mt-1 text-sm text-slate-500">Click or drag and drop to attach storefront-ready media.</span>
+              <span className="mt-3 inline-flex rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600 shadow-sm">
+                {multiSelect ? `Up to ${maxFiles} images` : "Single image"}
+              </span>
+              <input {...inputProps} ref={inputRef} className="hidden" />
+            </label>
+            {isUploading && (
+              <div className="absolute inset-0 z-[10] flex items-center justify-center rounded-[24px] bg-white/70">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="h-10 w-10 animate-spin rounded-full border-4 border-solid border-blue border-t-transparent"></div>
+                  <p className="text-xs font-semibold text-slate-600">Uploading image...</p>
+                </div>
+              </div>
+            )}
+          </div>
         ) : null}
         {!hidePreviewList ? (
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">

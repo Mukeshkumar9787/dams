@@ -1,6 +1,7 @@
 "use client";
 
 import AdminOverview from "@/components/Common/AdminOverview";
+import LoaderOverlay from "@/components/Common/LoaderOverlay";
 import { createHsn, deleteHsn, getHsnByCode, updateHsn } from "@/http/apiCalls";
 import { STATUS_TYPES } from "@/utils/constants";
 import { HSN_URL } from "@/utils/appUrls";
@@ -13,21 +14,34 @@ const HsnForm = ({ params }) => {
   const [code, setCode] = React.useState("");
   const [tax, setTax] = React.useState("");
   const [status, setStatus] = React.useState(STATUS_TYPES.ACTIVE);
+  const [apiState, setApiState] = React.useState<"loading" | "creating" | "updating" | null>(null);
   const editDataRef = React.useRef({ code: '', status: STATUS_TYPES.ACTIVE, id: '', tax: ''});
+
+  const loaderTextMap = {
+    loading: "Loading HSN details...",
+    creating: "Creating HSN...",
+    updating: "Updating HSN...",
+  } as const;
+  const loaderMessage = apiState ? loaderTextMap[apiState] : "";
 
   let isNew = params.slug === 'new';
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    let response:any;
-    if(isNew){
-      response = await createHsn({ code, status, tax })
-    }else {
-      response = await updateHsn({ code, status, id: editDataRef.current.id, tax })
-    }
-    if(response.success){
-       router.replace(HSN_URL);
+    setApiState(isNew ? "creating" : "updating");
+    try {
+      const response:any = isNew
+        ? await createHsn({ code, status, tax })
+        : await updateHsn({ code, status, id: editDataRef.current.id, tax });
+
+      if(response.success){
+         router.replace(HSN_URL);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setApiState(null);
     }
   };
   
@@ -53,6 +67,7 @@ const HsnForm = ({ params }) => {
     if(isNew) return;
     const fetchHsn = async () => {
       try {
+        setApiState("loading");
         const data = await getHsnByCode({code: params.slug});
         editDataRef.current = data?.data || {};
         setCode(editDataRef.current.code);
@@ -60,6 +75,8 @@ const HsnForm = ({ params }) => {
         setStatus(editDataRef.current.status);
       } catch (err) {
         console.error(err);
+      } finally {
+        setApiState(null);
       }
     };
 
@@ -69,6 +86,7 @@ const HsnForm = ({ params }) => {
 
   return (
     <>
+      {apiState && <LoaderOverlay message={loaderMessage} />}
       <section className="page-section">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
           <AdminOverview

@@ -1,6 +1,7 @@
 "use client";
 
 import AdminOverview from "@/components/Common/AdminOverview";
+import LoaderOverlay from "@/components/Common/LoaderOverlay";
 import { createColor, deleteColor, getColorBySlug, updateColor } from "@/http/apiCalls";
 import { STATUS_TYPES } from "@/utils/constants";
 import { COLOR_URL } from "@/utils/appUrls";
@@ -13,21 +14,34 @@ const ColorForm = ({ params }) => {
   const [title, setTitle] = React.useState("");
   const [code, setCode] = React.useState("");
   const [status, setStatus] = React.useState(STATUS_TYPES.ACTIVE);
+  const [apiState, setApiState] = React.useState<"loading" | "creating" | "updating" | null>(null);
   const editDataRef = React.useRef({ title: '', status: STATUS_TYPES.ACTIVE, id: '', code: ''});
+
+  const loaderTextMap = {
+    loading: "Loading color details...",
+    creating: "Creating color...",
+    updating: "Updating color...",
+  } as const;
+  const loaderMessage = apiState ? loaderTextMap[apiState] : "";
 
   let isNew = params.slug === 'new';
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    let response:any;
-    if(isNew){
-      response = await createColor({ title,code, status })
-    }else {
-      response = await updateColor({ title, code, status, id: editDataRef.current.id })
-    }
-    if(response.success){
-       router.replace(COLOR_URL);
+    setApiState(isNew ? "creating" : "updating");
+    try {
+      const response:any = isNew
+        ? await createColor({ title, code, status })
+        : await updateColor({ title, code, status, id: editDataRef.current.id });
+
+      if(response.success){
+         router.replace(COLOR_URL);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setApiState(null);
     }
   };
   
@@ -53,6 +67,7 @@ const ColorForm = ({ params }) => {
     if(isNew) return;
     const fetchColor = async () => {
       try {
+        setApiState("loading");
         const data = await getColorBySlug({slug: params.slug});
         editDataRef.current = data?.data || {};
         setTitle(editDataRef.current.title);
@@ -60,6 +75,8 @@ const ColorForm = ({ params }) => {
         setStatus(editDataRef.current.status);
       } catch (err) {
         console.error(err);
+      } finally {
+        setApiState(null);
       }
     };
 
@@ -69,6 +86,7 @@ const ColorForm = ({ params }) => {
 
   return (
     <>
+      {apiState && <LoaderOverlay message={loaderMessage} />}
       <section className="page-section">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
           <AdminOverview
