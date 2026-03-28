@@ -4,9 +4,9 @@ import { errorHandler } from "../utils/errorHandler.js";
 
 const createCategory = async (req, res) => {
   try {
-    const { title, status, fileIds } = req.body;
+    const { title, status, fileIds, deletedFileIds } = req.body;
 
-    const result = await categoryService.createCategory({ title, status, fileIds });
+    const result = await categoryService.createCategory({ title, status, fileIds, deletedFileIds });
 
     return res.status(201).json({
       success: true,

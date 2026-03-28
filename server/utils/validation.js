@@ -16,6 +16,7 @@ export const categoryBodySchema = Joi.object({
   title: Joi.string().min(1).max(100).required(),
   fileIds: Joi.array()
     .items(Joi.number().integer().positive())
+    .max(1)
     .optional(),
   deletedFileIds: Joi.array()
     .items(Joi.number().integer().positive())

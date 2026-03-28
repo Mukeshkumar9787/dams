@@ -4,15 +4,37 @@ import { FEATURE_TYPES } from "../utils/constants.js";
 import { convertToFullFilePath, deleteFiles, slugText } from "../utils/helpers.js";
 import { fileService } from "./index.js";
 
+const getCategoryFileIds = async ({ tx = prisma, categoryId }) => {
+  const files = await tx.file.findMany({
+    where: {
+      feature: FEATURE_TYPES.CATEGORY,
+      featureId: categoryId,
+    },
+    select: {
+      id: true,
+    },
+    orderBy: [{ createdAt: "asc" }],
+  });
+
+  return files.map((file) => file.id);
+};
+
 /**
  * Create category
  */
-const createCategory = async ({ title, fileIds, status, deletedFileIds }) => {
+const createCategory = async ({ title, fileIds = [], status, deletedFileIds = [] }) => {
   let category = null;
+  const normalizedFileIds = fileIds.slice(0, 1);
 
   await prisma.$transaction( async (tx) => {
     category = await tx.category.create({ data: { title, slug: slugText(title), status }});
-    await fileService.updateFilesByIds({ tx, feature: FEATURE_TYPES.CATEGORY, featureId: category.id, fileIds, deletedFileIds })
+    await fileService.updateFilesByIds({
+      tx,
+      feature: FEATURE_TYPES.CATEGORY,
+      featureId: category.id,
+      fileIds: normalizedFileIds,
+      deletedFileIds,
+    });
   })
 
   return {
@@ -48,10 +70,15 @@ const getCategories = async ({ status, includeProductCount = false }) => {
       c.title,
       c.status,
       c.slug,
-      f.path AS img
+      (
+        SELECT f.path
+        FROM "File" f
+        WHERE f."featureId" = c.id AND f."feature" = ${FEATURE_TYPES.CATEGORY}
+        ORDER BY f."createdAt" ASC
+        LIMIT 1
+      ) AS img
       ${includeProductCountClause}
     FROM "Category" c
-    LEFT JOIN "File" f ON f."featureId" = c.id and f."feature" = ${FEATURE_TYPES.CATEGORY}
     ${whereClause}
     ORDER BY c."createdAt" DESC;
   `;
@@ -69,9 +96,26 @@ const getCategories = async ({ status, includeProductCount = false }) => {
  */
 const getCategoryBySlug = async (slug) => {
   const categories = await prisma.$queryRaw`
-    select c.id, c.title, c.status, c.slug, f.path as img, f.id as "fileId"
+    select
+      c.id,
+      c.title,
+      c.status,
+      c.slug,
+      (
+        select f.path
+        from "File" f
+        where f."featureId" = c.id and f."feature" = ${FEATURE_TYPES.CATEGORY}
+        order by f."createdAt" asc
+        limit 1
+      ) as img,
+      (
+        select f.id
+        from "File" f
+        where f."featureId" = c.id and f."feature" = ${FEATURE_TYPES.CATEGORY}
+        order by f."createdAt" asc
+        limit 1
+      ) as "fileId"
     from "Category" c
-    left join "File" f on f."featureId" = c.id and f."feature" = ${FEATURE_TYPES.CATEGORY}
     where c.slug = ${slug}
     order by c."createdAt" desc;
   `;
@@ -88,11 +132,20 @@ const getCategoryBySlug = async (slug) => {
 /**
  * Update category
  */
-const updateCategory = async (id, { title, fileIds, deletedFileIds, status }) => {
+const updateCategory = async (id, { title, fileIds = [], deletedFileIds = [], status }) => {
   let updated = null;
   let deletedFiles = [];
+  const normalizedFileIds = fileIds.slice(0, 1);
+  const shouldDeleteOldImages = normalizedFileIds.length > 0;
 
   await prisma.$transaction(async (tx) => {
+    let normalizedDeletedFileIds = [...deletedFileIds];
+    if (shouldDeleteOldImages) {
+      const existingFileIds = await getCategoryFileIds({ tx, categoryId: id });
+      const keptFileId = normalizedFileIds[0];
+      const deletedCategoryFileIds = existingFileIds.filter((fileId) => fileId !== keptFileId);
+      normalizedDeletedFileIds = [...new Set([...normalizedDeletedFileIds, ...deletedCategoryFileIds])];
+    }
     let deletedRecords;
     [updated, { deletedRecords }] = await Promise.all([
       tx.category.update({
@@ -103,7 +156,13 @@ const updateCategory = async (id, { title, fileIds, deletedFileIds, status }) =>
           status
         },
       }),
-      fileService.updateFilesByIds({ tx, feature: FEATURE_TYPES.CATEGORY, featureId: id, fileIds, deletedFileIds })
+      fileService.updateFilesByIds({
+        tx,
+        feature: FEATURE_TYPES.CATEGORY,
+        featureId: id,
+        fileIds: normalizedFileIds,
+        deletedFileIds: normalizedDeletedFileIds,
+      })
     ]);
     deletedFiles = deletedRecords;
   })
