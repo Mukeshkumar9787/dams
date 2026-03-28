@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import "../css/euclid-circular-a-font.css";
 import "../css/style.css";
+import "react-image-crop/dist/ReactCrop.css";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import AdminDesktopShell from "@/components/AdminDesktopShell";

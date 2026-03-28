@@ -2,55 +2,81 @@
 import { uploadFile } from "@/http/apiCalls";
 import { notifyError } from "@/utils/notify";
 import React from "react";
+import ReactCrop, {
+  centerCrop,
+  convertToPixelCrop,
+  makeAspectCrop,
+  type Crop,
+  type PixelCrop,
+} from "react-image-crop";
 
-const CROP_BOX_SIZE = 320;
+const DEFAULT_ASPECT = 1;
+const MIN_CROP_SIZE = 160;
 
-const loadImage = (src: string) =>
-  new Promise<HTMLImageElement>((resolve, reject) => {
-    const image = new window.Image();
-    image.onload = () => resolve(image);
-    image.onerror = reject;
-    image.src = src;
-  });
+const toNaturalPixelCrop = (nextCrop: Crop, image: HTMLImageElement): PixelCrop => {
+  const renderedCrop = convertToPixelCrop(nextCrop, image.width, image.height);
+  const scaleX = image.naturalWidth / image.width;
+  const scaleY = image.naturalHeight / image.height;
+
+  return {
+    ...renderedCrop,
+    x: Math.floor(renderedCrop.x * scaleX),
+    y: Math.floor(renderedCrop.y * scaleY),
+    width: Math.floor(renderedCrop.width * scaleX),
+    height: Math.floor(renderedCrop.height * scaleY),
+  };
+};
 
 const cropImageFile = async ({
   file,
-  zoom,
+  crop,
   cropShape,
 }: {
   file: File;
-  zoom: number;
+  crop: PixelCrop;
   cropShape: "round" | "square";
 }) => {
   const imageUrl = URL.createObjectURL(file);
 
   try {
-    const image = await loadImage(imageUrl);
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const loadedImage = new window.Image();
+      loadedImage.onload = () => resolve(loadedImage);
+      loadedImage.onerror = reject;
+      loadedImage.src = imageUrl;
+    });
     const canvas = document.createElement("canvas");
-    canvas.width = CROP_BOX_SIZE;
-    canvas.height = CROP_BOX_SIZE;
+    const width = Math.max(1, Math.floor(crop.width));
+    const height = Math.max(1, Math.floor(crop.height));
+
+    canvas.width = width;
+    canvas.height = height;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) {
       throw new Error("Could not initialize crop canvas");
     }
 
-    const baseScale = Math.max(CROP_BOX_SIZE / image.width, CROP_BOX_SIZE / image.height);
-    const renderedWidth = image.width * baseScale * zoom;
-    const renderedHeight = image.height * baseScale * zoom;
-    const offsetX = Math.max(0, (renderedWidth - CROP_BOX_SIZE) / 2);
-    const offsetY = Math.max(0, (renderedHeight - CROP_BOX_SIZE) / 2);
-
-    ctx.clearRect(0, 0, CROP_BOX_SIZE, CROP_BOX_SIZE);
+    ctx.clearRect(0, 0, width, height);
 
     if (cropShape === "round") {
       ctx.beginPath();
-      ctx.arc(CROP_BOX_SIZE / 2, CROP_BOX_SIZE / 2, CROP_BOX_SIZE / 2, 0, Math.PI * 2);
+      ctx.arc(width / 2, height / 2, Math.min(width, height) / 2, 0, Math.PI * 2);
       ctx.closePath();
       ctx.clip();
     }
 
-    ctx.drawImage(image, -offsetX, -offsetY, renderedWidth, renderedHeight);
+    ctx.drawImage(
+      image,
+      crop.x,
+      crop.y,
+      crop.width,
+      crop.height,
+      0,
+      0,
+      width,
+      height
+    );
 
     const outputType = cropShape === "round" ? "image/png" : file.type || "image/jpeg";
     const extension = cropShape === "round" ? "png" : (file.name.split(".").pop() || "jpg");
@@ -108,10 +134,12 @@ const FileUploader = ({
   const [isDragging, setIsDragging] = React.useState(false);
   const [cropSource, setCropSource] = React.useState<string | null>(null);
   const [pendingCropFile, setPendingCropFile] = React.useState<File | null>(null);
-  const [cropZoom, setCropZoom] = React.useState(1);
+  const [crop, setCrop] = React.useState<Crop>();
+  const [completedCrop, setCompletedCrop] = React.useState<PixelCrop | null>(null);
   const localFiles = multiSelect ? files : (files ? [files] : []);
   const maxFiles = multiSelect ? 5 : 1;
   const cropResolverRef = React.useRef<((value: File | null) => void) | null>(null);
+  const imageRef = React.useRef<HTMLImageElement | null>(null);
 
   const resetCropState = React.useCallback(() => {
     if (cropSource) {
@@ -119,14 +147,17 @@ const FileUploader = ({
     }
     setCropSource(null);
     setPendingCropFile(null);
-    setCropZoom(1);
+    setCrop(undefined);
+    setCompletedCrop(null);
+    imageRef.current = null;
   }, [cropSource]);
 
   const openCropper = React.useCallback((file: File) => {
     const source = URL.createObjectURL(file);
     setCropSource(source);
     setPendingCropFile(file);
-    setCropZoom(1);
+    setCrop(undefined);
+    setCompletedCrop(null);
 
     return new Promise<File | null>((resolve) => {
       cropResolverRef.current = resolve;
@@ -134,12 +165,15 @@ const FileUploader = ({
   }, []);
 
   const confirmCrop = React.useCallback(async () => {
-    if (!pendingCropFile) return;
+    if (!pendingCropFile || !completedCrop || completedCrop.width <= 0 || completedCrop.height <= 0) {
+      notifyError("Please select a crop area.");
+      return;
+    }
 
     try {
       const croppedFile = await cropImageFile({
         file: pendingCropFile,
-        zoom: cropZoom,
+        crop: completedCrop,
         cropShape,
       });
 
@@ -151,7 +185,7 @@ const FileUploader = ({
       cropResolverRef.current = null;
       resetCropState();
     }
-  }, [cropShape, cropZoom, pendingCropFile, resetCropState]);
+  }, [completedCrop, cropShape, pendingCropFile, resetCropState]);
 
   const cancelCrop = React.useCallback(() => {
     cropResolverRef.current?.(null);
@@ -197,7 +231,7 @@ const FileUploader = ({
   };
 
   const handleImageChange = async(e: { target: { files: FileList; value: string; }; }) => {
-    const uploadedFiles = [...(e.target.files || [])];
+    const uploadedFiles = Array.from(e.target.files || []);
     await processSelectedFiles(uploadedFiles);
     e.target.value = "";
   };
@@ -240,7 +274,7 @@ const FileUploader = ({
   const handleDrop = async (e: React.DragEvent<HTMLLabelElement>) => {
     e.preventDefault();
     setIsDragging(false);
-    const droppedFiles = [...(e.dataTransfer.files || [])].filter((file) =>
+    const droppedFiles = Array.from(e.dataTransfer.files || []).filter((file) =>
       file.type.startsWith("image/")
     );
     if (droppedFiles.length === 0) {
@@ -277,6 +311,29 @@ const FileUploader = ({
 
   const inputRef = React.useRef<HTMLInputElement>(null);
 
+  const handleCropImageLoad = React.useCallback((event: React.SyntheticEvent<HTMLImageElement>) => {
+    const { width, height } = event.currentTarget;
+
+    imageRef.current = event.currentTarget;
+
+    const initialCrop = centerCrop(
+      makeAspectCrop(
+        {
+          unit: "%",
+          width: 80,
+        },
+        DEFAULT_ASPECT,
+        width,
+        height
+      ),
+      width,
+      height
+    );
+
+    setCrop(initialCrop);
+    setCompletedCrop(toNaturalPixelCrop(initialCrop, event.currentTarget));
+  }, []);
+
   const triggerProps: TriggerProps = {
     inputProps,
     inputRef,
@@ -297,44 +354,30 @@ const FileUploader = ({
               </div>
 
               <div className="rounded-[24px] bg-slate-100 p-4">
-                <div
-                  className={`relative mx-auto h-[320px] w-[320px] overflow-hidden bg-slate-200 ${
-                    cropShape === "round" ? "rounded-full" : "rounded-[28px]"
-                  }`}
-                >
-                  <img
-                    src={cropSource}
-                    alt="Crop preview"
-                    className="absolute left-1/2 top-1/2 max-w-none -translate-x-1/2 -translate-y-1/2 select-none"
-                    style={{
-                      width: `calc(100% * ${cropZoom})`,
-                      height: `calc(100% * ${cropZoom})`,
-                      objectFit: "cover",
-                      objectPosition: "center",
+                <div className="mx-auto max-w-[420px] overflow-hidden rounded-[28px] bg-slate-200">
+                  <ReactCrop
+                    crop={crop}
+                    onChange={(_, percentCrop) => {
+                      setCrop(percentCrop);
                     }}
-                  />
-                  <div className="pointer-events-none absolute inset-0 bg-slate-950/35" />
-                  <div
-                    className={`pointer-events-none absolute inset-0 border-2 border-white shadow-[0_0_0_9999px_rgba(15,23,42,0.38)] ${
-                      cropShape === "round" ? "rounded-full" : "rounded-[28px]"
-                    }`}
-                  />
+                    onComplete={(_, percentCrop) => {
+                      if (!imageRef.current) return;
+                      setCompletedCrop(toNaturalPixelCrop(percentCrop, imageRef.current));
+                    }}
+                    aspect={DEFAULT_ASPECT}
+                    circularCrop={cropShape === "round"}
+                    minWidth={MIN_CROP_SIZE}
+                    keepSelection
+                    className="max-h-[70vh] w-full"
+                  >
+                    <img
+                      src={cropSource}
+                      alt="Crop preview"
+                      onLoad={handleCropImageLoad}
+                      className="max-h-[70vh] w-full object-contain"
+                    />
+                  </ReactCrop>
                 </div>
-              </div>
-
-              <div className="mt-5 space-y-4">
-                <label className="block">
-                  <span className="mb-2 block text-sm font-medium text-slate-700">Zoom</span>
-                  <input
-                    type="range"
-                    min="1"
-                    max="3"
-                    step="0.01"
-                    value={cropZoom}
-                    onChange={(e) => setCropZoom(Number(e.target.value))}
-                    className="w-full"
-                  />
-                </label>
               </div>
 
               <div className="mt-6 flex justify-end gap-3">
