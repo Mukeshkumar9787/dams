@@ -85,6 +85,8 @@ const Breadcrumb = ({
 
   const isInline = variant === "inline";
   const isLightTone = tone === "light";
+  const rootLabel = adminOnly ? "Dashboard" : "Home";
+  const rootHref = adminOnly ? "/dashboard" : "/";
 
   const breadcrumbPages = (pages || [])
     .map((page) => {
@@ -103,7 +105,7 @@ const Breadcrumb = ({
   const breadcrumbList = (
     <ul className={`flex items-center gap-2 text-custom-sm flex-wrap ${isInline ? (isLightTone ? "text-sky-100" : "text-slate-500") : ""}`}>
       <li className={isInline ? (isLightTone ? "text-sky-100/80 hover:text-white" : "text-slate-500 hover:text-sky-700") : "text-dark-4 hover:text-blue"}>
-        <Link href="/">Home</Link>
+        <Link href={rootHref}>{rootLabel}</Link>
       </li>
       {breadcrumbPages.map((page, key) => {
         const isLast = key === breadcrumbPages.length - 1;
