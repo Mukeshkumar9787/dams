@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import AdminOverview from "../Common/AdminOverview";
+import AdminMobileList from "../Common/AdminMobileList";
 import Link from "next/link";
 import { getOrdersForAdmin } from "../../http/apiCalls.js";
 import { Input, Table } from "antd"
@@ -170,22 +171,76 @@ const AdminOrders = () => {
                 </div>
                 <StatusTags status={status} setStatus={(value)=> {setStatus(value); setPagination((prev) => ({...prev, pageNumber: 1}))}} />
               </div>
-              <Table className="admin-data-table" dataSource={orderItems} columns={columns} rowKey="id"
-                size="middle"
-                scroll={{ x: 980 }}
+              <AdminMobileList
+                items={orderItems}
+                emptyText="No orders found."
                 pagination={{
                   current: pagination.pageNumber,
                   pageSize: pagination.pageSize,
                   total: totalCount,
-                  showSizeChanger: true,
-                  pageSizeOptions: ['10', '20'],
-                  showTotal: (total, range) => `${range[0]}-${range[1]} of ${total}`,
+                  pageSizeOptions: ["10", "20"],
                   onChange(page, pageSize) {
-                    setPagination({pageNumber: page, pageSize});
+                    setPagination({ pageNumber: page, pageSize });
                   },
                 }}
-                locale={{ emptyText: "No orders found." }}
+                renderCard={(item, index) => (
+                  <div className="admin-mobile-card">
+                    <div className="mb-4 flex items-center gap-3">
+                      <img alt="" className="h-14 w-14 rounded-xl border border-gray-3 object-cover" src={item.filePath} />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-dark-5">Order #{(pagination.pageNumber - 1) * pagination.pageSize + index + 1}</p>
+                        <h3 className="text-base font-semibold text-dark">#{item.orderNo}</h3>
+                        <p className="truncate text-sm text-dark-4">{item.user?.name || "-"}</p>
+                      </div>
+                      <Link href={ORDER_URL + `/${item.orderNo}`} className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-3 text-dark transition hover:border-blue hover:text-blue">
+                        <ExportOutlined />
+                      </Link>
+                    </div>
+                    <div className="admin-mobile-meta">
+                      <span className="admin-mobile-label">Products</span>
+                      <span className="admin-mobile-value max-w-[60%] truncate" title={item.title}>{item.title}</span>
+                    </div>
+                    <div className="admin-mobile-meta">
+                      <span className="admin-mobile-label">Total</span>
+                      <span className="admin-mobile-value font-medium">{currency}{item.totalAmount}</span>
+                    </div>
+                    <div className="admin-mobile-meta">
+                      <span className="admin-mobile-label">Shipping</span>
+                      <span className="admin-mobile-value">{getShippingDisplay(item.shippingAmount)}</span>
+                    </div>
+                    <div className="admin-mobile-meta">
+                      <span className="admin-mobile-label">Status</span>
+                      <span className="inline-flex rounded-full px-3 py-1 text-xs font-semibold" style={ORDER_STATUS_COLOR[item.status]}>{item.status}</span>
+                    </div>
+                    <div className="admin-mobile-meta">
+                      <span className="admin-mobile-label">Dispute</span>
+                      {item.dispute ? (
+                        <span className="inline-flex rounded-full bg-red-600 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-white">{item.dispute.status}</span>
+                      ) : (
+                        <span className="admin-mobile-value">-</span>
+                      )}
+                    </div>
+                  </div>
+                )}
               />
+              <div className="hidden md:block">
+                <Table className="admin-data-table" dataSource={orderItems} columns={columns} rowKey="id"
+                  size="middle"
+                  scroll={{ x: 980 }}
+                  pagination={{
+                    current: pagination.pageNumber,
+                    pageSize: pagination.pageSize,
+                    total: totalCount,
+                    showSizeChanger: true,
+                    pageSizeOptions: ['10', '20'],
+                    showTotal: (total, range) => `${range[0]}-${range[1]} of ${total}`,
+                    onChange(page, pageSize) {
+                      setPagination({pageNumber: page, pageSize});
+                    },
+                  }}
+                  locale={{ emptyText: "No orders found." }}
+                />
+              </div>
             </div>
           </div>
         </section>

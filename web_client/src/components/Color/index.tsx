@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import AdminOverview from "../Common/AdminOverview";
+import AdminMobileList from "../Common/AdminMobileList";
 import Link from "next/link";
 import { getColors } from "../../http/apiCalls.js";
 import { Table } from "antd"
@@ -138,16 +139,46 @@ const Color = () => {
                 <span>Add&nbsp;Color</span>
               </Link>
               </div>
-              <Table
-                className="admin-data-table"
-                dataSource={items}
-                columns={columns}
-                rowKey="id"
-                size="middle"
-                scroll={{ x: 640 }}
-                pagination={false}
-                locale={{ emptyText: "No colors found." }}
+              <AdminMobileList
+                items={items}
+                emptyText="No colors found."
+                renderCard={(item, index) => (
+                  <div className="admin-mobile-card">
+                    <div className="mb-4 flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-dark-5">Color #{index + 1}</p>
+                        <h3 className="text-base font-semibold text-dark">{item.title}</h3>
+                      </div>
+                      <Link href={COLOR_URL + `/${item.title}`} className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-3 text-dark transition hover:border-blue hover:text-blue">
+                        <svg width="18" height="18" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" className="fill-current"><path fillRule="evenodd" clipRule="evenodd" d="M14.2218 2.71967C14.7931 2.14837 15.7202 2.14837 16.2915 2.71967L19.2803 5.70845C19.8516 6.27975 19.8516 7.20688 19.2803 7.77818L8.56302 18.4954C8.3418 18.7166 8.06445 18.8734 7.76089 18.9498L3.62422 20.0002C3.36527 20.066 3.09126 19.9902 2.90192 19.8008C2.71258 19.6115 2.63679 19.3375 2.70255 19.0786L3.75296 14.9419C3.82933 14.6383 3.98615 14.361 4.20737 14.1397L14.2218 2.71967ZM15.2567 3.75457L4.99993 14.0113L4.24693 17.002L7.23763 16.249L17.4944 5.99227L15.2567 3.75457Z" fill="" /></svg>
+                      </Link>
+                    </div>
+                    <div className="admin-mobile-meta">
+                      <span className="admin-mobile-label">Swatch</span>
+                      <span className="admin-mobile-value inline-flex items-center gap-2">
+                        <span style={{ backgroundColor: item.code }} className="h-5 w-10 rounded border border-gray-3"></span>
+                        <span>{item.code}</span>
+                      </span>
+                    </div>
+                    <div className="admin-mobile-meta">
+                      <span className="admin-mobile-label">Status</span>
+                      <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${item.status === STATUS_TYPES.ACTIVE ? "bg-green/15 text-green-700" : "bg-red/15 text-red-700"}`}>{item.status}</span>
+                    </div>
+                  </div>
+                )}
               />
+              <div className="hidden md:block">
+                <Table
+                  className="admin-data-table"
+                  dataSource={items}
+                  columns={columns}
+                  rowKey="id"
+                  size="middle"
+                  scroll={{ x: 640 }}
+                  pagination={false}
+                  locale={{ emptyText: "No colors found." }}
+                />
+              </div>
             </div>
           </div>
         </section>

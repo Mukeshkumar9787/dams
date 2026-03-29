@@ -3,6 +3,7 @@
 import React from "react";
 import { Button, Input, Table, Tag } from "antd";
 import AdminOverview from "@/components/Common/AdminOverview";
+import AdminMobileList from "@/components/Common/AdminMobileList";
 import ModalInfo from "@/components/Common/ModalInfo";
 import { getAuditLogStats, getAuditLogs } from "@/http/apiCalls";
 import { dateFormatter } from "@/utils/helper";
@@ -226,26 +227,81 @@ const AuditLogs = () => {
             />
           </div>
 
-          <Table
-            className="admin-data-table"
-            dataSource={items}
-            columns={columns}
-            rowKey="id"
-            size="middle"
-            scroll={{ x: 1760 }}
+          <AdminMobileList
+            items={items}
+            emptyText="No audit log entries found."
             pagination={{
               current: pagination.pageNumber,
               pageSize: pagination.pageSize,
               total: totalCount,
-              showSizeChanger: true,
               pageSizeOptions: ["10", "20", "50"],
-              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total}`,
               onChange(page, pageSize) {
                 setPagination({ pageNumber: page, pageSize });
               },
             }}
-            locale={{ emptyText: "No audit log entries found." }}
+            renderCard={(item, index) => (
+              <div className="admin-mobile-card">
+                <div className="mb-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-dark-5">Entry #{(pagination.pageNumber - 1) * pagination.pageSize + index + 1}</p>
+                  <h3 className="text-base font-semibold text-dark">{toTitleCase(item.action)}</h3>
+                  <p className="text-sm text-dark-4">{dateFormatter(item.createdAt)}</p>
+                </div>
+                <div className="admin-mobile-meta">
+                  <span className="admin-mobile-label">Admin</span>
+                  <span className="admin-mobile-value">
+                    <span className="block font-medium text-dark">{item.user?.name || "-"}</span>
+                    <span className="block text-xs text-dark-4">{item.user?.email || "-"}</span>
+                  </span>
+                </div>
+                <div className="admin-mobile-meta">
+                  <span className="admin-mobile-label">Method</span>
+                  <Tag color={methodColors[item.method] || "default"}>{item.method}</Tag>
+                </div>
+                <div className="admin-mobile-meta">
+                  <span className="admin-mobile-label">Reference</span>
+                  <span className="admin-mobile-value">
+                    <span className="block font-medium text-dark">{item.entityId || "-"}</span>
+                    <span className="block text-xs text-dark-4">{toTitleCase(item.entity || "-")}</span>
+                  </span>
+                </div>
+                <div className="admin-mobile-meta">
+                  <span className="admin-mobile-label">Route</span>
+                  <span className="admin-mobile-value max-w-[65%] break-all">{item.route}</span>
+                </div>
+                <div className="admin-mobile-meta">
+                  <span className="admin-mobile-label">IP Address</span>
+                  <span className="admin-mobile-value">{item.ipAddress || "-"}</span>
+                </div>
+                <div className="mt-4">
+                  <Button type="link" className="px-0" onClick={() => setSelectedMeta(item.meta || {})}>
+                    View details
+                  </Button>
+                </div>
+              </div>
+            )}
           />
+          <div className="hidden md:block">
+            <Table
+              className="admin-data-table"
+              dataSource={items}
+              columns={columns}
+              rowKey="id"
+              size="middle"
+              scroll={{ x: 1760 }}
+              pagination={{
+                current: pagination.pageNumber,
+                pageSize: pagination.pageSize,
+                total: totalCount,
+                showSizeChanger: true,
+                pageSizeOptions: ["10", "20", "50"],
+                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total}`,
+                onChange(page, pageSize) {
+                  setPagination({ pageNumber: page, pageSize });
+                },
+              }}
+              locale={{ emptyText: "No audit log entries found." }}
+            />
+          </div>
         </div>
       </div>
       <ModalInfo
