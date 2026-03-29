@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 import RecentlyViewdItems from "./RecentlyViewd";
-import PreLoader from "../Common/PreLoader";
+import LoaderOverlay from "../Common/LoaderOverlay";
 import { addProductReview, deleteMyProductReview, getMyProductReview, getProductBySlug, getProductReviews, updateMyProductReview } from "@/http/apiCalls";
 import { getCurrencyDetails, getOfferPercent, getStoredToken, redirectToSignIn } from "@/utils/helper";
 import AddToCart from "../Common/AddToCart";
@@ -232,7 +232,7 @@ const ShopDetails = ({ params }) => {
   return (
     <>
       {!product ? (
-        <PreLoader />
+        <LoaderOverlay message={"Loading..."} />
       ) : (
         <>
           <section className="overflow-hidden relative pb-20 pt-5 lg:pt-20 xl:pt-28">

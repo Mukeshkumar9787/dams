@@ -22,7 +22,6 @@ import { usePathname } from "next/navigation";
 import { subscribeApiLoader } from "@/http/apiLoader";
 
 import ScrollToTop from "@/components/Common/ScrollToTop";
-import PreLoader from "@/components/Common/PreLoader";
 import CartSync from "@/components/Common/CartSync";
 import WishlistSync from "@/components/Common/WishlistSync";
 
@@ -74,14 +73,14 @@ export default function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning={true}>
-      <body className="bg-[radial-gradient(circle_at_top_right,_rgba(14,165,233,0.12),_transparent_24%),linear-gradient(180deg,#ffffff_0%,#f6faff_100%)] text-dark">
+      <body className="bg-[radial-gradient(circle_at_top_right,_rgba(14,165,233,0.12),_transparent_24%),linear-gradient(180deg,#ffffff_0%,#f6faff_100%)] pb-[calc(6rem+env(safe-area-inset-bottom))] text-dark xl:pb-0">
 
         {loading ? (
-          <PreLoader />
+          <LoaderOverlay message={"Loading..."} />
         ) : (
           <>
             {!loading && (pageLoading || pendingGetRequests > 0) && (
-              <LoaderOverlay message={pendingGetRequests > 0 ? "Loading..." : "Loading page..."} />
+              <LoaderOverlay message={"Loading..."} />
             )}
             <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
               <ReduxProvider>
