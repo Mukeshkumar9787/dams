@@ -61,8 +61,11 @@ export async function deleteCategory(data) {
   return res.data;
 }
 
-export async function getProducts(params) {
-  const res = await axiosInstance.get(GET_ACTIVE_API(API_PRODUCTS, params),{ params });
+export async function getProducts(params, options = {}) {
+  const res = await axiosInstance.get(GET_ACTIVE_API(API_PRODUCTS, params),{
+    params,
+    ...options,
+  });
   return res?.data || [];
 }
 

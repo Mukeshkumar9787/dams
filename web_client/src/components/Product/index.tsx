@@ -90,7 +90,7 @@ const Product = () => {
         return (
           <span
             className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-              isActive ? "bg-green/15 text-green-700" : "bg-red/15 text-red-700"
+              isActive ? "bg-green text-white" : "bg-red text-white"
             }`}
           >
             {text}
@@ -213,7 +213,7 @@ const Product = () => {
                     </div>
                     <div className="admin-mobile-meta">
                       <span className="admin-mobile-label">Status</span>
-                      <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${item.status === STATUS_TYPES.ACTIVE ? "bg-green/15 text-green-700" : "bg-red/15 text-red-700"}`}>{item.status}</span>
+                      <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${item.status === STATUS_TYPES.ACTIVE ? "bg-green text-white" : "bg-red text-white"}`}>{item.status}</span>
                     </div>
                   </div>
                 )}

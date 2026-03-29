@@ -319,9 +319,16 @@ const Dashboard = () => {
                             >
                               {product.title}
                             </Link>
-                            <p className="text-sm text-dark-4">
-                              {product.categoryName || "Uncategorized"} • {product.status}
-                            </p>
+                            <div className="mt-1 flex flex-wrap items-center gap-2">
+                              <p className="text-sm text-dark-4">
+                                {product.categoryName || "Uncategorized"}
+                              </p>
+                              <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                                product.status === STATUS_TYPES.ACTIVE ? "bg-green text-white" : "bg-red text-white"
+                              }`}>
+                                {product.status}
+                              </span>
+                            </div>
                           </div>
                           <div className="text-right">
                             <div className="rounded-full bg-amber-100 px-3 py-1 text-sm font-semibold text-amber-800">

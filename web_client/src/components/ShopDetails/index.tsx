@@ -286,6 +286,12 @@ const ShopDetails = ({ params }) => {
                     <span className="line-through text-lg ml-2">{getCurrencyDetails().currencySymbol} {product.mrp}</span>
                   </h3>
 
+                  {product.description && (
+                    <div className="rounded-2xl border border-gray-3 bg-white/80 px-4 py-4 text-sm leading-7 text-dark-4">
+                      {product.description}
+                    </div>
+                  )}
+
                   <div className="flex flex-col gap-4.5 border-y border-gray-3 mt-7.5 mb-6 py-9">
                     <div className="flex items-center gap-4">
                       <div className="min-w-[65px]">

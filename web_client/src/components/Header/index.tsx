@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { adminMenuData, menuData } from "./menuData";
 import Dropdown from "./Dropdown";
 import { useAppSelector } from "@/redux/store";
@@ -9,18 +9,27 @@ import { useCartModalContext } from "@/app/context/CartSidebarModalContext";
 import { useWishlistModalContext } from "@/app/context/WishlistSidebarModalContext";
 import Image from "next/image";
 import { getLoggedInUserData, getStoredToken } from "@/utils/helper";
-import { CONFIG_KEYS, ROLE_TYPES } from "@/utils/constants";
-import { getConfig } from "@/http/apiCalls";
+import { CONFIG_KEYS, ROLE_TYPES, STATUS_TYPES } from "@/utils/constants";
+import { getConfig, getProducts } from "@/http/apiCalls";
+import { SHOP_DETAILS } from "@/utils/appUrls";
+import type { Product } from "@/types/product";
 
 const Header = () => {
+  const router = useRouter();
   const [menuItems, setMenuItems] = useState(menuData);
   const [navigationOpen, setNavigationOpen] = useState(false);
   const navRef = React.useRef<HTMLDivElement | null>(null);
   const navToggleRef = React.useRef<HTMLButtonElement | null>(null);
+  const desktopSearchRef = React.useRef<HTMLDivElement | null>(null);
+  const mobileSearchRef = React.useRef<HTMLDivElement | null>(null);
   const { openCartModal } = useCartModalContext();
   const { openWishlistModal } = useWishlistModalContext();
   const [user, setUser] = useState(null);
   const [compInfo, setCompInfo] = React.useState({});
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<Product[]>([]);
+  const [searchingProducts, setSearchingProducts] = useState(false);
+  const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
   const pathname = usePathname();
 
   const product = useAppSelector((state) => state.cartReducer.items);
@@ -84,7 +93,132 @@ const Header = () => {
 
   useEffect(() => {
     setNavigationOpen(false);
+    setSearchResults([]);
+    setShowSearchSuggestions(false);
   }, [pathname]);
+
+  useEffect(() => {
+    const trimmedQuery = searchQuery.trim();
+
+    if (!trimmedQuery) {
+      setSearchResults([]);
+      setSearchingProducts(false);
+      setShowSearchSuggestions(false);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setSearchingProducts(true);
+      setShowSearchSuggestions(true);
+      try {
+        const response = await getProducts({
+          status: STATUS_TYPES.ACTIVE,
+          search: trimmedQuery,
+          pageSize: 6,
+        }, { skipGlobalLoader: true });
+        setSearchResults(response?.data || []);
+      } catch (error) {
+        console.error(error);
+        setSearchResults([]);
+      } finally {
+        setSearchingProducts(false);
+      }
+    }, 250);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (desktopSearchRef.current?.contains(target) || mobileSearchRef.current?.contains(target)) {
+        return;
+      }
+      setSearchQuery("");
+      setSearchResults([]);
+      setShowSearchSuggestions(false);
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleSearchNavigate = (slug: string) => {
+    setSearchQuery("");
+    setSearchResults([]);
+    setShowSearchSuggestions(false);
+    router.push(`${SHOP_DETAILS}/${slug}`);
+  };
+
+  const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (searchResults[0]?.slug) {
+      handleSearchNavigate(searchResults[0].slug);
+    }
+  };
+
+  const renderSearchBox = (className = "", ref?: React.RefObject<HTMLDivElement | null>) => (
+    <div ref={ref} className={`relative ${className}`}>
+      <form onSubmit={handleSearchSubmit}>
+        <input
+          type="search"
+          value={searchQuery}
+          onChange={(event) => {
+            const value = event.target.value;
+            setSearchQuery(value);
+            setShowSearchSuggestions(Boolean(value.trim()));
+          }}
+          onFocus={() => {
+            if (searchQuery.trim()) {
+              setShowSearchSuggestions(true);
+            }
+          }}
+          placeholder="Search products"
+          className="w-full rounded-2xl border border-gray-3 bg-white px-4 py-3 text-sm text-dark shadow-sm outline-none transition focus:border-blue"
+        />
+      </form>
+      {showSearchSuggestions && (
+        <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-[80] overflow-hidden rounded-2xl border border-gray-3 bg-white shadow-[0_20px_45px_rgba(15,23,42,0.12)]">
+          <div className="max-h-[320px] overflow-y-auto">
+            {searchingProducts ? (
+              <div className="px-4 py-3 text-sm text-dark-4">Searching...</div>
+            ) : searchResults.length > 0 ? (
+              searchResults.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => handleSearchNavigate(item.slug)}
+                  className="flex w-full items-start gap-3 border-b border-gray-3 px-4 py-3 text-left transition hover:bg-gray-1 last:border-b-0"
+                >
+                  {item.img ? (
+                    <img src={item.img} alt={item.title} className="h-12 w-12 rounded-xl border border-gray-3 object-cover" />
+                  ) : (
+                    <div className="h-12 w-12 rounded-xl border border-gray-3 bg-gray-1" />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-medium text-dark">{item.title}</p>
+                    <p className="mt-1 text-xs uppercase tracking-[0.12em] text-dark-5">{item.categoryName || "Uncategorized"}</p>
+                    {item.description ? (
+                      <p
+                        className="mt-1 text-sm text-dark-4"
+                        style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}
+                      >
+                        {item.description}
+                      </p>
+                    ) : null}
+                  </div>
+                </button>
+              ))
+            ) : (
+              <div className="px-4 py-3 text-sm text-dark-4">No matching products found.</div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <header className="relative w-full z-50 bg-transparent backdrop-blur transition-all ease-in-out duration-300">
@@ -104,6 +238,10 @@ const Header = () => {
               />
             </Link>
             <span className="hidden truncate font-semibold tracking-tight text-dark sm:block">{compInfo?.name}</span>
+          </div>
+
+          <div className="hidden min-w-0 flex-1 px-4 lg:block">
+            {renderSearchBox("mx-auto w-full max-w-[420px]", desktopSearchRef)}
           </div>
 
           {/* <!-- header top right --> */}
@@ -319,6 +457,9 @@ const Header = () => {
               {/* //   <!-- Hamburger Toggle BTN --> */}
             </div>
           </div>
+        </div>
+        <div className="pb-4 lg:hidden">
+          {renderSearchBox("w-full", mobileSearchRef)}
         </div>
         {/* <!-- header top end --> */}
       </div>

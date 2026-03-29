@@ -14,6 +14,7 @@ import { confirmAction, notifyError, notifySuccess } from "@/utils/notify";
 const ProductForm = ({ params }) => {
   const router = useRouter();
   const [title, setTitle] = React.useState("");
+  const [description, setDescription] = React.useState("");
   const [variant, setVariant] = React.useState("");
   const [status, setStatus] = React.useState(STATUS_TYPES.ACTIVE);
   const [images, setImages] = React.useState([]);
@@ -113,7 +114,7 @@ const ProductForm = ({ params }) => {
       notifyError("Select at least one file.");
       return;
     }
-    let data = { title, status, categoryId, hsnId, sizeId, colorId, mrp, price, stock,variant, fileIds: [...fileIdsRef.current], deletedFileIds: [...deletedFileIdsRef.current] }
+    let data = { title, description, status, categoryId, hsnId, sizeId, colorId, mrp, price, stock,variant, fileIds: [...fileIdsRef.current], deletedFileIds: [...deletedFileIdsRef.current] }
     setApiState(isNew ? "creating" : "updating");
     try {
       const response:any = isNew
@@ -161,6 +162,7 @@ const ProductForm = ({ params }) => {
         editDataRef.current = data?.data || {};
         setVariant(editDataRef.current.variant);
         setTitle(editDataRef.current.title);
+        setDescription(editDataRef.current.description || "");
         setStatus(editDataRef.current.status);
         setImages(editDataRef.current.images);
         setCategoryId(editDataRef.current.categoryId);
@@ -232,6 +234,17 @@ const ProductForm = ({ params }) => {
                   onChange={(e) => setTitle(e.target.value)}
                   required
                   className="form-input"
+                />
+              </div>
+
+              <div className="mb-5">
+                <label className="form-label">Product Description</label>
+                <textarea
+                  placeholder="Enter product description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows={5}
+                  className="form-input min-h-[140px] resize-y py-4"
                 />
               </div>
 

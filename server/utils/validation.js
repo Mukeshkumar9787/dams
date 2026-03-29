@@ -36,6 +36,7 @@ export const hsnBodySchema = Joi.object({
 
 export const productBodySchema = Joi.object({
   title: Joi.string().min(1).max(100).required(),
+  description: Joi.string().max(2000).allow("").optional(),
   variant: Joi.string().min(1).max(100).required(),
   categoryId: Joi.number().required(), 
   hsnId: Joi.number().optional(), 

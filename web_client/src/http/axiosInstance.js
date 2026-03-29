@@ -21,7 +21,7 @@ axiosInstance.interceptors.request.use((config) => {
       config.headers.authorization = `Bearer ${token}`; // eslint-disable-line
     }
     const isGet = config.method?.toLowerCase() === "get";
-    if (isGet) {
+    if (isGet && !config.skipGlobalLoader) {
       incrementGetRequest();
       config._isTrackedGet = true;
     }

@@ -8,11 +8,11 @@ import { fileService } from "./index.js";
 /**
  * Create Product
  */
-const createProduct = async ({ title, fileIds, deletedFileIds, categoryId, hsnId, mrp, price, stock, status, sizeId, colorId, variant }) => {
+const createProduct = async ({ title, description, fileIds, deletedFileIds, categoryId, hsnId, mrp, price, stock, status, sizeId, colorId, variant }) => {
   let product = null;
 
   await prisma.$transaction( async (tx) => {
-    product = await tx.Product.create({ data: { title, slug: slugText(title), categoryId, hsnId, mrp, price, status, sizeId, colorId, variant }});
+    product = await tx.Product.create({ data: { title, description: description || null, slug: slugText(title), categoryId, hsnId, mrp, price, status, sizeId, colorId, variant }});
     await tx.stock.create({ data: { type: STOCK_TYPES.PRODUCT, productId: product.id, quantity: stock } })
     await fileService.updateFilesByIds({ tx, feature: FEATURE_TYPES.PRODUCT, featureId: product.id, fileIds, deletedFileIds })
   })
@@ -58,7 +58,13 @@ const getProducts = async ({ status, pageNumber=1, pageSize=10, search='', color
   
   if(search) {
     const searchText = `%${search}%`;
-    conditions.push(PrismaConfig.sql`p.title ilike ${searchText}`);
+    conditions.push(
+      PrismaConfig.sql`(
+        p.title ilike ${searchText}
+        OR COALESCE(p.description, '') ilike ${searchText}
+        OR COALESCE(c.title, '') ilike ${searchText}
+      )`
+    );
   }
 
   const whereClause =
@@ -78,6 +84,7 @@ const getProducts = async ({ status, pageNumber=1, pageSize=10, search='', color
       SELECT
         p.id,
         p.title,
+        p.description,
         p.status,
         p.slug,
         p.mrp,
@@ -199,7 +206,7 @@ const getProductBySlug = async (slug, options = {}) => {
 /**
  * Update Product
  */
-const updateProduct = async (id, { title, fileIds, deletedFileIds, categoryId, hsnId, mrp, price, stock, status, sizeId, colorId, variant, oldStockQty }) => {
+const updateProduct = async (id, { title, description, fileIds, deletedFileIds, categoryId, hsnId, mrp, price, stock, status, sizeId, colorId, variant, oldStockQty }) => {
   let updated = null;
   let deletedFiles = [];
   let shouldSendRestockNotification = false;
@@ -221,6 +228,7 @@ const updateProduct = async (id, { title, fileIds, deletedFileIds, categoryId, h
         where: { id },
         data: {
           title,
+          description: description || null,
           slug: slugText(title),
           categoryId, hsnId, mrp: parseFloat(mrp), price: parseFloat(price),
           status, sizeId, colorId, variant
