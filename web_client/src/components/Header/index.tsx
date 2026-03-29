@@ -159,6 +159,16 @@ const Header = () => {
     }
   };
 
+  const handleNavigationToggle = () => {
+    setNavigationOpen((prev) => {
+      const next = !prev;
+      if (next) {
+        setShowSearchSuggestions(false);
+      }
+      return next;
+    });
+  };
+
   const renderSearchBox = (className = "", ref?: React.RefObject<HTMLDivElement | null>) => (
     <div ref={ref} className={`relative ${className}`}>
       <form onSubmit={handleSearchSubmit}>
@@ -171,6 +181,7 @@ const Header = () => {
             setShowSearchSuggestions(Boolean(value.trim()));
           }}
           onFocus={() => {
+            setNavigationOpen(false);
             if (searchQuery.trim()) {
               setShowSearchSuggestions(true);
             }
@@ -249,7 +260,7 @@ const Header = () => {
             {/* <!--=== Main Nav Start ===--> */}
             <div
               ref={navRef}
-              className={`w-[288px] absolute right-0 top-full xl:static xl:w-auto h-0 xl:h-auto invisible xl:visible xl:flex xl:items-center xl:justify-between ${
+              className={`z-[70] w-[288px] absolute right-0 top-full xl:static xl:z-auto xl:w-auto h-0 xl:h-auto invisible xl:visible xl:flex xl:items-center xl:justify-between ${
                 navigationOpen &&
                 `!visible bg-white shadow-xl border border-gray-3 !h-auto max-h-[400px] overflow-y-scroll rounded-xl p-5`
               }`}
@@ -419,7 +430,7 @@ const Header = () => {
                 aria-label="Toggler"
                 className="block xl:hidden"
                 ref={navToggleRef}
-                onClick={() => setNavigationOpen(!navigationOpen)}
+                onClick={handleNavigationToggle}
               >
                 <span className="block relative cursor-pointer w-5.5 h-5.5">
                   <span className="du-block absolute right-0 w-full h-full">
@@ -458,7 +469,7 @@ const Header = () => {
             </div>
           </div>
         </div>
-        <div className="pb-4 lg:hidden">
+        <div className="relative z-10 pb-4 lg:hidden">
           {renderSearchBox("w-full", mobileSearchRef)}
         </div>
         {/* <!-- header top end --> */}
