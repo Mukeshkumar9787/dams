@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { adminMenuData, menuData } from "./menuData";
 import Dropdown from "./Dropdown";
 import { useAppSelector } from "@/redux/store";
@@ -20,6 +21,7 @@ const Header = () => {
   const { openWishlistModal } = useWishlistModalContext();
   const [user, setUser] = useState(null);
   const [compInfo, setCompInfo] = React.useState({});
+  const pathname = usePathname();
 
   const product = useAppSelector((state) => state.cartReducer.items);
   const wishlist = useAppSelector((state) => state.wishlistReducer.items);
@@ -79,6 +81,10 @@ const Header = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [navigationOpen]);
+
+  useEffect(() => {
+    setNavigationOpen(false);
+  }, [pathname]);
 
   return (
     <header className="relative w-full z-50 bg-transparent backdrop-blur transition-all ease-in-out duration-300">

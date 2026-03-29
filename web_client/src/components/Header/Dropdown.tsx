@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
@@ -6,6 +6,10 @@ const Dropdown = ({ menuItem, className = "" }) => {
   const [dropdownToggler, setDropdownToggler] = useState(false);
   const pathUrl = usePathname();
   const isActive = menuItem.submenu?.some((item) => pathUrl === item.path);
+
+  useEffect(() => {
+    setDropdownToggler(false);
+  }, [pathUrl]);
 
   return (
     <li
@@ -16,14 +20,15 @@ const Dropdown = ({ menuItem, className = "" }) => {
       <div
         className="flex items-center gap-1.5 capitalize xl:py-6"
       >
-        <Link
-          href={menuItem.path || "/"}
+        <button
+          type="button"
+          onClick={() => setDropdownToggler(!dropdownToggler)}
           className={`hover:text-blue text-custom-sm font-medium text-dark ${
             isActive ? "!text-blue" : ""
           }`}
         >
           {menuItem.title}
-        </Link>
+        </button>
         <button
           type="button"
           aria-label={`Toggle ${menuItem.title} menu`}
