@@ -36,7 +36,7 @@ const ProductItem = ({ item }: { item: Product }) => {
   return (
     <div className="group surface-card overflow-hidden p-3 sm:p-3.5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
         <Link href={`/shop-details/${item.slug}`}> 
-          <div className="relative overflow-hidden flex items-center justify-center rounded-xl bg-gray-1 p-3 sm:p-0">
+          <div className="relative overflow-hidden flex items-center justify-center bg-gray-1 p-3 sm:p-0">
             <img
               src={item.img}
               alt={item.title}

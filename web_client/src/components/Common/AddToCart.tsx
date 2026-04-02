@@ -60,7 +60,7 @@ const AddToCart = ({ id, align='center', stack = true, purchase = true, stock=0,
         <button
             type="button"
             onClick={() => handleAddToCart(true)}
-            className={`${actionBtnClass} bg-dark text-white hover:bg-[#121826]`}
+            className={`${actionBtnClass} bg-dark text-white hover:bg-[#121826] text-xs md:text-sm`}
         >
             Purchase&nbsp;Now
         </button>
@@ -89,14 +89,14 @@ const AddToCart = ({ id, align='center', stack = true, purchase = true, stock=0,
             </div>
         )
     }
-
+ 
     if(quantity === 0) {
         return (
             <div className={baseWrapClass}>
                 <button
                     type="button"
                     onClick={() => handleAddToCart()}
-                    className={`${actionBtnClass} bg-blue text-white hover:bg-blue-dark`}
+                    className={`${actionBtnClass} bg-blue text-white hover:bg-blue-dark text-xs md:text-sm`}
                 >
                     Add&nbsp;to&nbsp;cart
                 </button>

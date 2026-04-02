@@ -330,9 +330,11 @@ const Header = () => {
                       />
                     </svg>
 
-                    <span className="flex items-center justify-center font-medium text-2xs absolute -right-2 -top-2.5 bg-blue w-4.5 h-4.5 rounded-full text-white">
-                      {product.length}
-                    </span>
+                    {product.length > 0 && (
+                      <span className="flex items-center justify-center font-medium text-2xs absolute -right-2 -top-2.5 bg-blue w-4.5 h-4.5 rounded-full text-white">
+                        {product.length}
+                      </span>
+                    )}
                   </span>
                 </button>
                 <button onClick={handleOpenWishlistModal} className="flex items-center gap-2 rounded-lg px-2 py-2 hover:bg-gray-1 sm:px-2.5">
@@ -345,9 +347,11 @@ const Header = () => {
                         fill="#3C50E0"
                       />
                     </svg>
-                    <span className="flex items-center justify-center font-medium text-2xs absolute -right-2 -top-2.5 bg-blue w-4.5 h-4.5 rounded-full text-white">
-                      {wishlist.length}
-                    </span>
+                    {wishlist.length > 0 && (
+                      <span className="flex items-center justify-center font-medium text-2xs absolute -right-2 -top-2.5 bg-blue w-4.5 h-4.5 rounded-full text-white">
+                        {wishlist.length}
+                      </span>
+                    )}
                   </span>
                 </button>
                 {user ?
