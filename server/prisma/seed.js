@@ -9,6 +9,12 @@ const __dirname = path.dirname(__filename);
 // Ensure .env is loaded
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
+/**
+ * Seed Credentials:
+ * All seeded accounts (admin@dams.com, john@example.com, sarah@example.com)
+ * share the default plain-text password: Admin@123
+ */
+
 import prisma from './client.js';
 import { uploadFileToR2, isR2Configured } from '../utils/r2.js';
 
