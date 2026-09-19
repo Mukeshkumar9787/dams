@@ -51,12 +51,26 @@ const NewArrival = async () => {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 gap-x-1 gap-y-9 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {/* <!-- New Arrivals item --> */}
-            {shopData.map((item) => (
-              <ProductItem item={item} key={item.id} />
-            ))}
-          </div>
+          {shopData.length > 0 ? (
+            <div className="grid grid-cols-2 gap-x-1 gap-y-9 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {/* <!-- New Arrivals item --> */}
+              {shopData.map((item) => (
+                <ProductItem item={item} key={item.id} />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-8 text-center shadow-sm">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-sky-100 text-sky-600">
+                <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-base text-slate-800">Unable to Load Products</h3>
+              <p className="mt-1 text-xs text-slate-500">
+                We're having trouble connecting right now. Please try again later.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </section>

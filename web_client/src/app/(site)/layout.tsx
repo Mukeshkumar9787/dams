@@ -24,6 +24,7 @@ import { subscribeApiLoader } from "@/http/apiLoader";
 import ScrollToTop from "@/components/Common/ScrollToTop";
 import CartSync from "@/components/Common/CartSync";
 import WishlistSync from "@/components/Common/WishlistSync";
+import ServerOfflineBanner from "@/components/Common/ServerOfflineBanner";
 
 export default function RootLayout({
   children,
@@ -90,6 +91,7 @@ export default function RootLayout({
                   <WishlistModalProvider>
                     <ModalProvider>
                       <PreviewSliderProvider>
+                        <ServerOfflineBanner />
                         <Header />
                         <main className="relative min-h-[70vh] bg-transparent">
                           <AdminDesktopShell>{children}</AdminDesktopShell>
