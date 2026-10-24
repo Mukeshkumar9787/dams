@@ -7,7 +7,7 @@ import { PROJECT_DETAILS } from "@/utils/constants";
 export const metadata: Metadata = {
   title: `My Account | ${PROJECT_DETAILS.name}`,
   description:
-    "View and update your DAMS profile, addresses, and recent orders from one secure hub.",
+    "View and update your SMK profile, addresses, and recent orders from one secure hub.",
 };
 
 const MyAccountPage = () => {

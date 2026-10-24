@@ -104,7 +104,7 @@ const Contact = () => {
                   Reach out for product questions, orders, or custom print requests.
                 </h1>
                 <p className="mt-4 max-w-[560px] text-base leading-7 text-dark-4">
-                  Get in touch with the DAMS team for quick assistance. We are available to help with catalog guidance, availability, and project-specific inquiries.
+                  Get in touch with the SMK team for quick assistance. We are available to help with catalog guidance, availability, and project-specific inquiries.
                 </p>
 
                 <div className="mt-6 flex flex-wrap gap-3">

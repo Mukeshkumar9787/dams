@@ -7,7 +7,7 @@ import { PROJECT_DETAILS } from "@/utils/constants";
 export const metadata: Metadata = {
   title: `Shop | ${PROJECT_DETAILS.name}`,
   description:
-    "Browse the DAMS catalog with featured collections, filters, and curated offers.",
+    "Browse the SMK catalog with featured collections, filters, and curated offers.",
 };
 
 const ShopWithSidebarPage = () => {

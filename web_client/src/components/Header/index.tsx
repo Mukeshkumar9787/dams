@@ -25,7 +25,7 @@ const Header = () => {
   const { openCartModal } = useCartModalContext();
   const { openWishlistModal } = useWishlistModalContext();
   const [user, setUser] = useState(null);
-  const [compInfo, setCompInfo] = React.useState({});
+  const [compInfo, setCompInfo] = React.useState<any>({});
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [searchingProducts, setSearchingProducts] = useState(false);
@@ -242,13 +242,14 @@ const Header = () => {
           <div className="flex min-w-0 items-center gap-3">
             <Link className="flex-shrink-0" href="/">
               <Image
-                src="/images/logo/dams.jpg"
-                alt="Logo"
+                src="/images/logo/smk.jpg"
+                alt="SMK Logo"
                 width={50}
-                height={36}
+                height={50}
+                className="h-9 w-auto rounded-md object-contain"
               />
             </Link>
-            <span className="hidden truncate font-semibold tracking-tight text-dark sm:block">{compInfo?.name}</span>
+            <span className="hidden truncate font-semibold tracking-tight text-dark sm:block">{compInfo?.name || "SMK"}</span>
           </div>
 
           <div className="hidden min-w-0 flex-1 px-4 lg:block">

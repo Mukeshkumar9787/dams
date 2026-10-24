@@ -6,7 +6,7 @@ import { PROJECT_DETAILS } from "@/utils/constants";
 export const metadata: Metadata = {
   title: `Contact | ${PROJECT_DETAILS.name}`,
   description:
-    "Get in touch with the DAMS team for support, collaborations, or wholesale inquiries.",
+    "Get in touch with the SMK team for support, collaborations, or wholesale inquiries.",
 };
 
 const ContactPage = () => {

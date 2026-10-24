@@ -7,7 +7,7 @@ import ContactInfo from "../Common/ContactInfo";
 const Footer = () => {
   const year = new Date().getFullYear();
 
-  const [compInfo, setCompInfo] = React.useState({});
+  const [compInfo, setCompInfo] = React.useState<any>({});
 
   const fetchConfig = React.useCallback(async () => {
     try {
@@ -229,7 +229,7 @@ const Footer = () => {
         <div className="max-w-[1170px] mx-auto px-4 sm:px-8 xl:px-0">
           <div className="flex gap-5 flex-wrap items-center justify-between">
             <p className="text-dark font-medium">
-              &copy; {year}. All rights reserved by {compInfo?.name}.
+              &copy; {year}. All rights reserved by {compInfo?.name || "SMK"}.
             </p>
 
             {/* <div className="flex flex-wrap items-center gap-4">

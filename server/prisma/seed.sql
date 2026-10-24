@@ -270,7 +270,7 @@ VALUES
   (
     101,
     'COMP_INFO',
-    '{"name": "DAMS Fashion & Lifestyle", "email": "support@dams.com", "phone": "+1 (800) 555-0199", "address": "100 Fashion Boulevard, Suite 400, New York, NY 10001"}'::jsonb,
+    '{"name": "SMK Fashion & Lifestyle", "email": "support@smk.com", "phone": "+1 (800) 555-0199", "address": "100 Fashion Boulevard, Suite 400, New York, NY 10001"}'::jsonb,
     NOW(), NOW()
   ),
   (

@@ -95,7 +95,7 @@ export const ORDER_STATUS_COLOR = {
 
 
 export const PROJECT_DETAILS = {
-    name: "DAMS",
+    name: "SMK",
     description: "ecommerce platform"
 }
 

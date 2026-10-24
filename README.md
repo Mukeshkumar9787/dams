@@ -1,6 +1,6 @@
-# DAMS
+# SMK
 
-DAMS is a full-stack e-commerce application with a customer storefront, checkout flow, and role-protected administration features.
+SMK is a full-stack e-commerce application with a customer storefront, checkout flow, and role-protected administration features.
 
 ## Features
 
