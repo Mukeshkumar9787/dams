@@ -21,6 +21,16 @@ app.use(cors());
 // Parse incoming JSON payloads
 app.use(express.json());
 
+// Health check routes for Render cold starts and uptime monitoring
+app.get(['/health', '/api/health'], (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    message: 'Server is running',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+  });
+});
+
 app.use('/api', router);
 
 // 404 handler

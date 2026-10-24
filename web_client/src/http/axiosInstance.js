@@ -2,6 +2,7 @@ import { getStoredToken, redirectToSignIn } from '@/utils/helper';
 import axios from 'axios';
 import { message } from 'antd';
 import { decrementGetRequest, incrementGetRequest } from './apiLoader';
+import { serverStatusManager } from './serverStatusManager';
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -15,66 +16,86 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use((config) => {
   try {
-    // Do something before request is sent
     const token = getStoredToken();
     if (token) {
       config.headers.authorization = `Bearer ${token}`; // eslint-disable-line
     }
     const isGet = config.method?.toLowerCase() === "get";
-    if (isGet && !config.skipGlobalLoader) {
+    // Only increment global loader on the first attempt, not repeated retries
+    if (isGet && !config.skipGlobalLoader && !config._isTrackedGet) {
       incrementGetRequest();
       config._isTrackedGet = true;
     }
-  } catch (error) {}
+    config._retryCount = config._retryCount || 0;
+  } catch (error) { }
   return config;
 }, (error) => {
-  // Do something with request error
   Promise.reject(error);
 });
 
 axiosInstance.interceptors.response.use((response) => {
   const trackedGet = response?.config?._isTrackedGet;
-  if(trackedGet){
+  if (trackedGet) {
     decrementGetRequest();
   }
-  // Dispatch success event to clear offline status if previously offline
-  if (typeof window !== 'undefined') {
+  // Clear waking up / offline banner if it was active
+  if (serverStatusManager.isWakingUp() || serverStatusManager.isOffline()) {
+    serverStatusManager.markOnline();
+  } else if (typeof window !== 'undefined') {
     window.dispatchEvent(new CustomEvent('server-connection-success'));
   }
   return response;
-}, (error) => {
-  const trackedGet = error?.config?._isTrackedGet;
-  if(trackedGet){
+}, async (error) => {
+  const config = error?.config || {};
+  const trackedGet = config?._isTrackedGet;
+  const isGet = config?.method?.toLowerCase() === "get";
+
+  const isNetworkError = !error.response ||
+    error.code === 'ERR_NETWORK' ||
+    error.code === 'ECONNABORTED' ||
+    error.code === 'ERR_CONNECTION_REFUSED' ||
+    error.code === 'ETIMEDOUT';
+  const isColdStartStatus = error.response && [502, 503, 504].includes(error.response.status);
+  const isCandidateForColdStart = isNetworkError || isColdStartStatus;
+
+  // Render cold start handling: Automatically retry safe GET requests while waking up
+  if (isCandidateForColdStart) {
+    // Trigger background continuous ping loop to keep waking up Render instance
+    serverStatusManager.triggerWakeUp({ reloadOnWake: true });
+
+    const maxRetries = config.maxRetries !== undefined ? config.maxRetries : 5;
+    if ((isGet || config.allowRetry) && config._retryCount < maxRetries) {
+      config._retryCount += 1;
+      const delay = Math.min(1500 + config._retryCount * 1000, 5000);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      return axiosInstance(config);
+    }
+  }
+
+  if (trackedGet) {
     decrementGetRequest();
   }
+
   try {
-    const isNetworkError = !error.response || error.code === 'ERR_NETWORK' || error.code === 'ECONNABORTED' || error.code === 'ERR_CONNECTION_REFUSED';
     const isServerError = error.response && error.response.status >= 500;
 
-    if (isNetworkError || isServerError) {
-      const serverMessage = "Unable to connect right now. Please try again later.";
-      
-      // Dispatch custom event for global ServerOfflineBanner
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('server-connection-error', { 
-          detail: { 
-            message: serverMessage,
-            status: error.response?.status || 'OFFLINE',
-            url: error.config?.url
-          } 
-        }));
-      }
+    if (isCandidateForColdStart || isServerError) {
+      const serverMessage = "Connecting to services. Free instances may take a minute to start.";
 
-      message.error({
-        content: serverMessage,
-        key: 'server-connection-error',
-        duration: 5,
-      });
+      // Only show error notification if NOT in graceful wake-up mode and not muted
+      if (!serverStatusManager.isWakingUp() && !config.skipErrorToast) {
+        message.error({
+          content: "Unable to connect right now. Please try again later.",
+          key: 'server-connection-error',
+          duration: 5,
+        });
+      }
 
       return {
         data: {
           success: false,
           isServerUnreachable: true,
+          isWakingUp: serverStatusManager.isWakingUp(),
           message: serverMessage,
         }
       };
@@ -86,9 +107,12 @@ axiosInstance.interceptors.response.use((response) => {
       }
     } else {
       const errorMsg = error?.response?.data?.errors || error?.response?.data?.message || 'Something went wrong';
-      message.error(errorMsg);
+      if (!config.skipErrorToast) {
+        message.error(errorMsg);
+      }
     }
-  } catch (err) {}
+  } catch (err) { }
+
   return error?.response || { data: { success: false, message: "Something went wrong" } };
 });
 

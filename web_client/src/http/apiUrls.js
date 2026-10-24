@@ -38,3 +38,4 @@ export const API_WISHLIST = '/wishlist';
 export const API_DASHBOARD = '/dashboard';
 export const API_AUDIT_LOGS = '/audit-logs';
 export const API_AUDIT_LOGS_STATS = `${API_AUDIT_LOGS}/stats`;
+export const API_HEALTH = '/health';
