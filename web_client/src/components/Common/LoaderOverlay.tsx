@@ -17,7 +17,7 @@ const LoaderOverlay = ({ message }: { message: string }) => {
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-white/90 backdrop-blur-sm">
-      <div className="flex flex-col items-center gap-3 rounded-2xl border border-slate-200/80 bg-white p-7 shadow-2xl max-w-sm text-center mx-4">
+      <div className="flex flex-col items-center gap-3 max-w-sm text-center mx-4">
         <div className="h-12 w-12 animate-spin rounded-full border-4 border-solid border-sky-500 border-t-transparent"></div>
         <p className="text-sm font-semibold text-slate-800">
           {isWakingUp ? "Waking up server..." : message}
