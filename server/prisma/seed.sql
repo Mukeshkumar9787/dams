@@ -1,5 +1,5 @@
 -- ==============================================================================
--- DAMS Ecommerce Application SQL Seed Script (PostgreSQL)
+-- SMK Ecommerce Application SQL Seed Script (PostgreSQL)
 -- Schema: User, Hsn, Size, Color, Category, Product, Stock, File, ProductReview, Config
 -- ==============================================================================
 
@@ -31,11 +31,11 @@ RESTART IDENTITY CASCADE;
 -- ------------------------------------------------------------------------------
 -- 1. USERS (Admin & Customer accounts)
 -- Default Password for all seeded user accounts: Admin@123
--- Accounts: admin@dams.com (ADMIN), john@example.com (USER), sarah@example.com (USER)
+-- Accounts: admin@smk.com (ADMIN), john@example.com (USER), sarah@example.com (USER)
 -- ------------------------------------------------------------------------------
 INSERT INTO "User" ("id", "name", "email", "password", "mobile", "role", "status", "createdAt", "updatedAt")
 VALUES 
-  (101, 'System Admin', 'admin@dams.com', '$2b$10$bC6CpZeSzWcEd5cx3mhLMeGgoCTYIAF07HgDTp5t23FnAwbm59Dwa', '9876543210', 'ADMIN', 'ACTIVE', NOW(), NOW()),
+  (101, 'System Admin', 'admin@smk.com', '$2b$10$bC6CpZeSzWcEd5cx3mhLMeGgoCTYIAF07HgDTp5t23FnAwbm59Dwa', '9876543210', 'ADMIN', 'ACTIVE', NOW(), NOW()),
   (102, 'John Doe', 'john@example.com', '$2b$10$bC6CpZeSzWcEd5cx3mhLMeGgoCTYIAF07HgDTp5t23FnAwbm59Dwa', '9876543211', 'USER', 'ACTIVE', NOW(), NOW()),
   (103, 'Sarah Connor', 'sarah@example.com', '$2b$10$bC6CpZeSzWcEd5cx3mhLMeGgoCTYIAF07HgDTp5t23FnAwbm59Dwa', '9876543212', 'USER', 'ACTIVE', NOW(), NOW())
 ON CONFLICT ("email") DO UPDATE SET "role" = EXCLUDED."role", "password" = EXCLUDED."password", "updatedAt" = NOW();

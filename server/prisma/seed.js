@@ -11,7 +11,7 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 
 /**
  * Seed Credentials:
- * All seeded accounts (admin@dams.com, john@example.com, sarah@example.com)
+ * All seeded accounts (admin@smk.com, john@example.com, sarah@example.com)
  * share the default plain-text password: Admin@123
  */
 

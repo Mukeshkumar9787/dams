@@ -211,13 +211,14 @@ const Contact = () => {
               </div>
               <div className="h-[420px] w-full">
                 <iframe
-                  title="google-map"
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3915.1284225170953!2d77.37476937590091!3d11.103805453068034!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba907001591418b%3A0xe7e5829e7d28960e!2sDAMS%203D%20PRINTING!5e0!3m2!1sen!2sin!4v1771604589585!5m2!1sen!2sin"
-                  className="h-full w-full"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d606861.7374255045!2d76.52628908749591!3d11.14793662389917!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba907b0424d75b9%3A0x4750551698a91687!2sTiruppur%2C%20Tamil%20Nadu!5e0!3m2!1sen!2sin!4v1792996249754!5m2!1sen!2sin"
+                  width="600"
+                  height="450"
                   style={{ border: 0 }}
                   allowFullScreen
                   loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  title="Google Maps - Tiruppur, Tamil Nadu"
                 />
               </div>
             </div>
